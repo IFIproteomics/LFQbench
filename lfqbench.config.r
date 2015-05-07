@@ -1,9 +1,9 @@
 # data folder
-DataRootFolder = "../hye.r/proteins_builtin"
+DataRootFolder = "data"
 
 # protein quantification input data CSV format
-InputExtensionPattern = "\\.csv$"
-CsvColumnSeparator = ","
+InputExtensionPattern = "\\.tsv$"
+CsvColumnSeparator = "\t"
 CsvDecimalPointChar = "."
 
 # quantitative composition of samples
@@ -44,13 +44,13 @@ CenterLogRatioByBackground = T
 NormalizeAmountsToPPM = F
 
 # path to folder with protein quantification files
-InputFilesLocation = file.path(getwd(), DataRootFolder, "input")
+InputFilesLocation = file.path(DataRootFolder, "input")
 
 # target location for plot files 
-PlotFilesLocation = file.path(getwd(), DataRootFolder, "plot")
+PlotFilesLocation = file.path(DataRootFolder, "plot")
 
 # target location for log files
-LogFilesLocation   = file.path(getwd(), DataRootFolder,"log")
+LogFilesLocation   = file.path(DataRootFolder,"log")
 
 # graphics settings
 # pdf canvas size in inches

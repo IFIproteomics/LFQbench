@@ -10,8 +10,8 @@ plotResultSet = function( resSet )
   
   # accuracy and precision
   sapply( resSet$result, showScatterPlot )
-  sapply( resSet$result, showScatterAndDensityPlot )
-  sapply( resSet$result, showScatterAndBoxPlot )
+  sapply( resSet$result, showScatterAndDensityPlot, showRegLines=T )
+  sapply( resSet$result, showScatterAndBoxPlot, showRegLines=T )
   sapply( resSet$result, showLogRatioBoxPlot )
   sapply( resSet$result, showQuantBarPlot )
   sapply( resSet$result, showDistributionDensityPlot )
