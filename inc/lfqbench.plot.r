@@ -1,6 +1,6 @@
 ################################################################################
 # user defined R graphics parameters
-if(!exists("GraphicsParameters")) GraphicsParameters = list(
+if(!exists("cfg$par")) cfg$par = list(
     # plot area margins: c(bottom, left, top, right)
     mar=c(3,3.2,.5,.5),
     # plot axis: c(title, label, line)
@@ -9,20 +9,20 @@ if(!exists("GraphicsParameters")) GraphicsParameters = list(
     las=1
   )
 # backup original R graphics parameters
-GraphicsParametersBackup = par()[ names(GraphicsParameters) ]
-if(!exists("PlotCurveLineWidth")) PlotCurveLineWidth = 2
-if(!exists("PlotLegendLineWidth")) PlotLegendLineWidth = 8
-if(!exists("PlotPointSize")) PlotPointSize = 2
-if(!exists("ScatterPlotPointType")) ScatterPlotPointType = "."
+cfg$parBackup = par()[ names(cfg$par) ]
+if(!exists("cfg$PlotCurveLineWidth")) cfg$PlotCurveLineWidth = 2
+if(!exists("cfg$PlotLegendLineWidth")) cfg$PlotLegendLineWidth = 8
+if(!exists("cfg$PlotPointSize")) cfg$PlotPointSize = 2
+if(!exists("cfg$ScatterPlotPointType")) cfg$ScatterPlotPointType = "."
 ################################################################################
 
 ################################################################################
 plotToFile = function( file, plotFunc, ... )
 {
-  pdf(file=file, onefile=T, width=PlotWidth, height=PlotHeight, family="Helvetica", pointsize=9)
-  par(GraphicsParameters)
+  pdf(file=file, onefile=T, width=cfg$PlotWidth, height=cfg$PlotHeight, family="Helvetica", pointsize=9)
+  par(cfg$par)
   if(is.function(plotFunc)) res = plotFunc(...)
-  par(GraphicsParametersBackup)
+  par(cfg$parBackup)
   dev.off()
   if(exists("res")) return(res)
 }
@@ -94,32 +94,32 @@ scaleColor=function(col, scale=1.5, alpha=1)
 ################################################################################
 plotSpeciesLegend = function( pos="top", ... )
 {
-  legend(x=pos, legend=AllSpeciesNames, col=SpeciesColors, lwd=PlotLegendLineWidth, inset=.02, bg="white", ...)	
+  legend(x=pos, legend=cfg$AllSpeciesNames, col=cfg$SpeciesColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white", ...)	
 }
 ################################################################################
 
 ################################################################################
 plotSpeciesLegends = function()
 {
-  pdf(file = PlotFilesLocation + "/species_legend_vertical.pdf", width = 1.05, height = 0.66, family = "Helvetica", pointsize = 9)
+  pdf(file = cfg$PlotFilesLocation + "/species_legend_vertical.pdf", width = 1.05, height = 0.66, family = "Helvetica", pointsize = 9)
   par(mar=c(0,0,0.1,0))
   emptyPlot( 0:1, 0:1, lwd=0, grid=F, showXlab=F, showYlab=F, axes=F )
   plotSpeciesLegend(pos="top", horiz=F )
   dev.off()
-  pdf(file = PlotFilesLocation + "/species_legend_horizontal.pdf", width = 2.9, height = 0.35, family = "Helvetica", pointsize = 9)
+  pdf(file = cfg$PlotFilesLocation + "/species_legend_horizontal.pdf", width = 2.9, height = 0.35, family = "Helvetica", pointsize = 9)
   par(mar=c(0,0,0.1,0))
   emptyPlot( 0:1, 0:1, lwd=0, grid=F, showXlab=F, showYlab=F, axes=F )
   plotSpeciesLegend(pos="top", horiz=T )
   dev.off()
-  par(GraphicsParametersBackup)
+  par(cfg$parBackup)
 }
 ################################################################################
 
 ################################################################################
 # draw scatterplot
-showScatterPlot = function( samplePair, showLegend=F, pointType=ScatterPlotPointType, pointSize=PlotPointSize, cex.lab=1.2, cex.axis=1 )
+showScatterPlot = function( samplePair, showLegend=F, pointType=cfg$ScatterPlotPointType, pointSize=cfg$PlotPointSize, cex.lab=1.2, cex.axis=1 )
 {
-  par(GraphicsParameters)
+  par(cfg$par)
   emptyPlot(samplePair$xlim, samplePair$ylim, grid=F, cex.axis=cex.axis)
   title(main="",
         xlab=as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ),
@@ -138,7 +138,7 @@ showScatterPlot = function( samplePair, showLegend=F, pointType=ScatterPlotPoint
                       function(d) 
                       {
                         theCol = scaleColor(d$col,.8)
-                        hLine(y=d$expectation, lty=2, lwd=PlotCurveLineWidth, col=theCol )
+                        hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=theCol )
                         return(d$expectation) 
                       }
               )
@@ -147,7 +147,7 @@ showScatterPlot = function( samplePair, showLegend=F, pointType=ScatterPlotPoint
   
   if(showLegend) plotSpeciesLegend()
   
-  par(GraphicsParametersBackup)
+  par(cfg$parBackup)
 }
 ################################################################################
 
@@ -155,16 +155,16 @@ showScatterPlot = function( samplePair, showLegend=F, pointType=ScatterPlotPoint
 # draw log ratio quiantile based boxplot
 showLogRatioBoxPlot = function(samplePair)
 {
-  par(GraphicsParameters)
+  par(cfg$par)
   logRatios = sapply( samplePair$data, function(d) { return(d$y) } )
   qboxplot( logRatios, pch=20,
       ylab=as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ),
-      whiskerQuantile=BoxPlotWhiskerQuantile, axes=F, lims=LogRatioPlotRange,
+      whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F, lims=cfg$LogRatioPlotRange,
     )
   addAxes(showXlab=F)
-  axis(1, labels=AllSpeciesNames, at=(1:NumberOfSpecies), lwd.ticks=1, lwd=0)
+  axis(1, labels=cfg$AllSpeciesNames, at=(1:cfg$NumberOfSpecies), lwd.ticks=1, lwd=0)
   grid()
-  par(GraphicsParametersBackup)
+  par(cfg$parBackup)
 }
 ################################################################################
 
@@ -172,7 +172,7 @@ showLogRatioBoxPlot = function(samplePair)
 # draw barplot showing quantification bars
 showQuantBarPlot = function(samplePair)
 {
-  par(GraphicsParameters)
+  par(cfg$par)
   # emptyPlot(samplePair$xlim, samplePair$ylim)
   
   values = unlist(sapply( samplePair$data, function(d) { return(d$y) } ))
@@ -193,8 +193,8 @@ showQuantBarPlot = function(samplePair)
   
   legendLabels = sapply( samplePair$data, function(d) d$species )
   legendColors = sapply( samplePair$data, function(d) d$col )
-  legend(x="topright", legend=legendLabels, col=legendColors, lwd=PlotLegendLineWidth, inset=.02, bg="white")
-  par(GraphicsParametersBackup)
+  legend(x="topright", legend=legendLabels, col=legendColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white")
+  par(cfg$parBackup)
 }
 ################################################################################
 
@@ -202,7 +202,7 @@ showQuantBarPlot = function(samplePair)
 # draw scatter- and density plot
 showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F)
 {
-	par(GraphicsParameters)
+	par(cfg$par)
 	par(fig=c(0,0.7,0,1), new=F)
 	
 	# scatter plot
@@ -211,17 +211,17 @@ showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F)
 		xlab=as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ),
 		ylab=as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) )
 	)
-	# logRatios = sapply( samplePair$data, function(d) { points( d$x, d$y, pch=ScatterPlotPointType, col=d$col, cex=PlotPointSize ); return(d$y) } )
+	# logRatios = sapply( samplePair$data, function(d) { points( d$x, d$y, pch=cfg$ScatterPlotPointType, col=d$col, cex=cfg$PlotPointSize ); return(d$y) } )
 	logRatios = sapply( samplePair$data, function(d) { 
-	  points( d$x, d$y, pch=ScatterPlotPointType, col=d$col, cex=PlotPointSize )
+	  points( d$x, d$y, pch=cfg$ScatterPlotPointType, col=d$col, cex=cfg$PlotPointSize )
 	  if(showRegLines)
 	  {
 	    regLine = lowess( d$x, d$y )
-	    lines( regLine, col=scaleColor(d$col,.5), lty=5, lwd=PlotCurveLineWidth )
+	    lines( regLine, col=scaleColor(d$col,.5), lty=5, lwd=cfg$PlotCurveLineWidth )
 	  }
 	  return(d$y)
 	} )
-  expRatios = sapply( samplePair$data, function(d) { hLine(y=d$expectation, lty=2, lwd=PlotCurveLineWidth, col=scaleColor(d$col,.8) ); return(d$expectation) } )
+  expRatios = sapply( samplePair$data, function(d) { hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=scaleColor(d$col,.8) ); return(d$expectation) } )
 	
 	if(showLegend) plotSpeciesLegend( horiz=T )
 	
@@ -239,12 +239,12 @@ showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F)
 		function(d) 
 		{
 			idx = d$density$x > min(d$y) & d$density$x < max(d$y)
-			lines(d$density$y[idx], d$density$x[idx] , type="l", col=d$col, lwd=PlotCurveLineWidth ) 
-			hLine(y=d$expectation, lty=2, lwd=PlotCurveLineWidth, col=scaleColor(d$col,.8) )
+			lines(d$density$y[idx], d$density$x[idx] , type="l", col=d$col, lwd=cfg$PlotCurveLineWidth ) 
+			hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=scaleColor(d$col,.8) )
 		}
 	)
 	
-	par(GraphicsParametersBackup)
+	par(cfg$parBackup)
 	par(fig=c(0,1,0,1), new=F)
 }
 ################################################################################
@@ -253,7 +253,7 @@ showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F)
 # draw scatter- and boxplot
 showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F)
 {
-  par(GraphicsParameters)
+  par(cfg$par)
   par(fig=c(0,0.7,0,1), new=F)
   
   # scatter plot
@@ -264,15 +264,15 @@ showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F)
   )
   nSets = length(samplePair$data)
   logRatios = sapply( samplePair$data, function(d) { 
-    points( d$x, d$y, pch=ScatterPlotPointType, col=d$col, cex=PlotPointSize )
+    points( d$x, d$y, pch=cfg$ScatterPlotPointType, col=d$col, cex=cfg$PlotPointSize )
     if(showRegLines)
     {
       regLine = lowess( d$x, d$y )
-      lines( regLine, col=scaleColor(d$col,.5), lty=5, lwd=PlotCurveLineWidth )
+      lines( regLine, col=scaleColor(d$col,.5), lty=5, lwd=cfg$PlotCurveLineWidth )
     }
     return(d$y)
   } )
-  expRatios = sapply( samplePair$data, function(d) { hLine(y=d$expectation, lty=2, lwd=PlotCurveLineWidth, col=scaleColor(d$col,.8) ); return(d$expectation) } )
+  expRatios = sapply( samplePair$data, function(d) { hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=scaleColor(d$col,.8) ); return(d$expectation) } )
   
   if(showLegend) plotSpeciesLegend( horiz=T )
   
@@ -284,13 +284,13 @@ showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F)
   
   qboxplot( logRatios, pch=20,
             ylab=as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ),
-            whiskerQuantile=BoxPlotWhiskerQuantile, axes=F, lims=samplePair$ylim, border=SpeciesColors
+            whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F, lims=samplePair$ylim, border=cfg$SpeciesColors
   )
   
   # add horizontal lines
-  expRatios = sapply( samplePair$data, function(d) { hLine(y=d$expectation, lty=2, lwd=PlotCurveLineWidth, col=scaleColor(d$col,.8) ); return(d$expectation) } )
+  expRatios = sapply( samplePair$data, function(d) { hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=scaleColor(d$col,.8) ); return(d$expectation) } )
   
-  par(GraphicsParametersBackup)
+  par(cfg$parBackup)
   par(fig=c(0,1,0,1), new=F)
 }
 ################################################################################
@@ -301,17 +301,17 @@ showDistributionDensityPlot = function(samplePair, showLegend=F)
 {
   xLim=samplePair$ylim
   yLim=range( lapply(samplePair$data, function(d) range(d$density$y) ) )
-  par(GraphicsParameters)
+  par(cfg$par)
   emptyPlot(xLim, yLim)
   title(main="",
         xlab=as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ), 
         ylab="Density"
   )
-  sapply(samplePair$data, function(d) lines(d$density, type="l", col=d$col, lwd=PlotCurveLineWidth ) )
+  sapply(samplePair$data, function(d) lines(d$density, type="l", col=d$col, lwd=cfg$PlotCurveLineWidth ) )
 
   if(showLegend) plotSpeciesLegend( )
   
-  par(GraphicsParametersBackup)
+  par(cfg$parBackup)
 }
 ################################################################################
 
@@ -319,7 +319,7 @@ showDistributionDensityPlot = function(samplePair, showLegend=F)
 # draw quantification curve
 showAllSpeciesQC = function(samplePair)
 {
-  par(GraphicsParameters)
+  par(cfg$par)
   emptyPlot(xRange=samplePair$qcrange)
   x = (1:500)/500*samplePair$qcrange[2]
   title(
@@ -327,31 +327,31 @@ showAllSpeciesQC = function(samplePair)
     xlab=as.expression( bquote( "Absolute"~log[2]~"("~.(samplePair$name1)~":"~.(samplePair$name2)~")" ) ),
     ylab="Parts"
   )
-  sapply(samplePair$data, function(d) lines(x, d$qcfunction(x), type="l", col=d$col, lwd=PlotCurveLineWidth ) )
+  sapply(samplePair$data, function(d) lines(x, d$qcfunction(x), type="l", col=d$col, lwd=cfg$PlotCurveLineWidth ) )
   legendLabels = sapply( samplePair$data, function(d) d$species + ": " + d$auqc )
   legendColors = sapply( samplePair$data, function(d) d$col )
-  legend(x="bottomright", legend=legendLabels, col=legendColors, lwd=PlotLegendLineWidth, inset=.02, bg="white")
-  par(GraphicsParametersBackup)
+  legend(x="bottomright", legend=legendLabels, col=legendColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white")
+  par(cfg$parBackup)
 }
 ################################################################################
 
 ################################################################################
 showSingleSpeciesQC = function(samplePairsData, speciesName="MOUSE")
 {
-  speciesIndex = which( AllSpeciesNames == speciesName )
-  par( GraphicsParameters )
-  emptyPlot( xRange=AUQCRatioRange )
+  speciesIndex = which( cfg$AllSpeciesNames == speciesName )
+  par( cfg$par )
+  emptyPlot( xRange=cfg$AUQCRatioRange )
   title(
     main="",
     xlab=as.expression( bquote( Absolute~log[2]-ratio~"for"~.(speciesName) ) ),
     ylab="Parts"
   )
-  x = (1:500)/500*AUQCRatioRange[2]
-  sapply(samplePairsData, function(sp){ lines(x, sp$data[[speciesIndex]]$qcfunction(x), type="l", col=sp$col, lwd=PlotCurveLineWidth ) } )
+  x = (1:500)/500*cfg$AUQCRatioRange[2]
+  sapply(samplePairsData, function(sp){ lines(x, sp$data[[speciesIndex]]$qcfunction(x), type="l", col=sp$col, lwd=cfg$PlotCurveLineWidth ) } )
   legendLabels = sapply( samplePairsData, function(sp) "auqc("+sp$name1+":"+sp$name2+"): "+sp$data[[speciesIndex]]$auqc )
   legendColors = sapply( samplePairsData, function(sp) sp$col )
-  legend(x="bottomright", legend=legendLabels, col=legendColors, lwd=PlotLegendLineWidth, inset=.02, bg="white")
-  par( GraphicsParametersBackup )
+  legend(x="bottomright", legend=legendLabels, col=legendColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white")
+  par( cfg$parBackup )
 }
 ################################################################################
 
@@ -359,13 +359,13 @@ showSingleSpeciesQC = function(samplePairsData, speciesName="MOUSE")
 # draw protein dispersion between replicates by species
 plotProteinDispersionBySpecies = function( d )
 {
-  d4s = sapply( AllSpeciesNames, function(sp) as.vector( na.exclude( d$cv[ d$species==sp ] ) ) )
-  par(GraphicsParameters)
-  qboxplot(d4s, pch=20, ylab="Protein quantification dispersion (CV)", whiskerQuantile=BoxPlotWhiskerQuantile, axes=F )
+  d4s = sapply( cfg$AllSpeciesNames, function(sp) as.vector( na.exclude( d$cv[ d$species==sp ] ) ) )
+  par(cfg$par)
+  qboxplot(d4s, pch=20, ylab="Protein quantification dispersion (CV)", whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F )
   addAxes(showXlab=F)
-  axis(1, labels=AllSpeciesNames, at=(1:NumberOfSpecies), lwd.ticks=1, lwd=0)
+  axis(1, labels=cfg$AllSpeciesNames, at=(1:cfg$NumberOfSpecies), lwd.ticks=1, lwd=0)
   grid()
-  par(GraphicsParametersBackup)
+  par(cfg$parBackup)
 }
 ################################################################################
 
@@ -373,13 +373,13 @@ plotProteinDispersionBySpecies = function( d )
 # draw protein dispersion between replicates by sample
 plotProteinDispersionBySample = function( d )
 {
-  d4s = sapply( 1:NumberOfSamples, function(si) as.vector( na.exclude( d$cv[,si] ) ) )
-  par(GraphicsParameters)
-  qboxplot(d4s, pch=20, ylab="Protein quantification dispersion (CV)", whiskerQuantile=BoxPlotWhiskerQuantile, axes=F )
+  d4s = sapply( 1:cfg$NumberOfSamples, function(si) as.vector( na.exclude( d$cv[,si] ) ) )
+  par(cfg$par)
+  qboxplot(d4s, pch=20, ylab="Protein quantification dispersion (CV)", whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F )
   addAxes(showXlab=F)
-  axis(1, labels=AllSampleNames, at=(1:NumberOfSamples), lwd.ticks=1, lwd=0)
+  axis(1, labels=cfg$AllSampleNames, at=(1:cfg$NumberOfSamples), lwd.ticks=1, lwd=0)
   grid()
-  par(GraphicsParametersBackup)
+  par(cfg$parBackup)
 }
 ################################################################################
 
@@ -387,22 +387,22 @@ plotProteinDispersionBySample = function( d )
 plotLogRatios = function( logRatios, File )
 {
   cat("creating log ratio box plot ...")
-  pdf(file=File, onefile=T, width=PlotWidth*1.5, height=PlotHeight*2, family="Helvetica", pointsize=9)
+  pdf(file=File, onefile=T, width=cfg$PlotWidth*1.5, height=cfg$PlotHeight*2, family="Helvetica", pointsize=9)
   
-  par(GraphicsParameters)
+  par(cfg$par)
   par( las=2 )
-  mars = GraphicsParameters$mar
+  mars = cfg$par$mar
   mars[1] = 14
   par( mar = mars )
   qboxplot( logRatios, pch=20,
             ylab=as.expression( bquote( Log[2]~"(A:B)" ) ),
-            whiskerQuantile=BoxPlotWhiskerQuantile, axes=F, lims=LogRatioPlotRange, lwd=1, cex=PlotPointSize
+            whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F, lims=cfg$LogRatioPlotRange, lwd=1, cex=cfg$PlotPointSize
   )
   addAxes(showXlab=F)
   par()
   axis(1, labels=names(logRatios), at=(1:length(logRatios)), lwd.ticks=1, lwd=0)
   # grid()
-  par(GraphicsParametersBackup)
+  par(cfg$parBackup)
   
   dev.off()
   cat("[done]\n")
@@ -413,22 +413,22 @@ plotLogRatios = function( logRatios, File )
 plotCVs = function( CVs, File )
 {
   cat("creating CV boxplot ...")
-  pdf(file=File, onefile=T, width=PlotWidth*1.5, height=PlotHeight*1.5, family="Helvetica", pointsize=9)
+  pdf(file=File, onefile=T, width=cfg$PlotWidth*1.5, height=cfg$PlotHeight*1.5, family="Helvetica", pointsize=9)
   
-  par(GraphicsParameters)
+  par(cfg$par)
   par( las=2 )
-  mars = GraphicsParameters$mar
+  mars = cfg$par$mar
   mars[1] = 10
   par( mar = mars )
   qboxplot( CVs, pch=20,
             ylab="Protein quantification dispersion (CV)",
-            whiskerQuantile=BoxPlotWhiskerQuantile, axes=F, lims=range(CVs, na.rm = T), lwd=1, cex=PlotPointSize
+            whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F, lims=range(CVs, na.rm = T), lwd=1, cex=cfg$PlotPointSize
   )
   addAxes( showXlab=F )
   par()
   axis(1, labels=names(CVs), at=(1:length(CVs)), lwd.ticks=1, lwd=0)
   # grid()
-  par(GraphicsParametersBackup)
+  par(cfg$parBackup)
   
   dev.off()
   cat("[done]\n")
@@ -437,10 +437,10 @@ plotCVs = function( CVs, File )
 
 ################################################################################
 plotSampleComposition = function(
-  sampleAmounts = data.frame( SampleComposition, row.names = 1  ),
+  sampleAmounts = data.frame( cfg$SampleComposition, row.names = 1  ),
   bgColors=NULL, fgColors=NULL, 
   labMainSize=1.5,
-  pdfFile=PlotFilesLocation+"/SampleComposition.pdf",
+  pdfFile=cfg$PlotFilesLocation+"/SampleComposition.pdf",
   pdfWidth=2, pdfHeight=3,
   pdfFontSize=9, pdfFontFamily="Helvetica",
   pdfMar=c(2.3,2.8,.5,4.6)

@@ -3,48 +3,48 @@ loadLibrary("RColorBrewer")
 
 ################################################################################
 # create input/output paths
-sapply( c(InputFilesLocation, PlotFilesLocation, LogFilesLocation), mkdir )
+sapply( c(cfg$InputFilesLocation, cfg$PlotFilesLocation, cfg$LogFilesLocation), mkdir )
 ################################################################################
 
 ################################################################################
 # process composition of samples
-AllSampleNames = as.vector( colnames(SampleComposition)[-1] )
-AllSpeciesNames = as.vector( SampleComposition[,1] )
-AllExpectedAmounts = as.matrix( SampleComposition[,-1] )
-rownames(AllExpectedAmounts) = AllSpeciesNames
-NumberOfSamples = length(AllSampleNames)
-NumberOfSpecies = length(AllSpeciesNames)
-SampleColors = brewer.pal(max(NumberOfSamples,3),"Dark2")[1:NumberOfSamples]
-SpeciesColors = brewer.pal(max(NumberOfSpecies,3),"Dark2")[1:NumberOfSpecies]
+cfg$AllSampleNames = as.vector( colnames(cfg$SampleComposition)[-1] )
+cfg$AllSpeciesNames = as.vector( cfg$SampleComposition[,1] )
+cfg$AllExpectedAmounts = as.matrix( cfg$SampleComposition[,-1] )
+rownames(cfg$AllExpectedAmounts) = cfg$AllSpeciesNames
+cfg$NumberOfSamples = length(cfg$AllSampleNames)
+cfg$NumberOfSpecies = length(cfg$AllSpeciesNames)
+cfg$SampleColors = brewer.pal(max(cfg$NumberOfSamples,3),"Dark2")[1:cfg$NumberOfSamples]
+cfg$SpeciesColors = brewer.pal(max(cfg$NumberOfSpecies,3),"Dark2")[1:cfg$NumberOfSpecies]
 ################################################################################
 
 ################################################################################
-AUQCRatioRange = c(0, MaxLogRatioForAUQC)
+cfg$AUQCRatioRange = c(0, cfg$MaxLogRatioForAUQC)
 ################################################################################
 
 ################################################################################
 # create sample index pairs
-SamplePairsIndices   = createNumericPairs( 1, NumberOfSamples )
-NumberOfSamplePairs = nrow( SamplePairsIndices )
-SamplePairsLabels = apply(SamplePairsIndices, 1, function(sp){nms = AllSampleNames[sp]; return(nms[1]+":"+nms[2])} )
-SamplePairsColors  	= brewer.pal( max(NumberOfSamplePairs,3), "Dark2" )[1:NumberOfSamplePairs]
+cfg$SamplePairsIndices   = createNumericPairs( 1, cfg$NumberOfSamples )
+cfg$NumberOfSamplePairs = nrow( cfg$SamplePairsIndices )
+cfg$SamplePairsLabels = apply(cfg$SamplePairsIndices, 1, function(sp){nms = cfg$AllSampleNames[sp]; return(nms[1]+":"+nms[2])} )
+cfg$SamplePairsColors  	= brewer.pal( max(cfg$NumberOfSamplePairs,3), "Dark2" )[1:cfg$NumberOfSamplePairs]
 ################################################################################
 
 ################################################################################
-AllSpeciesPairs = createNumericPairs(1, NumberOfSpecies)
-AllSpeciesPairsLabels = apply(AllSpeciesPairs, 1, function(sp){nms = AllSpeciesNames[sp]; return(nms[1]+"-"+nms[2])} )
+cfg$AllSpeciesPairs = createNumericPairs(1, cfg$NumberOfSpecies)
+cfg$AllSpeciesPairsLabels = apply(cfg$AllSpeciesPairs, 1, function(sp){nms = cfg$AllSpeciesNames[sp]; return(nms[1]+"-"+nms[2])} )
 ################################################################################
 
 ################################################################################
 # key-accession-entry-species translation
 cat( "reading protein to species database ... " )
-IdToSpeciesFile = "inc/hye.id2species.csv"
+cfg$IdToSpeciesFile = "inc/hye.id2species.csv"
 IdToSpeciesTable = NULL
 getSpeciesForIds = function( IDs )
 {
   if(is.null(IdToSpeciesTable))
   {
-    IdToSpeciesTable <<- read.table(file=IdToSpeciesFile, header=T, sep=";")
+    IdToSpeciesTable <<- read.table(file=cfg$IdToSpeciesFile, header=T, sep=";")
   }
   as.vector( IdToSpeciesTable$species[ match(IDs, IdToSpeciesTable$id, nomatch=NA, incomparables=NA) ] )
 }

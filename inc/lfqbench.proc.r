@@ -7,7 +7,7 @@ processData = function( DocSet )
   
   ################################################################################
   # read run based data
-  csvDat = read.table(DocSet$csvFile, sep=CsvColumnSeparator, dec=CsvDecimalPointChar, header=T)
+  csvDat = read.table(DocSet$csvFile, sep=cfg$CsvColumnSeparator, dec=cfg$CsvDecimalPointChar, header=T)
   csvIDs = as.vector( csvDat[,1] )
   # csvAmounts = as.matrix( csvDat[,-1] )  ## Old version, it does not support additional factor columns 
   csvAmounts = as.matrix( csvDat[, sapply(csvDat, class) == "numeric" | sapply(csvDat, class) == "integer"] )
@@ -19,7 +19,7 @@ processData = function( DocSet )
   rm( csvDat )
   ################################################################################
   # check OTHER species
-  benchedSpeciesIndices = unlist(sapply( AllSpeciesNames, function(spc) which(csvSpecies==spc) ), use.names = F)
+  benchedSpeciesIndices = unlist(sapply( cfg$AllSpeciesNames, function(spc) which(csvSpecies==spc) ), use.names = F)
   otherSpeciesIndices = (1:length(csvIDs))[ -benchedSpeciesIndices ]
   otherSpeciesIDs = csvIDs[ otherSpeciesIndices ]
   NumberOfProteinsForOtherSpecies = length(otherSpeciesIndices)
@@ -29,15 +29,15 @@ processData = function( DocSet )
   csvSpecies = csvSpecies[ benchedSpeciesIndices ]
   ################################################################################
   # normalize protein amounts to ppm
-  if(NormalizeAmountsToPPM) csvAmounts = apply( csvAmounts, 2, function(x) x / sum(x, na.rm=T) * 1000000 )
+  if(cfg$NormalizeAmountsToPPM) csvAmounts = apply( csvAmounts, 2, function(x) x / sum(x, na.rm=T) * 1000000 )
   ################################################################################
   
   ################################################################################
   # extract data for a single sample
-  getSampleAverage = function(sampleIndex, nRuns=floor( ncol(csvAmounts) / NumberOfSamples ))
+  getSampleAverage = function(sampleIndex, nRuns=floor( ncol(csvAmounts) / cfg$NumberOfSamples ))
   {
     amount = as.matrix( csvAmounts[, ((sampleIndex-1)*nRuns + 1):(nRuns * sampleIndex)] )
-    amount[amount < MinProteinAmount] = NA
+    amount[amount < cfg$MinProteinAmount] = NA
     avg = rowMeans( amount, na.rm=T )
     std = apply( amount, 1, sd, na.rm=T )
     rsd = std / avg
@@ -45,27 +45,27 @@ processData = function( DocSet )
   }
   ################################################################################
   # generate sample average data
-  SampleAverageData = lapply( 1:NumberOfSamples, getSampleAverage )
-  SampleAverageAmounts = sapply( 1:NumberOfSamples, function(si) SampleAverageData[[si]]$mean )
-  SampleAverageCVs = sapply( 1:NumberOfSamples, function(si) SampleAverageData[[si]]$cv )
+  SampleAverageData = lapply( 1:cfg$NumberOfSamples, getSampleAverage )
+  SampleAverageAmounts = sapply( 1:cfg$NumberOfSamples, function(si) SampleAverageData[[si]]$mean )
+  SampleAverageCVs = sapply( 1:cfg$NumberOfSamples, function(si) SampleAverageData[[si]]$cv )
   SampleAverageSpecies = csvSpecies
   SampleAverageProteinIDs = csvIDs
   rownames(SampleAverageAmounts) = SampleAverageProteinIDs
   rownames(SampleAverageCVs) = SampleAverageProteinIDs
-  colnames(SampleAverageAmounts) = AllSampleNames
-  colnames(SampleAverageCVs) = AllSampleNames
+  colnames(SampleAverageAmounts) = cfg$AllSampleNames
+  colnames(SampleAverageCVs) = cfg$AllSampleNames
   ################################################################################
   
   ################################################################################
   # create protein identification statistics
-  NumberOfProteinsBySpecies = sapply( AllSpeciesNames, function(x) length( which(SampleAverageSpecies == x) ) )
+  NumberOfProteinsBySpecies = sapply( cfg$AllSpeciesNames, function(x) length( which(SampleAverageSpecies == x) ) )
   NumberOfProteinsBySpecies["OTHER"] = NumberOfProteinsForOtherSpecies
   ################################################################################
   
   ################################################################################
   # handle missing and low amount values
-  # SampleAverageAmounts[ is.na(SampleAverageAmounts) ] = MinProteinAmount
-  # SampleAverageAmounts[ SampleAverageAmounts < MinProteinAmount ] = MinProteinAmount
+  # SampleAverageAmounts[ is.na(SampleAverageAmounts) ] = cfg$MinProteinAmount
+  # SampleAverageAmounts[ SampleAverageAmounts < cfg$MinProteinAmount ] = cfg$MinProteinAmount
   ################################################################################
   
   ################################################################################
@@ -74,16 +74,16 @@ processData = function( DocSet )
   {
     ################################################################################
     # extract sample pair data
-    SamplePairColor = SamplePairsColors[SamplePairIndex]
-    Sample1Index = SamplePairsIndices[SamplePairIndex,1]
-    Sample2Index = SamplePairsIndices[SamplePairIndex,2]
-    Sample1Name = AllSampleNames[Sample1Index]
-    Sample2Name = AllSampleNames[Sample2Index]
+    SamplePairColor = cfg$SamplePairsColors[SamplePairIndex]
+    Sample1Index = cfg$SamplePairsIndices[SamplePairIndex,1]
+    Sample2Index = cfg$SamplePairsIndices[SamplePairIndex,2]
+    Sample1Name = cfg$AllSampleNames[Sample1Index]
+    Sample2Name = cfg$AllSampleNames[Sample2Index]
     Sample1ProteinAmounts = SampleAverageAmounts[,Sample1Index]
     Sample2ProteinAmounts = SampleAverageAmounts[,Sample2Index]
     SpeciesNames = SampleAverageSpecies
     ProteinIDs = SampleAverageProteinIDs
-    LogRatioExpectations = log2( AllExpectedAmounts[,Sample1Index] / AllExpectedAmounts[,Sample2Index] )
+    LogRatioExpectations = log2( cfg$AllExpectedAmounts[,Sample1Index] / cfg$AllExpectedAmounts[,Sample2Index] )
     ################################################################################
     
     ################################################################################
@@ -102,9 +102,9 @@ processData = function( DocSet )
     
     ################################################################################
     # drop invalid log ratios
-    if(DropInvalidLogRatio)
+    if(cfg$DropInvalidLogRatio)
     {
-      ValidLogRatioIndices = LogRatio >= LogRatioValidityRange[1] & LogRatio <= LogRatioValidityRange[2]
+      ValidLogRatioIndices = LogRatio >= cfg$LogRatioValidityRange[1] & LogRatio <= cfg$LogRatioValidityRange[2]
       invalidLogRatios = data.frame(
 	      	entry = ProteinIDs[!ValidLogRatioIndices],
 	      	species = SpeciesNames[!ValidLogRatioIndices],
@@ -122,17 +122,17 @@ processData = function( DocSet )
     
     ################################################################################
     # calculate log-ratio means and medians
-    LogRatioMedians = sapply(AllSpeciesNames, function(x) median( LogRatio[SpeciesNames==x], na.rm=T ))
-    LogRatioMeans = sapply(AllSpeciesNames, function(x) mean( LogRatio[SpeciesNames==x], na.rm=T ))
-    BackgroundSpeciesMedian = LogRatioMedians[AllSpeciesNames==BackgroundSpeciesName]
-    BackgroundSpeciesMean = LogRatioMeans[AllSpeciesNames==BackgroundSpeciesName]
+    LogRatioMedians = sapply(cfg$AllSpeciesNames, function(x) median( LogRatio[SpeciesNames==x], na.rm=T ))
+    LogRatioMeans = sapply(cfg$AllSpeciesNames, function(x) mean( LogRatio[SpeciesNames==x], na.rm=T ))
+    BackgroundSpeciesMedian = LogRatioMedians[cfg$AllSpeciesNames==cfg$BackgroundSpeciesName]
+    BackgroundSpeciesMean = LogRatioMeans[cfg$AllSpeciesNames==cfg$BackgroundSpeciesName]
     ################################################################################
     
     ################################################################################
     # center by mean, median, or not at all
-    if( CenterLogRatioByBackground || regexpr("median", CenterLogRatioByBackground, ignore.case=T) )
+    if( cfg$CenterLogRatioByBackground || regexpr("median", cfg$CenterLogRatioByBackground, ignore.case=T) )
       LogRatioAdjustmentValue = BackgroundSpeciesMedian 
-    else if(regexpr("mean", CenterLogRatioByBackground, ignore.case=T))
+    else if(regexpr("mean", cfg$CenterLogRatioByBackground, ignore.case=T))
       LogRatioAdjustmentValue = BackgroundSpeciesMean
     else
       LogRatioAdjustmentValue = 0
@@ -160,7 +160,7 @@ processData = function( DocSet )
     ScatterPlotXAxisData = log2( Sample2ProteinAmounts )
     # xLim = range(ScatterPlotXAxisData[ScatterPlotXAxisData>0])
     xLim = quantile( ScatterPlotXAxisData[ScatterPlotXAxisData>0], probs=c(0.01,0.99), na.rm = T )
-    yLim = LogRatioPlotRange
+    yLim = cfg$LogRatioPlotRange
     # ensure x-axis boundaries
     ScatterPlotXAxisData[ ScatterPlotXAxisData < xLim[1] ] = xLim[1]
     ScatterPlotXAxisData[ ScatterPlotXAxisData > xLim[2] ] = xLim[2]
@@ -171,19 +171,19 @@ processData = function( DocSet )
     packageSpecies = function( TheSpecies )
     {
       ValueIndices = which(SpeciesNames == TheSpecies)
-      SpeciesIndex = AllSpeciesNames == TheSpecies
+      SpeciesIndex = cfg$AllSpeciesNames == TheSpecies
       if(DEBUG) cat( TheSpecies + " has " + length( ValueIndices ) + " IDs ... \n")
       qcFunc = as.function(
-        getQCFunction( LogRatio[ValueIndices] - LogRatioMedians[SpeciesIndex], ensureValueRange=c(0, MaxLogRatioForAUQC) )
+        getQCFunction( LogRatio[ValueIndices] - LogRatioMedians[SpeciesIndex], ensureValueRange=c(0, cfg$MaxLogRatioForAUQC) )
       )
-      auqc = round( integrate( qcFunc, 0, MaxLogRatioForAUQC, stop.on.error=F )$value / MaxLogRatioForAUQC, 3)  
+      auqc = round( integrate( qcFunc, 0, cfg$MaxLogRatioForAUQC, stop.on.error=F )$value / cfg$MaxLogRatioForAUQC, 3)  
       return( 
         list(
           species = TheSpecies,
           x = ScatterPlotXAxisData[ ValueIndices ],
           y = LogRatio[ ValueIndices ],
           density = density(LogRatio[ ValueIndices ]),
-          col = SpeciesColors[ SpeciesIndex ],
+          col = cfg$SpeciesColors[ SpeciesIndex ],
           median = LogRatioMedians[ SpeciesIndex ],
           expectation = LogRatioExpectations[ SpeciesIndex ],
           shift = LogRatioMedians[ SpeciesIndex ] - LogRatioExpectations[ SpeciesIndex ],
@@ -194,8 +194,8 @@ processData = function( DocSet )
     }
     
     # package data for all species
-    dataBySpecies = lapply( AllSpeciesNames, packageSpecies )
-    names( dataBySpecies ) = AllSpeciesNames
+    dataBySpecies = lapply( cfg$AllSpeciesNames, packageSpecies )
+    names( dataBySpecies ) = cfg$AllSpeciesNames
     ################################################################################
     
     ################################################################################
@@ -209,13 +209,13 @@ processData = function( DocSet )
       return( AreaUnderROCCurveByValue )
     }
     # ROC-AUC for all species pairs
-    spcPairsSepRates = apply(AllSpeciesPairs, 1, function(sp) getSepRate( dataBySpecies, AllSpeciesNames[sp] ) )
-    names(spcPairsSepRates) = AllSpeciesPairsLabels
+    spcPairsSepRates = apply(cfg$AllSpeciesPairs, 1, function(sp) getSepRate( dataBySpecies, cfg$AllSpeciesNames[sp] ) )
+    names(spcPairsSepRates) = cfg$AllSpeciesPairsLabels
     ################################################################################
     
     ################################################################################
     # calculate species separation ROC-AUC for a species pair
-    getRangedSepRate = function(dataBySpecies, spcNames, ranges=IntensityBreaksForSpeciesSeparation)
+    getRangedSepRate = function(dataBySpecies, spcNames, ranges=cfg$Log2IntensityRangesForSpeciesSeparation)
     {
       l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
       l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
@@ -230,8 +230,8 @@ processData = function( DocSet )
       return( rangedAUCs )
     }
     
-    spcPairsRangedSeparationRates = apply(AllSpeciesPairs, 1, function(sp) getRangedSepRate( dataBySpecies, AllSpeciesNames[sp] ) )
-    colnames(spcPairsRangedSeparationRates) = AllSpeciesPairsLabels
+    spcPairsRangedSeparationRates = apply(cfg$AllSpeciesPairs, 1, function(sp) getRangedSepRate( dataBySpecies, cfg$AllSpeciesNames[sp] ) )
+    colnames(spcPairsRangedSeparationRates) = cfg$AllSpeciesPairsLabels
     ################################################################################
     
     ################################################################################
@@ -249,7 +249,7 @@ processData = function( DocSet )
       separation = spcPairsSepRates,
       separationRanged = spcPairsRangedSeparationRates,
       adjustment = LogRatioAdjustmentValue,
-      qcrange = AUQCRatioRange,
+      qcrange = cfg$AUQCRatioRange,
       allLogRatios = allLogRatios,
       validLogRatios = validLogRatios,
       invalidLogRatios = invalidLogRatios,
@@ -265,7 +265,7 @@ processData = function( DocSet )
   
   ################################################################################
   # process all sample pairs
-  SamplePairsData = lapply(1:NumberOfSamplePairs, getSamplePairData)
+  SamplePairsData = lapply(1:cfg$NumberOfSamplePairs, getSamplePairData)
   names(SamplePairsData) = sapply( SamplePairsData, function(d) d$name1+":"+d$name2 )
   ################################################################################
   

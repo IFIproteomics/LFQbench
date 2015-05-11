@@ -1,13 +1,15 @@
+cfg = list()
+
 # data folder
-DataRootFolder = "../lfqbench.testdata"
+cfg$DataRootFolder = "../lfqbench.testdata"
 
 # protein quantification input data CSV format
-InputExtensionPattern = "\\.tsv$"
-CsvColumnSeparator = "\t"
-CsvDecimalPointChar = "."
+cfg$InputExtensionPattern = "\\.tsv$"
+cfg$CsvColumnSeparator = "\t"
+cfg$CsvDecimalPointChar = "."
 
 # quantitative composition of samples
-SampleComposition = data.frame(
+cfg$SampleComposition = data.frame(
   species =c("HUMAN", "YEAST", "ECOLI"),
   A       =c(  65,       30,     05   ),
   B       =c(  65,       15,     20   )
@@ -15,29 +17,29 @@ SampleComposition = data.frame(
 
 # non regulated background species
 # has equal protein amounts in all samples
-BackgroundSpeciesName	= "HUMAN"
+cfg$BackgroundSpeciesName	= "HUMAN"
 
 # whiskers of boxplots will extend to given quantile
 # t.m. (1 - quantile*2) portion of data will be inside the whiskers
-BoxPlotWhiskerQuantile = 0.025
+cfg$BoxPlotWhiskerQuantile = 0.025
 
 # missing protein amounts or amounts below this threshold 
 # will be approximated to it
 # value in ppm
-MinProteinAmount    = 0.0001
+cfg$MinProteinAmount    = 0.0001
 
 # log-ratios outside validity range will be droped
-DropInvalidLogRatio = T
-LogRatioValidityRange  = c(-10, 10)
+cfg$DropInvalidLogRatio = T
+cfg$LogRatioValidityRange  = c(-10, 10)
 
 # log-ratio range for plots
-LogRatioPlotRange   = c(-4, 4)
+cfg$LogRatioPlotRange   = c(-4, 4)
 
 # value used as maximum for AUQC quantification
-MaxLogRatioForAUQC  = 2
+cfg$MaxLogRatioForAUQC  = 2
 
 # split positions
-IntensityBreaksForSpeciesSeparation = rbind(
+cfg$Log2IntensityRangesForSpeciesSeparation = rbind(
   "<11"=c(0,11),
   "<12"=11:12,
   "<13"=12:13,
@@ -50,35 +52,33 @@ IntensityBreaksForSpeciesSeparation = rbind(
 
 # if TRUE then all log-ratios will be centered
 # by median log-ratio of background species
-CenterLogRatioByBackground = T
+cfg$CenterLogRatioByBackground = T
 
 # if TRUE then all protein amounts will be translated to ppm values
-NormalizeAmountsToPPM = F
+cfg$NormalizeAmountsToPPM = F
 
 # path to folder with protein quantification files
-InputFilesLocation = file.path(DataRootFolder, "input")
+cfg$InputFilesLocation = file.path(cfg$DataRootFolder, "input")
 
 # target location for plot files 
-PlotFilesLocation = file.path(DataRootFolder, "plot")
-
+cfg$PlotFilesLocation = file.path(cfg$DataRootFolder, "plot")
 # target location for log files
-LogFilesLocation   = file.path(DataRootFolder,"log")
-
+cfg$LogFilesLocation   = file.path(cfg$DataRootFolder,"log")
 # graphics settings
 # pdf canvas size in inches
-PlotWidth	= 6
-PlotHeight	= 4
+cfg$PlotWidth	= 6
+cfg$PlotHeight	= 4
 # line thickness
-PlotCurveLineWidth = 2
-PlotLegendLineWidth = 4
+cfg$PlotCurveLineWidth = 2
+cfg$PlotLegendLineWidth = 4
 # point size
-PlotPointSize = 1
+cfg$PlotPointSize = 1
 # point type
-ScatterPlotPointType = 20
+cfg$ScatterPlotPointType = 20
 # point transparency
-PlotPointAlpha = 0.5
+cfg$PlotPointAlpha = 0.5
 # canvas settings
-GraphicsParameters = list(
+cfg$par = list(
   # plot area margins: c(bottom, left, top, right)
   mar = c( 3, 3.2, 0.5, 0.5 ),
   # plot axis: c(title, label, line)
