@@ -26,7 +26,7 @@ DocSets = lapply( AllInputFiles, makeDocSet )
 names(DocSets)=sapply(DocSets, function(d)d$fileBase)
 ResultSets = lapply( DocSets, processData )
 
-save(DocSets, ResultSets, file = LogFilesLocation + "/ResultSets.R")
+save(DocSets, ResultSets, file = LogFilesLocation + "/ResultSets.rda")
 # nix=sapply( ResultSets, saveSampleMeans )
 # nix=sapply( ResultSets, saveSpeciesSeparation )
 # nix=sapply( ResultSets, saveIDs )
