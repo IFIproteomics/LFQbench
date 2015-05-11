@@ -63,6 +63,10 @@ explainMetrics = function()
   cat("\tseparation:\n")
   cat("\t\tspecies separation ability,\n")
   cat("\t\tthe area under ROC curve between a species pair\n")
+  
+  cat("\tseparation by range:\n")
+  cat("\t\tspecies separation ability for predefined log2-intensity ranges,\n")
+  cat("\t\tthe area under ROC curve between a species pair\n")
 }
 ################################################################################
 
@@ -75,9 +79,11 @@ showMetrics = function(m)
   cat("replication: "+ m$replication +"\n")
   cat("accuracy: \n")
   show(m$accuracy)
-  cat("precision deviation: "+ m$precision +"\n")
+  cat( "precision deviation: "+ m$precision +"\n" )
   cat("separation: \n")
-  show(m$separation)
+  show( m$separation )
+  cat("separation by range: \n")
+  show( m$separationByIntensityRange )
   cat("\n")
 }
 ################################################################################
@@ -221,6 +227,9 @@ getMetrics = function(resultSet)
   # area under ROC curve
   separation = sapply(resultSet$result, function(d) d$separation)
   
+  # area under ROC curve for predefined ranges of intensity
+  separationByIntensityRange = lapply(resultSet$result, function(d) d$separationRanged)
+  
   return(
     list(
       name = resultSet$docSet$fileBase,
@@ -228,7 +237,8 @@ getMetrics = function(resultSet)
       replication = replication,
       accuracy = accuracy,
       precision = precision,
-      separation = separation
+      separation = separation,
+      separationByIntensityRange = separationByIntensityRange
     )  
   )
 }
@@ -261,5 +271,28 @@ getCombinedProteinRSDs = function( ResultSets )
   CVs = lapply( ResultSets, function(rs) as.vector(rs$data$cv) )
   names(CVs) = as.vector( lapply(ResultSets, function(rs) rs$docSet$fileBase ) )
   return(CVs)
+}
+################################################################################
+
+################################################################################
+makeDocSet = function( inFile )
+{
+  fileBase = sub(InputExtensionPattern, "", inFile)
+  return( 
+    list(
+      inputPath = InputFilesLocation,
+      plotPath = PlotFilesLocation,
+      logPath = LogFilesLocation,
+      fileBase = fileBase,
+      csvFile = InputFilesLocation + "/" + inFile,
+      pdfFile = PlotFilesLocation + "/" + fileBase + ".pdf",
+      logFile = LogFilesLocation + "/" + fileBase + ".log",
+      avgFile = LogFilesLocation + "/" + fileBase + " sample_means.csv",
+      rsdFile = LogFilesLocation + "/" + fileBase + " cv.csv",
+      l2rFile = LogFilesLocation + "/" + fileBase + " log2_ratio.csv",
+      rocFile = LogFilesLocation + "/" + fileBase + " species_separation.csv",
+      idsFile = LogFilesLocation + "/" + fileBase + " ids.csv"
+    )
+  )
 }
 ################################################################################

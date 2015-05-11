@@ -1,5 +1,5 @@
 # data folder
-DataRootFolder = "data"
+DataRootFolder = "../lfqbench.testdata"
 
 # protein quantification input data CSV format
 InputExtensionPattern = "\\.tsv$"
@@ -35,6 +35,18 @@ LogRatioPlotRange   = c(-4, 4)
 
 # value used as maximum for AUQC quantification
 MaxLogRatioForAUQC  = 2
+
+# split positions
+IntensityBreaksForSpeciesSeparation = rbind(
+  "<11"=c(0,11),
+  "<12"=11:12,
+  "<13"=12:13,
+  "<14"=13:14,
+  "<15"=14:15,
+  "<16"=15:16,
+  "<17"=16:17,
+  ">17"=c(17,100)
+)
 
 # if TRUE then all log-ratios will be centered
 # by median log-ratio of background species

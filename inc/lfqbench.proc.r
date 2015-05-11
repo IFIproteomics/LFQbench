@@ -214,6 +214,27 @@ processData = function( DocSet )
     ################################################################################
     
     ################################################################################
+    # calculate species separation ROC-AUC for a species pair
+    getRangedSepRate = function(dataBySpecies, spcNames, ranges=IntensityBreaksForSpeciesSeparation)
+    {
+      l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
+      l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
+      spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
+      spcFlags = as.numeric( factor(spcs) ) - 1
+      auc4range = function(r) 
+      { 
+        idx = l2is >= r[1] & l2is < r[2]
+        auc(spcFlags[idx], l2rs[idx])
+      }
+      rangedAUCs = apply( ranges,  1, auc4range )
+      return( rangedAUCs )
+    }
+    
+    spcPairsRangedSeparationRates = apply(AllSpeciesPairs, 1, function(sp) getRangedSepRate( dataBySpecies, AllSpeciesNames[sp] ) )
+    colnames(spcPairsRangedSeparationRates) = AllSpeciesPairsLabels
+    ################################################################################
+    
+    ################################################################################
     # package sample pair data
     SamplePair = list(
       index = SamplePairIndex,
@@ -226,6 +247,7 @@ processData = function( DocSet )
       col = SamplePairColor,
       data = dataBySpecies,
       separation = spcPairsSepRates,
+      separationRanged = spcPairsRangedSeparationRates,
       adjustment = LogRatioAdjustmentValue,
       qcrange = AUQCRatioRange,
       allLogRatios = allLogRatios,
