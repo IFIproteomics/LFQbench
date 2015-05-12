@@ -12,7 +12,6 @@ source('inst/scripts/lfqbench.access.R')
 if(DEBUG) cat( "R working directory: " + getwd() + "\n")
 
 ###############################################################################
-cat("here")
 AllInputFiles = list.files( path=cfg$InputFilesLocation, pattern=cfg$InputExtensionPattern, full.names = FALSE )
 
 if( length(AllInputFiles) < 1 ) 
