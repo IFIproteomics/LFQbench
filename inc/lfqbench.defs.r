@@ -34,19 +34,3 @@ cfg$SamplePairsColors  	= brewer.pal( max(cfg$NumberOfSamplePairs,3), "Dark2" )[
 cfg$AllSpeciesPairs = createNumericPairs(1, cfg$NumberOfSpecies)
 cfg$AllSpeciesPairsLabels = apply(cfg$AllSpeciesPairs, 1, function(sp){nms = cfg$AllSpeciesNames[sp]; return(nms[1]+"-"+nms[2])} )
 ################################################################################
-
-################################################################################
-# key-accession-entry-species translation
-cat( "reading protein to species database ... " )
-cfg$IdToSpeciesFile = "inc/hye.id2species.csv"
-IdToSpeciesTable = NULL
-getSpeciesForIds = function( IDs )
-{
-  if(is.null(IdToSpeciesTable))
-  {
-    IdToSpeciesTable <<- read.table(file=cfg$IdToSpeciesFile, header=T, sep=";")
-  }
-  as.vector( IdToSpeciesTable$species[ match(IDs, IdToSpeciesTable$id, nomatch=NA, incomparables=NA) ] )
-}
-cat( "[done]\n" )
-################################################################################

@@ -4,7 +4,7 @@ cfg = list()
 cfg$DataRootFolder = "../lfqbench.testdata"
 
 # protein quantification input data CSV format
-cfg$InputExtensionPattern = "\\.tsv$"
+cfg$InputExtensionPattern = "\\..sv$"
 cfg$CsvColumnSeparator = "\t"
 cfg$CsvDecimalPointChar = "."
 

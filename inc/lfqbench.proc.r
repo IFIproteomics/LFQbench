@@ -8,14 +8,25 @@ processData = function( DocSet )
   ################################################################################
   # read run based data
   csvDat = read.table(DocSet$csvFile, sep=cfg$CsvColumnSeparator, dec=cfg$CsvDecimalPointChar, header=T)
+  
+  # ids are always the first column
   csvIDs = as.vector( csvDat[,1] )
-  # csvAmounts = as.matrix( csvDat[,-1] )  ## Old version, it does not support additional factor columns 
-  csvAmounts = as.matrix( csvDat[, sapply(csvDat, class) == "numeric" | sapply(csvDat, class) == "integer"] )
-  if(any(names(csvDat) == "specie")){
-      csvSpecies = as.vector( csvDat[, "specie"] ) 
-  }else{
-      csvSpecies = as.vector( getSpeciesForIds( csvIDs ) )
-  }
+  
+  # every numeric column belongs to the amount data
+  numericColumnIdx = sapply(csvDat, class) == "numeric" | sapply(csvDat, class) == "integer"
+  
+  # species column name must start with "speci"
+  speciesColumnIdx = grep("speci", names(csvDat), ignore.case = T)[1]
+  
+  # some checks for data fitness
+  if(length(which(numericColumnIdx)) < cfg$NumberOfSamples)
+    stop("number of amount columns is smaller than the number of samples")
+  
+  if(!any(grep("speci.*", names(csvDat), ignore.case = T)[[1]])) 
+    stop("no ''species'' column found.")
+  
+  csvAmounts = as.matrix( csvDat[, numericColumnIdx] )
+  csvSpecies = as.vector( csvDat[, speciesColumnIdx] )  
   rm( csvDat )
   ################################################################################
   # check OTHER species
@@ -110,7 +121,9 @@ processData = function( DocSet )
 	      	species = SpeciesNames[!ValidLogRatioIndices],
 	      	logratio = LogRatio[!ValidLogRatioIndices],
 	      	sample1means = Sample1ProteinAmounts[!ValidLogRatioIndices],
-	      	sample2means = Sample2ProteinAmounts[!ValidLogRatioIndices]
+	      	sample2means = Sample2ProteinAmounts[!ValidLogRatioIndices],
+	      	row.names = NULL,
+          stringsAsFactors=F
 	      )
       LogRatio = LogRatio[ValidLogRatioIndices]
       SpeciesNames = SpeciesNames[ValidLogRatioIndices]
@@ -152,7 +165,8 @@ processData = function( DocSet )
       species = SpeciesNames,
       logratio = LogRatio,
       sample1means = Sample1ProteinAmounts,
-      sample2means = Sample2ProteinAmounts
+      sample2means = Sample2ProteinAmounts,
+      row.names = NULL, stringsAsFactors=F
     )
     
     ################################################################################
