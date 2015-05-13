@@ -25,9 +25,14 @@ processData = function( DocSet )
   if(!any(grep("speci.*", names(csvDat), ignore.case = T)[[1]])) 
     stop("no ''species'' column found.")
   
-  csvAmounts = as.matrix( csvDat[, numericColumnIdx] )
+  # 1.0 * is a work-around to force the amounts matrix to numeric class
+  csvAmounts = 1.0 * as.matrix( csvDat[, numericColumnIdx] )
   csvSpecies = as.vector( csvDat[, speciesColumnIdx] )  
   rm( csvDat )
+  
+  # disable low amounts
+  csvAmounts[csvAmounts < cfg$MinProteinAmount] = NA
+  
   ################################################################################
   # check OTHER species
   benchedSpeciesIndices = unlist(sapply( cfg$AllSpeciesNames, function(spc) which(csvSpecies==spc) ), use.names = F)
@@ -48,7 +53,6 @@ processData = function( DocSet )
   getSampleAverage = function(sampleIndex, nRuns=floor( ncol(csvAmounts) / cfg$NumberOfSamples ))
   {
     amount = as.matrix( csvAmounts[, ((sampleIndex-1)*nRuns + 1):(nRuns * sampleIndex)] )
-    amount[amount < cfg$MinProteinAmount] = NA
     avg = rowMeans( amount, na.rm=T )
     std = apply( amount, 1, sd, na.rm=T )
     rsd = std / avg
