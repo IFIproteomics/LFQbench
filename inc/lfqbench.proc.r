@@ -9,6 +9,10 @@ processData = function( DocSet )
   # read run based data
   csvDat = read.table(DocSet$csvFile, sep=cfg$CsvColumnSeparator, dec=cfg$CsvDecimalPointChar, header=T)
   
+  # csv parsing problems lead to everything being in a single column
+  if( ncol(csvDat) < 2 )
+    stop("wrong input format! (please check column separator settings)")
+  
   # ids are always the first column
   csvIDs = as.vector( csvDat[,1] )
   
@@ -16,18 +20,18 @@ processData = function( DocSet )
   numericColumnIdx = sapply(csvDat, class) == "numeric" | sapply(csvDat, class) == "integer"
   
   # species column name must start with "speci"
-  speciesColumnIdx = grep("speci", names(csvDat), ignore.case = T)[1]
+  speciesColumnIdx = grep("speci", names(csvDat), ignore.case = T)
   
   # some checks for data fitness
-  if(length(which(numericColumnIdx)) < cfg$NumberOfSamples)
+  if( length( which( numericColumnIdx ) ) < cfg$NumberOfSamples )
     stop("number of amount columns is smaller than the number of samples")
   
-  if(!any(grep("speci.*", names(csvDat), ignore.case = T)[[1]])) 
+  if( length( speciesColumnIdx ) < 1 ) 
     stop("no ''species'' column found.")
   
   # 1.0 * is a work-around to force the amounts matrix to numeric class
   csvAmounts = 1.0 * as.matrix( csvDat[, numericColumnIdx] )
-  csvSpecies = as.vector( csvDat[, speciesColumnIdx] )  
+  csvSpecies = as.vector( csvDat[, speciesColumnIdx[[1]]] )  
   rm( csvDat )
   
   # disable low amounts
