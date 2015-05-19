@@ -221,40 +221,20 @@ processData = function( DocSet )
     ################################################################################
     
     ################################################################################
-    # calculate species separation ROC-AUC for a species pair
-    getSepRate = function(dataBySpecies, spcNames)
-    {
-      l2rs = unlist( lapply( spcNames, function( x ) dataBySpecies[[x]]$y ) )
-      spcs = unlist( lapply( spcNames, function( x ) rep( x, length( dataBySpecies[[x]]$y ) ) ) )
-      spcFlags = as.numeric( factor(spcs) ) - 1
-      AreaUnderROCCurveByValue = auc(spcFlags, l2rs)
-      return( AreaUnderROCCurveByValue )
-    }
     # ROC-AUC for all species pairs
-    spcPairsSepRates = apply(cfg$AllSpeciesPairs, 1, function(sp) getSepRate( dataBySpecies, cfg$AllSpeciesNames[sp] ) )
+    spcPairsSepRates = apply(cfg$AllSpeciesPairs, 1, 
+         function(sp) getSepRate( dataBySpecies, cfg$AllSpeciesNames[sp] ) )
     names(spcPairsSepRates) = cfg$AllSpeciesPairsLabels
     ################################################################################
     
     ################################################################################
-    # calculate species separation ROC-AUC for a species pair
-    getRangedSepRate = function(dataBySpecies, spcNames, ranges=cfg$Log2IntensityRangesForSpeciesSeparation)
-    {
-      l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
-      l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
-      spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
-      spcFlags = as.numeric( factor(spcs) ) - 1
-      auc4range = function(r) 
-      { 
-        idx = l2is >= r[1] & l2is < r[2]
-        auc(spcFlags[idx], l2rs[idx])
-      }
-      rangedAUCs = apply( ranges,  1, auc4range )
-      return( rangedAUCs )
-    }
-    
-    spcPairsRangedSeparationRates = apply(cfg$AllSpeciesPairs, 1, function(sp) getRangedSepRate( dataBySpecies, cfg$AllSpeciesNames[sp] ) )
+    spcPairsRangedSeparationRates = apply(cfg$AllSpeciesPairs, 1, 
+        function(sp) getRangedSepRate( dataBySpecies, cfg$AllSpeciesNames[sp] ) )
     colnames(spcPairsRangedSeparationRates) = cfg$AllSpeciesPairsLabels
     ################################################################################
+    
+    rangedAccuracy = getRangedAccuracy( dataBySpecies )
+    rangedPrecision = getRangedPrecision( dataBySpecies )
     
     ################################################################################
     # package sample pair data
@@ -269,7 +249,10 @@ processData = function( DocSet )
       col = SamplePairColor,
       data = dataBySpecies,
       separation = spcPairsSepRates,
-      separationRanged = spcPairsRangedSeparationRates,
+      rangedSeparation = spcPairsRangedSeparationRates,
+      rangedAccuracy = rangedAccuracy,
+      rangedPrecision = rangedPrecision,
+      log2IntensityRanges = cfg$Log2IntensityRanges,
       adjustment = LogRatioAdjustmentValue,
       qcrange = cfg$AUQCRatioRange,
       allLogRatios = allLogRatios,
@@ -311,3 +294,73 @@ processData = function( DocSet )
   return( ResultSet )
 }
 
+################################################################################
+# median deviation for log-ratios for each species in each range
+getRangedAccuracy = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spcNames = cfg$AllSpeciesNames )
+{
+  el2r = sapply(spcNames, function(sn) dataBySpecies[[sn]]$expectation, USE.NAMES = F )  
+  l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
+  l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
+  spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
+  acc4rs = function(r, s)
+  { 
+    idx4r = l2is >= r[1] & l2is < r[2]
+    idx4s = spcs %in% s
+    vals = l2rs[ idx4r & idx4s ]
+    dev = median(vals, na.rm = T) - el2r[s]
+    return(dev)
+  }
+  rangedAcc = sapply( spcNames, function(s) apply( ranges,  1, acc4rs, s) )
+  return( rangedAcc )
+}
+################################################################################
+
+################################################################################
+# standard deviation for log-ratios for each species in each range
+getRangedPrecision = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spcNames = cfg$AllSpeciesNames )
+{
+  l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
+  l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
+  spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
+  var4rs = function(r, s)
+  { 
+    idx4r = l2is >= r[1] & l2is < r[2]
+    idx4s = spcs %in% s
+    vals = l2rs[ idx4r & idx4s ]
+    std = sd(vals, na.rm = T)
+    return( std )
+  }
+  rangedSDs = sapply( spcNames, function(s) apply( ranges,  1, var4rs, s) )
+  return( rangedSDs )
+}
+################################################################################
+
+################################################################################
+# calculate species separation ROC-AUC for a species pair
+getRangedSepRate = function(dataBySpecies, spcNames, ranges=cfg$Log2IntensityRanges)
+{
+  l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
+  l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
+  spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
+  spcFlags = as.numeric( factor(spcs) ) - 1
+  auc4range = function(r) 
+  { 
+    idx = l2is >= r[1] & l2is < r[2]
+    auc(spcFlags[idx], l2rs[idx])
+  }
+  rangedAUCs = apply( ranges,  1, auc4range )
+  return( rangedAUCs )
+}
+################################################################################
+
+################################################################################
+# calculate species separation ROC-AUC for a species pair
+getSepRate = function(dataBySpecies, spcNames)
+{
+  l2rs = unlist( lapply( spcNames, function( x ) dataBySpecies[[x]]$y ) )
+  spcs = unlist( lapply( spcNames, function( x ) rep( x, length( dataBySpecies[[x]]$y ) ) ) )
+  spcFlags = as.numeric( factor(spcs) ) - 1
+  AreaUnderROCCurveByValue = auc(spcFlags, l2rs)
+  return( AreaUnderROCCurveByValue )
+}
+################################################################################

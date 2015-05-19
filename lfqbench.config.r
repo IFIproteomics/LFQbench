@@ -39,7 +39,7 @@ cfg$LogRatioPlotRange   = c(-4, 4)
 cfg$MaxLogRatioForAUQC  = 2
 
 # split positions
-cfg$Log2IntensityRangesForSpeciesSeparation = rbind(
+cfg$Log2IntensityRanges = rbind(
   "<1"=c(0,1),
   "<2"=1:2,
   "<3"=2:3,

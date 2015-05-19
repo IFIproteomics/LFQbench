@@ -54,18 +54,14 @@ explainMetrics = function()
   
   cat("\taccuracy:\n")
   cat("\t\taccuracy of relative quantification,\n")
-  cat("\t\tthe area under quantification curve for background species\n")
+  cat("\t\tthe median deviation of log-ratios to the expected value\n")
   
-  cat("\tprecision deviation:\n")
-  cat("\t\tdeviation of precision of quantification,\n")
-  cat("\t\tthe root mean square of ( medianLR - expectation ) for regulated species\n")
-  
+  cat("\tprecision:\n")
+  cat("\t\tprecision of quantification,\n")
+  cat("\t\tthe standard deviation of log-ratios\n")
+
   cat("\tseparation:\n")
   cat("\t\tspecies separation ability,\n")
-  cat("\t\tthe area under ROC curve between a species pair\n")
-  
-  cat("\tseparation by range:\n")
-  cat("\t\tspecies separation ability for predefined log2-intensity ranges,\n")
   cat("\t\tthe area under ROC curve between a species pair\n")
 }
 ################################################################################
@@ -75,15 +71,22 @@ showMetrics = function(m)
 {
   cat("--------------------------------------------\n")
   cat("\n" + m$name + "\n")
-  cat("identification: "+ m$identification +"\n")
-  cat("replication: "+ m$replication +"\n")
-  cat("accuracy: \n")
-  show(m$accuracy)
-  cat( "precision deviation: "+ m$precision +"\n" )
-  cat("separation: \n")
-  show( m$separation )
-  cat("separation by range: \n")
-  show( m$separationByIntensityRange )
+  sm = function(mn) 
+  {
+      cat( mn + ": " )
+      v = m[[mn]]
+      if( is.atomic(v) ) 
+      {
+        cat(v)
+      }
+      else 
+      {
+        cat("\n")
+        show(v)
+      }
+      cat("\n")
+  }
+  nix = sapply(names(m), sm)
   cat("\n")
 }
 ################################################################################
@@ -214,21 +217,14 @@ getMetrics = function(resultSet)
   # median CV for background-species
   replication = median( na.exclude( resultSet$data$cv[ resultSet$data$species==cfg$BackgroundSpeciesName ] ) )
   
-  # accuracy of relative quantification
-  # AUQC of background species
-  accuracy = sapply(resultSet$result, function(d) d$data[[cfg$BackgroundSpeciesName]]$auqc )
+  # area under ROC curve in predefined ranges of intensity
+  separation = lapply(resultSet$result, function(d) d$rangedSeparation )
   
-  # precision of quantification
-  # root mean square ( medianLR - expectation ) for regulated species
-  idx = which(cfg$AllSpeciesNames != cfg$BackgroundSpeciesName)
-  dat = sapply( resultSet$result, function( sp ) sapply( idx, function(x) sp$data[[x]]$shift ) )
-  precision = rms( dat )
+  # median log-ratio deviation to the expectation in predefined ranges of intensity
+  accuracy = lapply(resultSet$result, function(d) d$rangedAccuracy )
   
-  # area under ROC curve
-  separation = sapply(resultSet$result, function(d) d$separation)
-  
-  # area under ROC curve for predefined ranges of intensity
-  separationByIntensityRange = lapply(resultSet$result, function(d) d$separationRanged)
+  # standard deviation of log-ratios in predefined ranges of intensity
+  precision = lapply(resultSet$result, function(d) d$rangedAccuracy )
   
   return(
     list(
@@ -237,9 +233,8 @@ getMetrics = function(resultSet)
       replication = replication,
       accuracy = accuracy,
       precision = precision,
-      separation = separation,
-      separationByIntensityRange = separationByIntensityRange
-    )  
+      separation = separation
+    )
   )
 }
 ################################################################################
