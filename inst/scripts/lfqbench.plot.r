@@ -142,9 +142,7 @@ showScatterPlot = function( samplePair, showLegend=F, pointType=cfg$ScatterPlotP
                         return(d$expectation) 
                       }
               )
-  
-  
-  
+
   if(showLegend) plotSpeciesLegend()
   
   par(cfg$parBackup)

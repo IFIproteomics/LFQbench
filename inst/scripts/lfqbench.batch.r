@@ -2,12 +2,12 @@ rm( list=ls() )
 
 DEBUG=T
 
-source('inc/lfqbench.com.r')
+source('lfqbench.com.r')
 source('lfqbench.config.r')
-source('inc/lfqbench.defs.r')
-source('inc/lfqbench.plot.r')
-source('inc/lfqbench.proc.r')
-source('inc/lfqbench.access.r')
+source('lfqbench.defs.r')
+source('lfqbench.plot.r')
+source('lfqbench.proc.r')
+source('lfqbench.access.r')
 
 if(DEBUG) cat( "R working directory: " + getwd() + "\n")
 

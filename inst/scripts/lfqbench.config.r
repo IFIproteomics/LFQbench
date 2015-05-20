@@ -1,7 +1,7 @@
 cfg = list()
 
 # data folder
-cfg$DataRootFolder = "../lfqbench.testdata"
+cfg$DataRootFolder = "/Volumes/home/kuharev/Desktop/lfqbench.git/lfqbench.testdata/"
 
 # protein quantification input data CSV format
 cfg$InputExtensionPattern = "\\..sv$"
