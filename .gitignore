@@ -11,3 +11,9 @@
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
+
+.RData
+
+Rplots.pdf
+
+*.Rout
