@@ -1,7 +1,8 @@
 cfg = list()
 
 # data folder
-cfg$DataRootFolder = "/Volumes/home/kuharev/Desktop/lfqbench.git/lfqbench.testdata/"
+# cfg$DataRootFolder = "/Volumes/home/kuharev/Desktop/lfqbench.git/lfqbench.testdata/"
+cfg$DataRootFolder = "/Volumes/home/kuharev/Desktop/lfqbench.git/diaumpire.testdata"
 
 # protein quantification input data CSV format
 cfg$InputExtensionPattern = "\\..sv$"
@@ -78,7 +79,7 @@ cfg$PlotPointSize = 1
 # point type
 cfg$ScatterPlotPointType = 20
 # point transparency
-cfg$PlotPointAlpha = 0.5
+cfg$PlotPointAlpha = 0.8
 # canvas settings
 cfg$par = list(
   # plot area margins: c(bottom, left, top, right)

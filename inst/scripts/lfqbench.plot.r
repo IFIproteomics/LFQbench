@@ -126,22 +126,24 @@ showScatterPlot = function( samplePair, showLegend=F, pointType=cfg$ScatterPlotP
         ylab=as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ),
         cex.lab=cex.lab
   )
-  logRatios = sapply( samplePair$data, 
-    function(d) { 
-      y = d$y
-      y[y<samplePair$ylim[1]] = samplePair$ylim[1]
-      y[y>samplePair$ylim[2]] = samplePair$ylim[2]
-      points( d$x, y, pch=pointType, col= d$col, cex=pointSize )
-      return(d$y) 
-  } )
-  expRatios = sapply( samplePair$data, 
-                      function(d) 
-                      {
-                        theCol = scaleColor(d$col,.8)
-                        hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=theCol )
-                        return(d$expectation) 
-                      }
-              )
+  
+  makePoints = function(d) 
+  { 
+    y = d$y
+    y[y<samplePair$ylim[1]] = samplePair$ylim[1]
+    y[y>samplePair$ylim[2]] = samplePair$ylim[2]
+    points( d$x, y, pch=pointType, col=alpha(d$col, cfg$PlotPointAlpha), cex=pointSize )
+    return(d$y) 
+  }
+  logRatios = sapply( samplePair$data, makePoints)
+  
+  makeExpLine = function(d) 
+  {
+    theCol = scaleColor(d$col,.8)
+    hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=theCol )
+    return(d$expectation) 
+  }
+  expRatios = sapply( samplePair$data, makeExpLine )
 
   if(showLegend) plotSpeciesLegend()
   
@@ -211,7 +213,7 @@ showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F)
 	)
 	# logRatios = sapply( samplePair$data, function(d) { points( d$x, d$y, pch=cfg$ScatterPlotPointType, col=d$col, cex=cfg$PlotPointSize ); return(d$y) } )
 	logRatios = sapply( samplePair$data, function(d) { 
-	  points( d$x, d$y, pch=cfg$ScatterPlotPointType, col=d$col, cex=cfg$PlotPointSize )
+	  points( d$x, d$y, pch=cfg$ScatterPlotPointType, col=alpha(d$col, cfg$PlotPointAlpha), cex=cfg$PlotPointSize )
 	  if(showRegLines)
 	  {
 	    regLine = lowess( d$x, d$y )
@@ -247,6 +249,8 @@ showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F)
 }
 ################################################################################
 
+loadLibrary("scales")
+
 ################################################################################
 # draw scatter- and boxplot
 showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F)
@@ -262,7 +266,7 @@ showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F)
   )
   nSets = length(samplePair$data)
   logRatios = sapply( samplePair$data, function(d) { 
-    points( d$x, d$y, pch=cfg$ScatterPlotPointType, col=d$col, cex=cfg$PlotPointSize )
+    points( d$x, d$y, pch=cfg$ScatterPlotPointType, col=alpha(d$col, cfg$PlotPointAlpha), cex=cfg$PlotPointSize )
     if(showRegLines)
     {
       regLine = lowess( d$x, d$y )
