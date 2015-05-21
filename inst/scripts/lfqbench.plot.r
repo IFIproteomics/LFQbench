@@ -164,7 +164,7 @@ makeScatter = function(samplePair, showLegend=F, showRegLines=F)
 showScatterPlot = function( samplePair, showLegend=F, showRegLines=F )
 {
   par(cfg$par)
-  logRatios = makeScatter(samplePair)
+  logRatios = makeScatter(samplePair, showLegend, showRegLines )
   par(cfg$parBackup)
 }
 ################################################################################
