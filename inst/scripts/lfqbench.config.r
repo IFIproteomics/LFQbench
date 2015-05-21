@@ -1,8 +1,8 @@
 cfg = list()
 
 # data folder
-# cfg$DataRootFolder = "/Volumes/home/kuharev/Desktop/lfqbench.git/lfqbench.testdata/"
-cfg$DataRootFolder = "/Volumes/home/kuharev/Desktop/lfqbench.git/diaumpire.testdata"
+cfg$DataRootFolder = "/Volumes/home/kuharev/Desktop/lfqbench.git/lfqbench.testdata/"
+# cfg$DataRootFolder = "/Volumes/home/kuharev/Desktop/lfqbench.git/diaumpire.testdata"
 
 # protein quantification input data CSV format
 cfg$InputExtensionPattern = "\\..sv$"
@@ -62,30 +62,36 @@ cfg$NormalizeAmountsToPPM = T
 
 # path to folder with protein quantification files
 cfg$InputFilesLocation = file.path(cfg$DataRootFolder, "input")
-
 # target location for plot files 
 cfg$PlotFilesLocation = file.path(cfg$DataRootFolder, "plot")
 # target location for log files
-cfg$LogFilesLocation   = file.path(cfg$DataRootFolder,"log")
+cfg$LogFilesLocation  = file.path(cfg$DataRootFolder,"log")
+
 # graphics settings
 # pdf canvas size in inches
-cfg$PlotWidth	= 10
+cfg$PlotWidth	= 6
 cfg$PlotHeight = 4
 # line thickness
 cfg$PlotCurveLineWidth = 2
 cfg$PlotLegendLineWidth = 4
 # point size
-cfg$PlotPointSize = 4
+cfg$PlotPointSize = 1.5
 # point type
 cfg$ScatterPlotPointType = 20
 # point transparency
 cfg$PlotPointAlpha = 0.8
+# size magnification for axis labels (cex.lab)
+cfg$AxisLabelSize = 2
+# size magnification for axis annotations (cex.axis)
+cfg$AxisAnnotationSize = 2
+# line thinkes for plotting axes
+cfg$AxisLineThickness = 2
 # canvas settings
 cfg$par = list(
   # plot area margins: c(bottom, left, top, right)
-  mar = c( 3, 3.2, 0.5, 0.5 ),
+  mar = c( 4.5, 5.5, 0.5, 0.5 ),
   # plot axis: c(title, label, line)
-  mgp = c( 2, 0.6, 0 ),
+  mgp = c( 3.5, 1.5, 0 ),
   # axis labels orientation: 0: parallel, 1: horizontal, 2: perpendicular, 3: vertical
   las = 1
 )

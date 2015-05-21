@@ -9,14 +9,12 @@ plotResultSet = function( resSet )
   # plotProteinDispersionBySample( resSet$data )
   
   # accuracy and precision
-  sapply( resSet$result, showScatterPlot )
+  sapply( resSet$result, showScatterPlot, showRegLines=T )
   sapply( resSet$result, showScatterAndDensityPlot, showRegLines=T )
   sapply( resSet$result, showScatterAndBoxPlot, showRegLines=T )
   sapply( resSet$result, showLogRatioBoxPlot )
-  sapply( resSet$result, showQuantBarPlot )
   sapply( resSet$result, showDistributionDensityPlot )
-  showSingleSpeciesQC( resSet$result, cfg$BackgroundSpeciesName )
-  
+    
   dev.off()
   cat("[done]\n")
 }
