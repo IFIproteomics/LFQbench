@@ -1,6 +1,9 @@
 ################################################################################
 # user defined R graphics parameters
-if(!exists("cfg$par")) cfg$par = list(
+if(!exists("cfg") | is.null(cfg$initialized) )
+{
+  cfg=list()
+  cfg$par = list(
     # plot area margins: c(bottom, left, top, right)
     mar=c(3,3.2,.5,.5),
     # plot axis: c(title, label, line)
@@ -8,12 +11,16 @@ if(!exists("cfg$par")) cfg$par = list(
     # axis labels orientation: 0: parallel, 1: horizontal, 2: perpendicular, 3: vertical
     las=1
   )
+  cfg$PlotWidth  = 6
+  cfg$PlotHeight = 4
+  cfg$PlotCurveLineWidth = 2
+  cfg$PlotLegendLineWidth = 4
+  cfg$PlotPointSize = 2
+  cfg$ScatterPlotPointType = 20
+  cfg$PlotPointAlpha = 0.8
+}
 # backup original R graphics parameters
 cfg$parBackup = par()[ names(cfg$par) ]
-if(!exists("cfg$PlotCurveLineWidth")) cfg$PlotCurveLineWidth = 2
-if(!exists("cfg$PlotLegendLineWidth")) cfg$PlotLegendLineWidth = 8
-if(!exists("cfg$PlotPointSize")) cfg$PlotPointSize = 2
-if(!exists("cfg$ScatterPlotPointType")) cfg$ScatterPlotPointType = "."
 ################################################################################
 
 ################################################################################

@@ -69,13 +69,13 @@ cfg$PlotFilesLocation = file.path(cfg$DataRootFolder, "plot")
 cfg$LogFilesLocation   = file.path(cfg$DataRootFolder,"log")
 # graphics settings
 # pdf canvas size in inches
-cfg$PlotWidth	= 6
-cfg$PlotHeight	= 4
+cfg$PlotWidth	= 10
+cfg$PlotHeight = 4
 # line thickness
 cfg$PlotCurveLineWidth = 2
 cfg$PlotLegendLineWidth = 4
 # point size
-cfg$PlotPointSize = 1
+cfg$PlotPointSize = 4
 # point type
 cfg$ScatterPlotPointType = 20
 # point transparency
@@ -89,3 +89,6 @@ cfg$par = list(
   # axis labels orientation: 0: parallel, 1: horizontal, 2: perpendicular, 3: vertical
   las = 1
 )
+
+# set flag for config initialization completeness
+cfg$initialized = TRUE
