@@ -1,8 +1,8 @@
 ################################################################################
 # user defined R graphics parameters
-if(!exists("cfg") | is.null(cfg$initialized) )
+if( !exists("cfg") ) cfg=list()
+if( is.null(cfg$initialized) )
 {
-  cfg=list()
   cfg$par = list(
     # plot area margins: c(bottom, left, top, right)
     mar=c(3,3.2,.5,.5),
