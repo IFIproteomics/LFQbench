@@ -1,0 +1,150 @@
+###############
+#' loadConfig 
+#' 
+#' this function configure the enviroment for the main functions and functionalities of the project
+#' 
+#' @param String Data folder where the original data for the anlysis will be store and handle
+#' 
+
+loadConfig <- function(dataFolder)
+{
+    loadLibrary("RColorBrewer")
+    
+    cfg = list()
+    
+    # data folder
+    cfg$DataRootFolder = dataFolder
+    
+    # quantitative composition of samples
+    cfg$SampleComposition = data.frame(
+        species =c("HUMAN", "YEAST", "ECOLI"),
+        A       =c(  65,       30,     05   ),
+        B       =c(  65,       15,     20   )
+    )
+    
+    # non regulated background species
+    # has equal protein amounts in all samples
+    cfg$BackgroundSpeciesName    = "HUMAN"
+    
+    # whiskers of boxplots will extend to given quantile
+    # t.m. (1 - quantile*2) portion of data will be inside the whiskers
+    cfg$BoxPlotWhiskerQuantile = 0.025
+    
+    
+    # missing protein amounts or amounts below this threshold 
+    # will be approximated to it
+    # value in ppm
+    cfg$MinProteinAmount    = 0.0001
+    
+    # log-ratios outside validity range will be droped
+    cfg$DropInvalidLogRatio = T
+    cfg$LogRatioValidityRange  = c(-10, 10)
+    
+    # protein quantification input data CSV format
+    cfg$InputExtensionPattern = "\\..sv$"
+    cfg$CsvColumnSeparator = "\t"
+    cfg$CsvDecimalPointChar = "."
+    
+    # log-ratio range for plots
+    cfg$LogRatioPlotRange   = c(-4, 4)
+    
+    # value used as maximum for AUQC quantification
+    cfg$MaxLogRatioForAUQC  = 2
+    
+    # split positions
+    cfg$Log2IntensityRanges = rbind(
+        "<1"=c(0,1),
+        "<2"=1:2,
+        "<3"=2:3,
+        "<4"=3:4,
+        "<5"=4:5,
+        "<6"=5:6,
+        "<7"=6:7,
+        "<8"=7:8,
+        "<9"=8:9,  
+        ">9"=c(9,100)
+    )
+    
+    # if TRUE then all log-ratios will be centered
+    # by median log-ratio of background species
+    cfg$CenterLogRatioByBackground = T
+    
+    # if TRUE then all protein amounts will be translated to ppm values
+    cfg$NormalizeAmountsToPPM = T
+    
+    # path to folder with protein quantification files
+    cfg$InputFilesLocation = file.path(cfg$DataRootFolder, "input")
+    # target location for plot files 
+    cfg$PlotFilesLocation = file.path(cfg$DataRootFolder, "plot")
+    # target location for log files
+    cfg$LogFilesLocation  = file.path(cfg$DataRootFolder,"log")
+    
+    # graphics settings
+    # pdf canvas size in inches
+    cfg$PlotWidth    = 6
+    cfg$PlotHeight = 4
+    # line thickness
+    cfg$PlotCurveLineWidth = 2
+    cfg$PlotLegendLineWidth = 4
+    # point size
+    cfg$PlotPointSize = 1.5
+    # point type
+    cfg$ScatterPlotPointType = 20
+    # point transparency
+    cfg$PlotPointAlpha = 0.8
+    # size magnification for axis labels (cex.lab)
+    cfg$AxisLabelSize = 2
+    # size magnification for axis annotations (cex.axis)
+    cfg$AxisAnnotationSize = 2
+    # line thinkes for plotting axes
+    cfg$AxisLineThickness = 2
+    
+    # canvas settings
+    cfg$par = list(
+        # plot area margins: c(bottom, left, top, right)
+        mar = c( 4.5, 5.5, 0.5, 0.5 ),
+        # plot axis: c(title, label, line)
+        mgp = c( 3.5, 1.5, 0 ),
+        # axis labels orientation: 0: parallel, 1: horizontal, 2: perpendicular, 3: vertical
+        las = 1
+    )
+    
+    ################################################################################
+    # create input/output paths
+    sapply( c(cfg$InputFilesLocation, cfg$PlotFilesLocation, cfg$LogFilesLocation), mkdir )
+    ################################################################################
+    
+    ################################################################################
+    # process composition of samples
+    cfg$AllSampleNames = as.vector( colnames(cfg$SampleComposition)[-1] )
+    cfg$AllSpeciesNames = as.vector( cfg$SampleComposition[,1] )
+    cfg$AllExpectedAmounts = as.matrix( cfg$SampleComposition[,-1] )
+    rownames(cfg$AllExpectedAmounts) = cfg$AllSpeciesNames
+    cfg$NumberOfSamples = length(cfg$AllSampleNames)
+    cfg$NumberOfSpecies = length(cfg$AllSpeciesNames)
+    cfg$SampleColors = brewer.pal(max(cfg$NumberOfSamples,3),"Dark2")[1:cfg$NumberOfSamples]
+    cfg$SpeciesColors = brewer.pal(max(cfg$NumberOfSpecies,3),"Dark2")[1:cfg$NumberOfSpecies]
+    ################################################################################
+    
+    ################################################################################
+    cfg$AUQCRatioRange = c(0, cfg$MaxLogRatioForAUQC)
+    ################################################################################
+    
+    ################################################################################
+    # create sample index pairs
+    cfg$SamplePairsIndices   = createNumericPairs( 1, cfg$NumberOfSamples )
+    cfg$NumberOfSamplePairs = nrow( cfg$SamplePairsIndices )
+    cfg$SamplePairsLabels = apply(cfg$SamplePairsIndices, 1, function(sp){nms = cfg$AllSampleNames[sp]; return(nms[1]+":"+nms[2])} )
+    cfg$SamplePairsColors      = brewer.pal( max(cfg$NumberOfSamplePairs,3), "Dark2" )[1:cfg$NumberOfSamplePairs]
+    ################################################################################
+    
+    ################################################################################
+    cfg$AllSpeciesPairs = createNumericPairs(1, cfg$NumberOfSpecies)
+    cfg$AllSpeciesPairsLabels = apply(cfg$AllSpeciesPairs, 1, function(sp){nms = cfg$AllSpeciesNames[sp]; return(nms[1]+"-"+nms[2])} )
+    ################################################################################
+    
+    # set flag for config initialization completeness
+    cfg$initialized = TRUE
+    
+    return(cfg)
+}
