@@ -123,21 +123,27 @@ processData = function( DocSet )
     # drop invalid log ratios
     if(cfg$DropInvalidLogRatio)
     {
-      ValidLogRatioIndices = LogRatio >= cfg$LogRatioValidityRange[1] & LogRatio <= cfg$LogRatioValidityRange[2]
-      invalidLogRatios = data.frame(
-	      	entry = ProteinIDs[!ValidLogRatioIndices],
-	      	species = SpeciesNames[!ValidLogRatioIndices],
-	      	logratio = LogRatio[!ValidLogRatioIndices],
-	      	sample1means = Sample1ProteinAmounts[!ValidLogRatioIndices],
-	      	sample2means = Sample2ProteinAmounts[!ValidLogRatioIndices],
-	      	row.names = NULL,
-          stringsAsFactors=F
-	      )
-      LogRatio = LogRatio[ValidLogRatioIndices]
-      SpeciesNames = SpeciesNames[ValidLogRatioIndices]
-      ProteinIDs = ProteinIDs[ValidLogRatioIndices]
-      Sample1ProteinAmounts = Sample1ProteinAmounts[ValidLogRatioIndices]
-      Sample2ProteinAmounts = Sample2ProteinAmounts[ValidLogRatioIndices]
+      emptyLRs = which(is.na(LogRatio))
+      smallLRs = which(LogRatio < min(cfg$LogRatioValidityRange))
+      bigLRs = which(LogRatio > max(cfg$LogRatioValidityRange))      
+      badLRs = unique(c(emptyLRs, smallLRs, bigLRs))
+      if(length(badLRs)>0)
+      {
+        invalidLogRatios = data.frame(
+  	      	entry = ProteinIDs[badLRs],
+  	      	species = SpeciesNames[badLRs],
+  	      	logratio = LogRatio[badLRs],
+  	      	sample1means = Sample1ProteinAmounts[badLRs],
+  	      	sample2means = Sample2ProteinAmounts[badLRs],
+  	      	row.names = NULL,
+            stringsAsFactors=F
+  	    )
+        LogRatio = LogRatio[-badLRs]
+        SpeciesNames = SpeciesNames[-badLRs]
+        ProteinIDs = ProteinIDs[-badLRs]
+        Sample1ProteinAmounts = Sample1ProteinAmounts[-badLRs]
+        Sample2ProteinAmounts = Sample2ProteinAmounts[-badLRs]
+      }
     }
     ################################################################################
     

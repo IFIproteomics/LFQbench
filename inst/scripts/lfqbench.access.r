@@ -224,6 +224,29 @@ getMetrics = function(resultSet)
   # standard deviation of log-ratios in predefined ranges of intensity
   precision = lapply(resultSet$result, function(d) d$rangedAccuracy )
   
+  # count log ratio statistics
+  lrs4spc = function(spc, sp)
+  {
+    iLR = sp$invalidLogRatios$logratio[sp$invalidLogRatios$species==spc]
+    vLR = sp$validLogRatios$logratio[sp$validLogRatios$species==spc]
+    
+    invalid = length(iLR)
+    missing = ifelse(invalid==0, 0, length(which(is.na(iLR))) )
+    
+    valid = length(vLR)
+    plotted = length( which( vLR >= min(cfg$LogRatioPlotRange) & vLR <= max(cfg$LogRatioPlotRange) ) )
+    return( c(
+        "invalid ratios"=invalid, 
+        "invalid, out of validity range"=(invalid - missing),
+        "invalid, missing value"=missing,
+        "valid ratios"=valid,
+        "in plot range"=plotted, 
+        "out of plot range"=(valid - plotted)
+    ) )
+  }
+  
+  logRatioStats = lapply(resultSet$result, function(sp) sapply( cfg$AllSpeciesNames, lrs4spc, sp  ))
+    
   return(
     list(
       name = resultSet$docSet$fileBase,
@@ -231,7 +254,8 @@ getMetrics = function(resultSet)
       replication = replication,
       accuracy = accuracy,
       precision = precision,
-      separation = separation
+      separation = separation,
+      quantification = logRatioStats
     )
   )
 }
