@@ -1,19 +1,20 @@
 ################################################################################
-plotResultSet = function( resSet )
+plotResultSet = function( resSet, 
+                          showScatterPlot=T,
+                          showScatterAndDensityPlot=T,
+                          showScatterAndBoxPlot=T,
+                          showBoxPlot=T,
+                          showDensityPlot=T)
 {
   cat("creating "+resSet$docSet$pdfFile+" ...")
   pdf(file=resSet$docSet$pdfFile, onefile=T, width=cfg$PlotWidth, height=cfg$PlotHeight, family="Helvetica", pointsize=9)
   
-  # replication variance
-  # plotProteinDispersionBySpecies( resSet$data )
-  # plotProteinDispersionBySample( resSet$data )
-  
   # accuracy and precision
-  sapply( resSet$result, showScatterPlot, showRegLines=T )
-  sapply( resSet$result, showScatterAndDensityPlot, showRegLines=T )
-  sapply( resSet$result, showScatterAndBoxPlot, showRegLines=T )
-  sapply( resSet$result, showLogRatioBoxPlot )
-  sapply( resSet$result, showDistributionDensityPlot )
+  if(showScatterPlot) sapply( resSet$result, showScatterPlot, showRegLines=T )
+  if(showScatterAndDensityPlot) sapply( resSet$result, showScatterAndDensityPlot, showRegLines=T )
+  if(showScatterAndBoxPlot) sapply( resSet$result, showScatterAndBoxPlot, showRegLines=T )
+  if(showBoxPlot) sapply( resSet$result, showLogRatioBoxPlot )
+  if(showDensityPlot) sapply( resSet$result, showDistributionDensityPlot )
     
   dev.off()
   cat("[done]\n")
@@ -222,7 +223,7 @@ getMetrics = function(resultSet)
   accuracy = lapply(resultSet$result, function(d) d$rangedAccuracy )
   
   # standard deviation of log-ratios in predefined ranges of intensity
-  precision = lapply(resultSet$result, function(d) d$rangedAccuracy )
+  precision = lapply(resultSet$result, function(d) d$rangedPrecision )
   
   # count log ratio statistics
   lrs4spc = function(spc, sp)
