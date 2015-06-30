@@ -74,18 +74,18 @@ addAxes = function(lwd=1, showXlab=T, showYlab=T, showXAxis=T, showYAxis=T, cex.
 
 ################################################################################
 # add an x-axis label shifted by marginShift from par()$mgp[1]
-addXLab = function(xlab="", marginShift=0.5, ...)
+addXLab = function(xlab="", marginShift=-0.2, cex.lab = cfg$AxisLabelSize, ...)
 {
   m = par()$mgp
   m[1] = m[1]+marginShift
-  title(xlab=xlab, mgp=m, ...)
+  title(xlab=xlab, mgp=m, cex.lab=cex.lab, ...)
 }
 # add an y-axis label shifted by marginShift from par()$mgp[1]
-addYLab = function(ylab="", marginShift=0.5, ...)
+addYLab = function(ylab="", marginShift=0.3, cex.lab = cfg$AxisLabelSize, ...)
 {
   m = par()$mgp
   m[1] = m[1]+marginShift
-  title(ylab=ylab, mgp=m, ...)
+  title(ylab=ylab, mgp=m, cex.lab=cex.lab, ...)
 }
 ################################################################################
 
@@ -180,11 +180,8 @@ addScatterPointsForSpecies = function(species, samplePairResult, minAlpha=.2, sh
 makeScatter = function(samplePair, showLegend=F, showRegLines=F, showExpLines=T, useCfgColor=T )
 {
   emptyPlot(samplePair$xlim, samplePair$ylim, grid=F, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize)
-  title(main="",
-        xlab=as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ),
-        ylab=as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ),
-        cex.lab = cfg$AxisLabelSize
-  )
+  addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ) )
+  addYLab( as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ) )
   logRatios = sapply(cfg$AllSpeciesNames, 
                      addScatterPointsForSpecies, samplePair, 
                       minAlpha=cfg$PlotPointMinAlpha, showExpectationLine=showExpLines, showRegressionLine=showRegLines, 
@@ -211,14 +208,14 @@ showLogRatioBoxPlot = function(samplePair)
 {
   par(cfg$par)
   logRatios = sapply( samplePair$data, function(d) { return(d$y) } )
-  qboxplot( logRatios, pch=20,
-      ylab=as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ),
-      whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F, lims=cfg$LogRatioPlotRange,
+  qboxplot( logRatios, pch=20, ylab="",
+            whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F, lims=cfg$LogRatioPlotRange,
       cex.lab = cfg$AxisLabelSize
     )
   addAxes(showXlab=F, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize)
   axis(1, labels=cfg$AllSpeciesNames, at=(1:cfg$NumberOfSpecies), 
        lwd.ticks=cfg$AxisLineThickness, lwd=0, cex.axis = cfg$AxisAnnotationSize )
+  addYLab( as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ))
   grid()
   par(cfg$parBackup)
 }
@@ -237,11 +234,11 @@ showQuantBarPlot = function(samplePair)
   values = values[sortedIndices]
   barplot(values, col=colors, border=NA,
         ylim=samplePair$ylim,
-        main="", names.arg=NA,
-        xlab=as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ),
-        ylab=as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ),
+        main="", names.arg=NA, xlab="", ylab="",
         cex.lab = cfg$AxisLabelSize, cex.axis = cfg$AxisAnnotationSize
   )
+  addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ) )
+  addYLab( as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ) )
   legendLabels = sapply( samplePair$data, function(d) d$species )
   legendColors = sapply( samplePair$data, function(d) d$col )
   legend(x="topright", legend=legendLabels, col=legendColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white")
@@ -316,8 +313,8 @@ showDistributionDensityPlot = function(samplePair, showLegend=F)
   yLim=range( lapply(samplePair$data, function(d) range(d$density$y) ) )
   par(cfg$par)
   emptyPlot(xLim, yLim, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize )
-  addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ), -0.2, cex.lab = cfg$AxisLabelSize)
-  addYLab( "Density", .6, cex.lab = cfg$AxisLabelSize)
+  addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ) )
+  addYLab( "Density", .6 )
   sapply(samplePair$data, function(d) lines(d$density, type="l", col=d$col, lwd=cfg$PlotCurveLineWidth ) )
   if(showLegend) plotSpeciesLegend( )
   par(cfg$parBackup)
