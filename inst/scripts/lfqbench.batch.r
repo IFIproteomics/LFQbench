@@ -3,8 +3,13 @@ rm( list=ls() )
 DEBUG=T
 
 source('lfqbench.com.r')
+# load static configuration data
 source('lfqbench.config.r')
+# override parameters by command line (if any)
+evalCommandLineArguments()
+# calculate dynamic parameters from config
 source('lfqbench.defs.r')
+
 source('lfqbench.plot.r')
 source('lfqbench.proc.r')
 source('lfqbench.access.r')

@@ -188,3 +188,13 @@ spiner = function(samples, sampleNames=colnames(samples), partNames=rownames(sam
 }
 ################################################################################
 
+
+################################################################################
+evalCommandLineArguments = function()
+{
+  args=commandArgs(trailingOnly = T)
+  sapply(args[grep("=", args)], 
+         function(arg) eval(expr = parse(text=arg), envir = globalenv())
+  ) 
+}
+################################################################################

@@ -2,6 +2,13 @@
 
 loadLibrary("RColorBrewer")
 
+# path to folder with protein quantification files
+cfg$InputFilesLocation = file.path(cfg$DataRootFolder, "input")
+# target location for plot files 
+cfg$PlotFilesLocation = file.path(cfg$DataRootFolder, "plot")
+# target location for log files
+cfg$LogFilesLocation  = file.path(cfg$DataRootFolder,"log")
+
 ################################################################################
 # create input/output paths
 sapply( c(cfg$InputFilesLocation, cfg$PlotFilesLocation, cfg$LogFilesLocation), mkdir )

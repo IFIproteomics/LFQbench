@@ -55,13 +55,6 @@ cfg$CenterLogRatioByBackground = T
 # if TRUE then all protein amounts will be translated to ppm values
 cfg$NormalizeAmountsToPPM = T
 
-# path to folder with protein quantification files
-cfg$InputFilesLocation = file.path(cfg$DataRootFolder, "input")
-# target location for plot files 
-cfg$PlotFilesLocation = file.path(cfg$DataRootFolder, "plot")
-# target location for log files
-cfg$LogFilesLocation  = file.path(cfg$DataRootFolder,"log")
-
 # graphics settings
 # pdf canvas size in inches
 cfg$PlotWidth	= 6
