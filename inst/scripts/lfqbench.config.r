@@ -1,8 +1,7 @@
 cfg = list()
 
 # data folder
-cfg$DataRootFolder = "/Volumes/home/kuharev/Desktop/lfqbench.git/lfqbench.testdata/"
-# cfg$DataRootFolder = "/Volumes/home/kuharev/Desktop/lfqbench.git/diaumpire.testdata"
+cfg$DataRootFolder = "../../../lfqbench.testdata/"
 
 # protein quantification input data CSV format
 cfg$InputExtensionPattern = "\\..sv$"
@@ -22,12 +21,12 @@ cfg$BackgroundSpeciesName	= "HUMAN"
 
 # whiskers of boxplots will extend to given quantile
 # t.m. (1 - quantile*2) portion of data will be inside the whiskers
-cfg$BoxPlotWhiskerQuantile = 0.025
+cfg$BoxPlotWhiskerQuantile = 0.01
 
 # missing protein amounts or amounts below this threshold 
 # will be approximated to it
 # value in ppm
-cfg$MinProteinAmount    = 0.0001
+cfg$MinProteinAmount    = 0.000001
 
 # log-ratios outside validity range will be droped
 cfg$DropInvalidLogRatio = T
@@ -41,16 +40,12 @@ cfg$MaxLogRatioForAUQC  = 2
 
 # split positions
 cfg$Log2IntensityRanges = rbind(
-  "<1"=c(0,1),
-  "<2"=1:2,
-  "<3"=2:3,
-  "<4"=3:4,
-  "<5"=4:5,
-  "<6"=5:6,
-  "<7"=6:7,
-  "<8"=7:8,
-  "<9"=8:9,  
-  ">9"=c(9,100)
+  "<2"=c(0,2),
+  "<4"=c(2,4),
+  "<6"=c(4,6),
+  "<8"=c(6,8),
+  "<10"=c(8,10),
+  ">10"=c(10,100)
 )
 
 # if TRUE then all log-ratios will be centered
@@ -79,7 +74,7 @@ cfg$PlotPointSize = 1.5
 # point type
 cfg$ScatterPlotPointType = 20
 # point transparency
-cfg$PlotPointAlpha = 0.8
+cfg$PlotPointMinAlpha = 0.1
 # size magnification for axis labels (cex.lab)
 cfg$AxisLabelSize = 2
 # size magnification for axis annotations (cex.axis)
@@ -89,9 +84,9 @@ cfg$AxisLineThickness = 2
 # canvas settings
 cfg$par = list(
   # plot area margins: c(bottom, left, top, right)
-  mar = c( 4.5, 5.5, 0.5, 0.5 ),
+  mar = c( 4.5, 6, 0.5, 0.5 ),
   # plot axis: c(title, label, line)
-  mgp = c( 3.5, 1.5, 0 ),
+  mgp = c( 3.7, 1.5, 0 ),
   # axis labels orientation: 0: parallel, 1: horizontal, 2: perpendicular, 3: vertical
   las = 1
 )

@@ -17,7 +17,7 @@ if( is.null(cfg$initialized) )
   cfg$PlotLegendLineWidth = 4
   cfg$PlotPointSize = 2
   cfg$ScatterPlotPointType = 20
-  cfg$PlotPointAlpha = 0.8
+  cfg$PlotPointMinAlpha=.2
 }
 # backup original R graphics parameters
 cfg$parBackup = par()[ names(cfg$par) ]
@@ -61,14 +61,31 @@ emptyPlot = function(xRange=c(0,1), yRange=c(0,1), lwd=1, grid=T, showXlab=T, sh
 ################################################################################
 
 ################################################################################
-# add normal 
+# add normal axes having full lengths of plotting area
 addAxes = function(lwd=1, showXlab=T, showYlab=T, showXAxis=T, showYAxis=T, cex.axis=1)
 {
   usr = par()$usr
+  if(showXAxis) lines(x=usr[c(1,2)], y=usr[c(3,3)], lwd=lwd, xpd=T)
+  if(showYAxis) lines(x=usr[c(1,1)], y=usr[c(3,4)], lwd=lwd, xpd=T)
   if(showXlab) axis(1, lwd=0, lwd.ticks=lwd, cex.axis=cex.axis)
   if(showYlab) axis(2, lwd=0, lwd.ticks=lwd, cex.axis=cex.axis)
-  if(showXAxis) lines(x=usr[c(1,2)], y=usr[c(3,3)], lwd=lwd*2)
-  if(showYAxis) lines(x=usr[c(1,1)], y=usr[c(3,4)], lwd=lwd*2)
+}
+################################################################################
+
+################################################################################
+# add an x-axis label shifted by marginShift from par()$mgp[1]
+addXLab = function(xlab="", marginShift=0.5, ...)
+{
+  m = par()$mgp
+  m[1] = m[1]+marginShift
+  title(xlab=xlab, mgp=m, ...)
+}
+# add an y-axis label shifted by marginShift from par()$mgp[1]
+addYLab = function(ylab="", marginShift=0.5, ...)
+{
+  m = par()$mgp
+  m[1] = m[1]+marginShift
+  title(ylab=ylab, mgp=m, ...)
 }
 ################################################################################
 
@@ -123,8 +140,44 @@ plotSpeciesLegends = function()
 ################################################################################
 
 ################################################################################
-# make a simple scatter plot without globally changing graphical parameters
-makeScatter = function(samplePair, showLegend=F, showRegLines=F)
+addScatterPointsForSpecies = function(species, samplePairResult, minAlpha=.2, showExpectationLine=T, showRegressionLine=T, useCfgColor=T, rampColors=T, ...)
+{
+  ds = samplePairResult$data[[species]]
+  theCol = ifelse(useCfgColor, cfg$SpeciesColors[which(cfg$AllSpeciesNames==ds$species)], ds$col)
+  cols=theCol
+  if(rampColors)
+  {
+    # get density for a log-ratio value
+    lr2d = approxfun(ds$density$x, ds$density$y, method = "linear")
+    # densities for all log-ratios of the species
+    densities = lr2d(ds$y)
+    # scale densities between 0 and 1
+    densities = (densities - min(densities))
+    densities = densities / max(densities)
+    densities[densities<minAlpha] = minAlpha
+    # set alpha for each log-ratio by its scaled density
+    cols = alpha(theCol, densities)
+  }
+  # draw points
+  points(ds, pch=20, col=cols, ... )
+  # draw expectation line
+  if(showExpectationLine) 
+  {
+    abline(h = ds$expectation, col=scaleColor(theCol, .8), lty="dashed", lwd=cfg$PlotCurveLineWidth)
+  }
+  # draw lowess regression line
+  if(showRegressionLine)
+  {
+    regLine = lowess( ds$x, ds$y )
+    lines( regLine, col=scaleColor(theCol,.5), lty=5, lwd=cfg$PlotCurveLineWidth )
+  }
+  return(ds$y)
+}
+################################################################################
+
+################################################################################
+# make a scatter plot with smoothed colors
+makeScatter = function(samplePair, showLegend=F, showRegLines=F, showExpLines=T, useCfgColor=T )
 {
   emptyPlot(samplePair$xlim, samplePair$ylim, grid=F, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize)
   title(main="",
@@ -132,28 +185,11 @@ makeScatter = function(samplePair, showLegend=F, showRegLines=F)
         ylab=as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ),
         cex.lab = cfg$AxisLabelSize
   )
-  makePoints = function(d)
-  {
-    y = d$y
-    # limit to y-range ?
-    # y[y<samplePair$ylim[1]] = samplePair$ylim[1]
-    # y[y>samplePair$ylim[2]] = samplePair$ylim[2]
-    points( d$x, y, pch=cfg$ScatterPlotPointType, col=alpha(d$col, cfg$PlotPointAlpha), cex=cfg$PlotPointSize )
-    if(showRegLines)
-    {
-      regLine = lowess( d$x, y )
-      lines( regLine, col=scaleColor(d$col,.5), lty=5, lwd=cfg$PlotCurveLineWidth )
-    }
-    return(d$y)
-  } 
-  logRatios = sapply( samplePair$data, makePoints)
-  makeExpLine = function(d) 
-  {
-    theCol = scaleColor(d$col,.8)
-    hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=theCol )
-    return(d$expectation) 
-  }
-  expRatios = sapply( samplePair$data, makeExpLine )  
+  logRatios = sapply(cfg$AllSpeciesNames, 
+                     addScatterPointsForSpecies, samplePair, 
+                      minAlpha=cfg$PlotPointMinAlpha, showExpectationLine=showExpLines, showRegressionLine=showRegLines, 
+                      useCfgColor=T, rampColors=ifelse(cfg$PlotPointMinAlpha==1, F, T), cex=cfg$PlotPointSize
+  )
   if(showLegend) plotSpeciesLegend( horiz=T )
   return(logRatios)
 }
@@ -215,24 +251,25 @@ showQuantBarPlot = function(samplePair)
 
 ################################################################################
 # draw scatter- and density plot
-showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F)
+showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8)
 {
 	par(cfg$par)
-	par(fig=c(0,0.7,0,1), new=F)
+	par(fig=c(0,scatterPlotWidth,0,1), new=F)
 	logRatios = makeScatter(samplePair, showLegend, showRegLines)
 	# density plot
-	par(fig=c(0.7,1,0,1), new=T)
+	par(fig=c(scatterPlotWidth,1,0,1), new=T)
 	pm = par()$mar
 	pm[c(2,4)] = 0
 	par(mar=pm)
 	xLim=samplePair$ylim
 	yLim=range( lapply(samplePair$data, function(d) range(d$density$y) ) )
 	emptyPlot(yLim, xLim, axes=F, grid=F)
-  mkLines = function(d) 
+  mkLines = function(d)
   {
     idx = d$density$x > min(d$y) & d$density$x < max(d$y)
-    lines(d$density$y[idx], d$density$x[idx] , type="l", col=d$col, lwd=cfg$PlotCurveLineWidth ) 
-    hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=scaleColor(d$col,.8) )
+    theCol = cfg$SpeciesColors[which(cfg$AllSpeciesNames==d$species)]
+    lines(d$density$y[idx], d$density$x[idx] , type="l", col=theCol, lwd=cfg$PlotCurveLineWidth ) 
+    hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=scaleColor(theCol,.8) )
   }
 	nix = sapply( samplePair$data, mkLines )
 	par(cfg$parBackup)
@@ -244,13 +281,13 @@ loadLibrary("scales")
 
 ################################################################################
 # draw scatter- and boxplot
-showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F)
+showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8)
 {
   par(cfg$par)
-  par(fig=c(0,0.7,0,1), new=F)
+  par(fig=c(0,scatterPlotWidth,0,1), new=F)
   logRatios = makeScatter(samplePair, showLegend, showRegLines)
   # box plot
-  par(fig=c(0.7,1,0,1), new=T)
+  par(fig=c(scatterPlotWidth,1,0,1), new=T)
   pm = par()$mar
   pm[c(2,4)] = 0
   par(mar=pm)
@@ -260,10 +297,11 @@ showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F)
   )
   # add horizontal lines
   makeExpLines = function(d) 
-  { 
-      hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=scaleColor(d$col,.8) )
-      return(d$expectation) 
-  }
+  {
+    theCol = cfg$SpeciesColors[which(cfg$AllSpeciesNames==d$species)]
+    hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=scaleColor(theCol,.8) )
+    return(d$expectation) 
+  }  
   expRatios = sapply( samplePair$data, makeExpLines )
   par(cfg$parBackup)
   par(fig=c(0,1,0,1), new=F)
@@ -277,16 +315,10 @@ showDistributionDensityPlot = function(samplePair, showLegend=F)
   xLim=samplePair$ylim
   yLim=range( lapply(samplePair$data, function(d) range(d$density$y) ) )
   par(cfg$par)
-  emptyPlot(xLim, yLim, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize)
-  title(main="",
-        xlab=as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ), 
-        ylab="Density",
-        cex.lab = cfg$AxisLabelSize
-  )
-  sapply(samplePair$data, function(d) {
-    lines(d$density, type="l", col=d$col, lwd=cfg$PlotCurveLineWidth ) 
-  }
-  )
+  emptyPlot(xLim, yLim, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize )
+  addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ), -0.2, cex.lab = cfg$AxisLabelSize)
+  addYLab( "Density", .6, cex.lab = cfg$AxisLabelSize)
+  sapply(samplePair$data, function(d) lines(d$density, type="l", col=d$col, lwd=cfg$PlotCurveLineWidth ) )
   if(showLegend) plotSpeciesLegend( )
   par(cfg$parBackup)
 }
