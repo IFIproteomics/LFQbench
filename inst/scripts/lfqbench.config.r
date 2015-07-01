@@ -2,6 +2,7 @@ cfg = list()
 
 # data folder
 cfg$DataRootFolder = "../../../lfqbench.testdata/"
+cfg$DataRootFolder = "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/newLib_may2015/Peakview_round2"
 
 # protein quantification input data CSV format
 cfg$InputExtensionPattern = "\\..sv$"

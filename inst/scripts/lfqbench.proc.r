@@ -37,7 +37,15 @@ processData = function( DocSet )
   
   ################################################################################
   # calculate missing value statistics
-  
+  calHistNAsWithSpecies <- function(species){
+      sp_hist = hist(csvNumNAs[csvSpecies == species],  breaks=seq(-1, ncol(csvAmounts)), include.lowest=T,  plot=F  )
+      return(sp_hist$counts)
+  }
+  csvNumNAs = apply(csvAmounts,1, function(row) sum(is.na(row)))
+  numNAs_histograms = as.data.frame(sapply(cfg$AllSpeciesNames, calHistNAsWithSpecies)) 
+  numNAs_histograms = cbind( seq(0, ncol(csvAmounts) ), numNAs_histograms)
+  names(numNAs_histograms)[1] = c("numNAs")
+  #row.names(numNAs_histograms) = seq(0, ncol(csvAmounts) - 1)
   ################################################################################
   
   ################################################################################
@@ -47,7 +55,10 @@ processData = function( DocSet )
   
   ################################################################################
   # add more info to missing value statistics
-  
+  csvNumNAs = apply(csvAmounts,1, function(row) sum(is.na(row)))
+  numNAs_histograms_after_dis_low_amounts = as.data.frame(sapply(cfg$AllSpeciesNames, calHistNAsWithSpecies)) 
+  names(numNAs_histograms_after_dis_low_amounts) = paste(names(numNAs_histograms_after_dis_low_amounts), "lowAmountsAsNA",sep="_")
+  numNAs_histograms = cbind( numNAs_histograms, numNAs_histograms_after_dis_low_amounts)
   ################################################################################
   
   ################################################################################
@@ -303,8 +314,8 @@ processData = function( DocSet )
         species=SampleAverageSpecies,
         id=SampleAverageProteinIDs,
         mean=SampleAverageAmounts,
-        cv=SampleAverageCVs
-        # missing values,
+        cv=SampleAverageCVs,
+        missingvalues = numNAs_histograms
       )
       
   )
