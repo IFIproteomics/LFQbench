@@ -176,6 +176,61 @@ addScatterPointsForSpecies = function(species, samplePairResult, minAlpha=.2, sh
 ################################################################################
 
 ################################################################################
+# scale a vector to values ranging from 0 to 1
+scaleTo01 = function(v)
+{
+  v = v - min(v)
+  v = v / max(v)
+  return( v )
+}
+################################################################################
+
+################################################################################
+addScatterPointsForSpecies2 = function(species, samplePairResult, minAlpha=.2, showExpectationLine=T, showRegressionLine=T, useCfgColor=T, rampColors=T, ...)
+{
+  ds = samplePairResult$data[[species]]
+  theCol = ifelse(useCfgColor, cfg$SpeciesColors[which(cfg$AllSpeciesNames==ds$species)], ds$col)
+  cols=theCol
+  if(rampColors)
+  {
+    # get density for log2(B)
+    xDens = density( ds$x )
+    x2d = approxfun(xDens$x, xDens$y, method = "linear")
+    # normalized densities for log2-intensities
+    d4x = scaleTo01( x2d( ds$x ) )
+      
+    # get density for a log-ratio value
+    y2d = approxfun(ds$density$x, ds$density$y, method = "linear")
+    # normalized densities for log-ratios
+    d4y = scaleTo01( y2d(ds$y) )
+
+    # calculate 2d density
+    densities = d4x * d4y 
+  
+    # limit by min threshold
+    densities[ densities<minAlpha ] = minAlpha
+    
+    # set alpha for each log-ratio by its scaled density
+    cols = alpha(theCol, densities)
+  }
+  # draw points
+  points(ds, pch=20, col=cols, ... )
+  # draw expectation line
+  if(showExpectationLine) 
+  {
+    abline(h = ds$expectation, col=scaleColor(theCol, .8), lty="dashed", lwd=cfg$PlotCurveLineWidth)
+  }
+  # draw lowess regression line
+  if(showRegressionLine)
+  {
+    regLine = lowess( ds$x, ds$y )
+    lines( regLine, col=scaleColor(theCol,.5), lty=5, lwd=cfg$PlotCurveLineWidth )
+  }
+  return(ds$y)
+}
+################################################################################
+
+################################################################################
 # make a scatter plot with smoothed colors
 makeScatter = function(samplePair, showLegend=F, showRegLines=F, showExpLines=T, useCfgColor=T )
 {
@@ -183,7 +238,7 @@ makeScatter = function(samplePair, showLegend=F, showRegLines=F, showExpLines=T,
   addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ) )
   addYLab( as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ) )
   logRatios = sapply(cfg$AllSpeciesNames, 
-                     addScatterPointsForSpecies, samplePair, 
+                     addScatterPointsForSpecies2, samplePair, 
                       minAlpha=cfg$PlotPointMinAlpha, showExpectationLine=showExpLines, showRegressionLine=showRegLines, 
                       useCfgColor=T, rampColors=ifelse(cfg$PlotPointMinAlpha==1, F, T), cex=cfg$PlotPointSize
   )
