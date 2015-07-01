@@ -66,7 +66,7 @@ cfg$PlotLegendLineWidth = 4
 cfg$PlotPointSize = 1.5
 # point type
 cfg$ScatterPlotPointType = 20
-# point transparency
+# minimum alpha threshold for point transparency ramping
 cfg$PlotPointMinAlpha = 0.1
 # size magnification for axis labels (cex.lab)
 cfg$AxisLabelSize = 2

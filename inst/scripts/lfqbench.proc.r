@@ -33,9 +33,22 @@ processData = function( DocSet )
   csvAmounts = 1.0 * as.matrix( csvDat[, numericColumnIdx] )
   csvSpecies = as.vector( csvDat[, speciesColumnIdx[[1]]] )  
   rm( csvDat )
+  ################################################################################
   
+  ################################################################################
+  # calculate missing value statistics
+  
+  ################################################################################
+  
+  ################################################################################
   # disable low amounts
   csvAmounts[csvAmounts < cfg$MinProteinAmount] = NA
+  ################################################################################
+  
+  ################################################################################
+  # add more info to missing value statistics
+  
+  ################################################################################
   
   ################################################################################
   # check OTHER species
@@ -291,7 +304,9 @@ processData = function( DocSet )
         id=SampleAverageProteinIDs,
         mean=SampleAverageAmounts,
         cv=SampleAverageCVs
+        # missing values,
       )
+      
   )
   ################################################################################
   
