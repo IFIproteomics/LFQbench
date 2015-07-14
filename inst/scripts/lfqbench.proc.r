@@ -203,6 +203,7 @@ processData = function( DocSet )
     ScatterPlotXAxisData = log2( Sample2ProteinAmounts )
     # xLim = range(ScatterPlotXAxisData[ScatterPlotXAxisData>0])
     xLim = quantile( ScatterPlotXAxisData[ScatterPlotXAxisData>0], probs=c(0.01,0.99), na.rm = T )
+    if(!is.null(cfg[["XaxisPlotRange"]])) xLim = cfg$XaxisPlotRange
     yLim = cfg$LogRatioPlotRange
     # ensure x-axis boundaries
     ScatterPlotXAxisData[ ScatterPlotXAxisData < xLim[1] ] = xLim[1]

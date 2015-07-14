@@ -2,7 +2,6 @@ cfg = list()
 
 # data folder
 cfg$DataRootFolder = "../../../lfqbench.testdata/"
-cfg$DataRootFolder = "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/newLib_may2015/Peakview_round2"
 
 # protein quantification input data CSV format
 cfg$InputExtensionPattern = "\\..sv$"
@@ -35,6 +34,7 @@ cfg$LogRatioValidityRange  = c(-10, 10)
 
 # log-ratio range for plots
 cfg$LogRatioPlotRange   = c(-4, 4)
+cfg$XaxisPlotRange = c(10, 26)
 
 # value used as maximum for AUQC quantification
 cfg$MaxLogRatioForAUQC  = 2
@@ -54,7 +54,7 @@ cfg$Log2IntensityRanges = rbind(
 cfg$CenterLogRatioByBackground = T
 
 # if TRUE then all protein amounts will be translated to ppm values
-cfg$NormalizeAmountsToPPM = T
+cfg$NormalizeAmountsToPPM = F
 
 # graphics settings
 # pdf canvas size in inches
