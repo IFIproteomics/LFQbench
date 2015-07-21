@@ -13,16 +13,16 @@ source('lfqbench.defs.r')
 source('lfqbench.plot.r')
 
 
-if(DEBUG) cat( "R working directory: " + getwd() + "\n")
+if(DEBUG) cat(paste("R working directory: ",getwd(), "\n", sep = ""))
 
 ################################################################################
 AllInputFiles = list.files( path=cfg$InputFilesLocation, pattern=cfg$InputExtensionPattern, full.names = FALSE )
 
 if( length(AllInputFiles) < 1 ) 
 {
-  cat("working directory: " + getwd() + "\n")
-  cat("input directory:   " + cfg$InputFilesLocation + "\n")
-  cat("file extension:    " + cfg$InputExtensionPattern + "\n")
+  cat(paste("working directory: ", getwd(),"\n", sep=""))
+  cat(paste("input directory:   ", cfg$InputFilesLocation, "\n", sep = ""))
+  cat(paste("file extension:    ", cfg$InputExtensionPattern, "\n", sep=""))
   stop( "no input files found!" )
 }
 
@@ -30,7 +30,7 @@ DocSets = lapply( AllInputFiles, makeDocSet )
 names(DocSets)=sapply(DocSets, function(d)d$fileBase)
 ResultSets = lapply( DocSets, processData )
 
-save(DocSets, ResultSets, file = cfg$LogFilesLocation + "/ResultSets.rda")
+save(DocSets, ResultSets, file = paste(cfg$LogFilesLocation, "/ResultSets.rda"))
 # nix=sapply( ResultSets, saveSampleMeans )
 # nix=sapply( ResultSets, saveSpeciesSeparation )
 # nix=sapply( ResultSets, saveIDs )

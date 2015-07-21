@@ -6,7 +6,7 @@
 
 processData = function( DocSet ) {
   #DocSet = DocSets[[1]]    
-  cat( "processing " + DocSet$fileBase + " ... \n" )
+  cat(paste("processing ",DocSet$fileBase," ... \n",sep = ""))
   
   ################################################################################
   # read run based data
@@ -219,7 +219,7 @@ processData = function( DocSet ) {
     {
       ValueIndices = which(SpeciesNames == TheSpecies)
       SpeciesIndex = cfg$AllSpeciesNames == TheSpecies
-      if(DEBUG) cat( TheSpecies + " has " + length( ValueIndices ) + " IDs ... \n")
+      if(DEBUG) cat( paste(TheSpecies, " has ", length( ValueIndices ), " IDs ... \n", sep = ""))
       qcFunc = as.function(
         getQCFunction( LogRatio[ValueIndices] - LogRatioMedians[SpeciesIndex], ensureValueRange=c(0, cfg$MaxLogRatioForAUQC) )
       )
@@ -296,7 +296,7 @@ processData = function( DocSet ) {
   ################################################################################
   # process all sample pairs
   SamplePairsData = lapply(1:cfg$NumberOfSamplePairs, getSamplePairData)
-  names(SamplePairsData) = sapply( SamplePairsData, function(d) d$name1+":"+d$name2 )
+  names(SamplePairsData) = sapply( SamplePairsData, function(d) paste(d$name1, ":", d$name2,sep = "" ))
   ################################################################################
   
   ################################################################################

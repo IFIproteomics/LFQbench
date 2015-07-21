@@ -16,7 +16,7 @@ plotResultSet = function( resSet,
                           showScatterAndBoxPlot=T,
                           showBoxPlot=T,
                           showDensityPlot=T){
-  cat("creating "+resSet$docSet$pdfFile+" ...")
+  cat(paste("creating ", resSet$docSet$pdfFile, " ...", sep=""))
   pdf(file=resSet$docSet$pdfFile, onefile=T, width=cfg$PlotWidth, height=cfg$PlotHeight, family="Helvetica", pointsize=9)
   
   # accuracy and precision
@@ -40,7 +40,7 @@ plotResultSet = function( resSet,
 #' @export
 #' 
 
-saveMetrics = function(resultSets = ResultSets, File = cfg$LogFilesLocation + "/metrics.txt"){
+saveMetrics = function(resultSets = ResultSets, File = paste(cfg$LogFilesLocation, "/metrics.txt", sep="")){
   metrics = lapply( resultSets, getMetrics )
   sink(file=File, split=T)
   explainMetrics()
@@ -91,10 +91,9 @@ explainMetrics = function(){
 
 showMetrics = function(m){
   cat("--------------------------------------------\n")
-  cat("\n" + m$name + "\n")
-  sm = function(mn) 
-  {
-      cat( mn + ": " )
+  cat(paste("\n", m$name, "\n", sep=""))
+  sm = function(mn){
+      cat( paste(mn,": ", sep="" ))
       v = m[[mn]]
       if( is.atomic(v) ) 
       {
@@ -125,9 +124,7 @@ logIdStatistics = function( resultSets ){
   sums = rowSums(idstats)
   labs = sapply( resultSets, function(rs) rs$docSet$fileBase )
   write.table(
-    data.frame( "name"=labs, idstats, "sum"=sums ) ,
-      file=cfg$LogFilesLocation+"/identification_statistics.csv",
-      sep=cfg$CsvColumnSeparator, row.names=F, col.names=T)
+    data.frame( "name"=labs, idstats, "sum"=sums ) , file=paste(cfg$LogFilesLocation,"/identification_statistics.csv",sep=""), sep=cfg$CsvColumnSeparator, row.names=F, col.names=T)
   cat("[done]\n")
 }
 
@@ -143,19 +140,19 @@ saveLogRatios = function( rs ){
     pairRes = rs$result[[pairName]]
     write.table( 
       pairRes$validLogRatios,
-      cfg$LogFilesLocation + "/" + rs$docSet$fileBase + " LR ("+pairRes$name1 + "-" + pairRes$name2+").csv",
+      paste(cfg$LogFilesLocation,"/",rs$docSet$fileBase," LR (", pairRes$name1,"-" ,pairRes$name2, ").csv",sep=""),
       sep = ",",dec = ".",row.names = F, col.names = T
     )
     
     write.table( 
       pairRes$validLogRatios[pairRes$validLogRatios$logratio < cfg$LogRatioPlotRange[1] | pairRes$validLogRatios$logratio > cfg$LogRatioPlotRange[2],],
-      cfg$LogFilesLocation + "/" + rs$docSet$fileBase + " LR ("+pairRes$name1 + "-" + pairRes$name2+") out of range.csv",
+      paste(cfg$LogFilesLocation,"/", rs$docSet$fileBase ," LR (", pairRes$name1 , "-" , pairRes$name2, ") out of range.csv", sep=""),
       sep = ",",dec = ".",row.names = F, col.names = T
     )    
     
     write.table( 
       pairRes$invalidLogRatios,
-      cfg$LogFilesLocation + "/" + rs$docSet$fileBase + " invalid LR ("+pairRes$name1 + "-" + pairRes$name2+").csv",
+      paste(cfg$LogFilesLocation ,"/" , rs$docSet$fileBase , " invalid LR (", pairRes$name1 , "-" , pairRes$name2, ").csv",sep=""),
       sep = ",",dec = ".",row.names = F, col.names = T
     )
 
@@ -317,7 +314,7 @@ getCombinedLogRatios = function( ResultSets ){
     fileName = rs$docSet$fileBase
     spcNames = names( rs$result[[pairName]]$data )
     spcLogRatios = sapply( rs$result[[pairName]]$data, function(d) d$y )
-    names(spcLogRatios) = fileName + "  " + pairName + "  " + spcNames
+    names(spcLogRatios) = paste(fileName , "  " , pairName , "  " , spcNames, sep = "")
     return(spcLogRatios)
   }
   
@@ -351,18 +348,18 @@ makeDocSet = function( inFile ){
   fileBase = sub(cfg$InputExtensionPattern, "", inFile)
   return( 
     list(
-      inputPath = cfg$InputFilesLocation,
-      plotPath = cfg$PlotFilesLocation,
+      inputPath = cfg$InputFilesLocation, 
+      plotPath = cfg$PlotFilesLocation, 
       logPath = cfg$LogFilesLocation,
-      fileBase = fileBase,
-      csvFile = cfg$InputFilesLocation + "/" + inFile,
-      pdfFile = cfg$PlotFilesLocation + "/" + fileBase + ".pdf",
-      logFile = cfg$LogFilesLocation + "/" + fileBase + ".log",
-      avgFile = cfg$LogFilesLocation + "/" + fileBase + " sample_means.csv",
-      rsdFile = cfg$LogFilesLocation + "/" + fileBase + " cv.csv",
-      l2rFile = cfg$LogFilesLocation + "/" + fileBase + " log2_ratio.csv",
-      rocFile = cfg$LogFilesLocation + "/" + fileBase + " species_separation.csv",
-      idsFile = cfg$LogFilesLocation + "/" + fileBase + " ids.csv"
+      fileBase = fileBase, 
+      csvFile  = paste(cfg$InputFilesLocation,"/",inFile, sep = ""),
+      pdfFile  = paste(cfg$PlotFilesLocation,"/",fileBase,".pdf", sep = ""),
+      logFile  = paste(cfg$LogFilesLocation,"/",fileBase,".log", sep = ""),
+      avgFile  = paste(cfg$LogFilesLocation, "/", fileBase, " sample_means.csv", sep = ""),
+      rsdFile  = paste(cfg$LogFilesLocation, "/", fileBase, " cv.csv", sep = ""),
+      l2rFile =  paste(cfg$LogFilesLocation, "/", fileBase, " log2_ratio.csv", sep=""),
+      rocFile =  paste(cfg$LogFilesLocation, "/", fileBase, " species_separation.csv", sep = ""),
+      idsFile =  paste(cfg$LogFilesLocation, "/", fileBase, " ids.csv", sep = "")
     )
   )
 }

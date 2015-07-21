@@ -36,11 +36,11 @@ cfg$AUQCRatioRange = c(0, cfg$MaxLogRatioForAUQC)
 # create sample index pairs
 cfg$SamplePairsIndices   = createNumericPairs( 1, cfg$NumberOfSamples )
 cfg$NumberOfSamplePairs = nrow( cfg$SamplePairsIndices )
-cfg$SamplePairsLabels = apply(cfg$SamplePairsIndices, 1, function(sp){nms = cfg$AllSampleNames[sp]; return(nms[1]+":"+nms[2])} )
+cfg$SamplePairsLabels = apply(cfg$SamplePairsIndices, 1, function(sp){nms = cfg$AllSampleNames[sp]; return(paste(nms[1], ":" ,nms[2], sep = ""))} )
 cfg$SamplePairsColors  	= brewer.pal( max(cfg$NumberOfSamplePairs,3), "Dark2" )[1:cfg$NumberOfSamplePairs]
 ################################################################################
 
 ################################################################################
 cfg$AllSpeciesPairs = createNumericPairs(1, cfg$NumberOfSpecies)
-cfg$AllSpeciesPairsLabels = apply(cfg$AllSpeciesPairs, 1, function(sp){nms = cfg$AllSpeciesNames[sp]; return(nms[1]+"-"+nms[2])} )
+cfg$AllSpeciesPairsLabels = apply(cfg$AllSpeciesPairs, 1, function(sp){nms = cfg$AllSpeciesNames[sp]; return(paste(nms[1], "-", nms[2], sep=""))} )
 ################################################################################

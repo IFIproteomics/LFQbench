@@ -4,8 +4,8 @@
 \alias{saveMetrics}
 \title{saveMetrics}
 \usage{
-saveMetrics(resultSets = ResultSets, File = cfg$LogFilesLocation +
-  "/metrics.txt")
+saveMetrics(resultSets = ResultSets, File = paste(cfg$LogFilesLocation,
+  "/metrics.txt", sep = ""))
 }
 \arguments{
 \item{resultSets}{}

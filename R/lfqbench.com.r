@@ -29,7 +29,7 @@ loadLibrary <- function(x)
 mkdir = function(dirName){
 	if(!file.exists(dirName))
 	{
-    	cat("folder '"+dirName+"' does not exist, creating ... ")
+    	cat(paste("folder ", dirName, " does not exist, creating ... ", sep = ""))
 	    dir.create(dirName, recursive=T, showWarnings=F)
     	cat("done!\n")
   	}
@@ -204,7 +204,7 @@ spiner = function(samples, sampleNames=colnames(samples), partNames=rownames(sam
     sx[] = sampleX[si]
     sr = rel( samples[,si] )
     sy = mipo( sr )
-    text( sx, sy, ""+ round(sr*100, 1) + " %", col=sampleFGCols )
+    text( sx, sy, paste("", round(sr*100, 1)," %",sep = ""), col=sampleFGCols )
   }
   
   axis(4, labels=partNames, at=sy, tick=F)

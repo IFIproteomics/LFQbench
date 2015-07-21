@@ -125,12 +125,12 @@ plotSpeciesLegend = function( pos="top", ... )
 ################################################################################
 plotSpeciesLegends = function()
 {
-  pdf(file = cfg$PlotFilesLocation + "/species_legend_vertical.pdf", width = 1.05, height = 0.66, family = "Helvetica", pointsize = 9)
+  pdf(file = paste(cfg$PlotFilesLocation,"/species_legend_vertical.pdf", sep = ""), width = 1.05, height = 0.66, family = "Helvetica", pointsize = 9)
   par(mar=c(0,0,0.1,0))
   emptyPlot( 0:1, 0:1, lwd=0, grid=F, showXlab=F, showYlab=F, axes=F )
   plotSpeciesLegend(pos="top", horiz=F )
   dev.off()
-  pdf(file = cfg$PlotFilesLocation + "/species_legend_horizontal.pdf", width = 2.9, height = 0.35, family = "Helvetica", pointsize = 9)
+  pdf(file = paste(cfg$PlotFilesLocation,"/species_legend_horizontal.pdf",sep = ""), width = 2.9, height = 0.35, family = "Helvetica", pointsize = 9)
   par(mar=c(0,0,0.1,0))
   emptyPlot( 0:1, 0:1, lwd=0, grid=F, showXlab=F, showYlab=F, axes=F )
   plotSpeciesLegend(pos="top", horiz=T )
@@ -236,7 +236,7 @@ makeScatter = function(samplePair, showLegend=F, showRegLines=F, showExpLines=T,
 {
   emptyPlot(samplePair$xlim, samplePair$ylim, grid=F, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize)
   addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ) )
-  addYLab( as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ) )
+  addYLab( as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ) )
   logRatios = sapply(cfg$AllSpeciesNames, 
                      addScatterPointsForSpecies2, samplePair, 
                       minAlpha=cfg$PlotPointMinAlpha, showExpectationLine=showExpLines, showRegressionLine=showRegLines, 
@@ -270,7 +270,7 @@ showLogRatioBoxPlot = function(samplePair)
   addAxes(showXlab=F, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize)
   axis(1, labels=cfg$AllSpeciesNames, at=(1:cfg$NumberOfSpecies), 
        lwd.ticks=cfg$AxisLineThickness, lwd=0, cex.axis = cfg$AxisAnnotationSize )
-  addYLab( as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ))
+  addYLab( as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ))
   grid()
   par(cfg$parBackup)
 }
@@ -283,7 +283,7 @@ showQuantBarPlot = function(samplePair)
   par(cfg$par)
   values = unlist(sapply( samplePair$data, function(d) { return(d$y) } ))
   colors = unlist(sapply( samplePair$data, function(d) { return(rep(d$col,length(d$y)) ) } ))
-  cat(""+length(values)+" values ...\n")
+  cat(paste("",length(values)," values ...\n", sep=""))
   sortedIndices = order(values, decreasing=T)
   colors = colors[sortedIndices]
   values = values[sortedIndices]
@@ -293,7 +293,7 @@ showQuantBarPlot = function(samplePair)
         cex.lab = cfg$AxisLabelSize, cex.axis = cfg$AxisAnnotationSize
   )
   addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ) )
-  addYLab( as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ) )
+  addYLab( as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ) )
   legendLabels = sapply( samplePair$data, function(d) d$species )
   legendColors = sapply( samplePair$data, function(d) d$col )
   legend(x="topright", legend=legendLabels, col=legendColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white")
@@ -344,7 +344,7 @@ showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F, scatt
   pm[c(2,4)] = 0
   par(mar=pm)
   qboxplot( logRatios, pch=20,
-            ylab=as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ),
+            ylab=as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ),
             whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F, lims=samplePair$ylim, border=cfg$SpeciesColors
   )
   # add horizontal lines
@@ -368,7 +368,7 @@ showDistributionDensityPlot = function(samplePair, showLegend=F)
   yLim=range( lapply(samplePair$data, function(d) range(d$density$y) ) )
   par(cfg$par)
   emptyPlot(xLim, yLim, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize )
-  addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name1+":"+samplePair$name2)~")" ) ) )
+  addXLab( as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ) )
   addYLab( "Density", .6 )
   sapply(samplePair$data, function(d) lines(d$density, type="l", col=d$col, lwd=cfg$PlotCurveLineWidth ) )
   if(showLegend) plotSpeciesLegend( )
@@ -389,7 +389,7 @@ showAllSpeciesQC = function(samplePair)
     ylab="Parts"
   )
   sapply(samplePair$data, function(d) lines(x, d$qcfunction(x), type="l", col=d$col, lwd=cfg$PlotCurveLineWidth ) )
-  legendLabels = sapply( samplePair$data, function(d) d$species + ": " + d$auqc )
+  legendLabels = sapply( samplePair$data, function(d) paste(d$species , ": " , d$auqc, sep="" ))
   legendColors = sapply( samplePair$data, function(d) d$col )
   legend(x="bottomright", legend=legendLabels, col=legendColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white")
   par(cfg$parBackup)
@@ -409,7 +409,7 @@ showSingleSpeciesQC = function(samplePairsData, speciesName="MOUSE")
   )
   x = (1:500)/500*cfg$AUQCRatioRange[2]
   sapply(samplePairsData, function(sp){ lines(x, sp$data[[speciesIndex]]$qcfunction(x), type="l", col=sp$col, lwd=cfg$PlotCurveLineWidth ) } )
-  legendLabels = sapply( samplePairsData, function(sp) "auqc("+sp$name1+":"+sp$name2+"): "+sp$data[[speciesIndex]]$auqc )
+  legendLabels = sapply( samplePairsData, function(sp) paste("auqc(",sp$name1, ":", sp$name2, "): ", sp$data[[speciesIndex]]$auqc, sep = "" ))
   legendColors = sapply( samplePairsData, function(sp) sp$col )
   legend(x="bottomright", legend=legendLabels, col=legendColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white")
   par( cfg$parBackup )
@@ -501,7 +501,7 @@ plotSampleComposition = function(
   sampleAmounts = data.frame( cfg$SampleComposition, row.names = 1  ),
   bgColors=NULL, fgColors=NULL, 
   labMainSize=1.5,
-  pdfFile=cfg$PlotFilesLocation+"/SampleComposition.pdf",
+  pdfFile=paste(cfg$PlotFilesLocation, "/SampleComposition.pdf", sep = ""),
   pdfWidth=2, pdfHeight=3,
   pdfFontSize=9, pdfFontFamily="Helvetica",
   pdfMar=c(2.3,2.8,.5,4.6)
