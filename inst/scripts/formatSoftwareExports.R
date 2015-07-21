@@ -16,26 +16,16 @@ loadLibrary("ggplot2")
 loadLibrary("readxl")
 
 
-#working_dir <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/newLib_may2015/Peakview_iRTshift_round1/RTwidth_6min"
-#working_dir <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/newLib_may2015/Peakview_iRTshift_round1/RTwidth_10min"
+working_dir <- "../../ext/data/example_spectronaut"
+working_dir <- "../../ext/data/example_peakview"
 
-
-#working_dir <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/newLib_may2015/Skyline_round1"
-#working_dir <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/newLib_may2015/openSWATH_round1"
-#working_dir <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/newLib_may2015/openSWATH_round2"
-#working_dir <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/newLib_may2015/Spectronaut_round1"
-#working_dir <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/newLib_may2015/Spectronaut_round2"
-#working_dir <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/round1/DIA.Umpire/SummaryResult_20150510/peptidesSummaries"
-#working_dir <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/round1/DIA.Umpire/SummaryResult_20150510/proteinSummaries"
-#working_dir <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/round1/DIA.Umpire/SummaryResult_20150720/peptidesSummaries"
-working_dir <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/round1/DIA.Umpire/SummaryResult_20150720/proteinSummaries"
 
 # Options: "Spectronaut", "PeakView", "Skyline", "openSWATH", "DIAumpire", "PeakView_builtin_proteins", "DIAumpire_builtin_proteins"
-software_source <- "DIAumpire_builtin_proteins"    
+software_source <- "PeakView"    
 
-suffix <- "r1_builtin"
+suffix <- "r1"
 
-results_dir <- "input_builtin"
+results_dir <- "input"
 supplementary <- "supplementary"
 
 # Use sequencelist when you want to analyse a subset of peptides
@@ -59,7 +49,7 @@ top.N.min = 2
 ##
 
 #histNAs.peptides.scale = c(0,2000)
-histNAs.proteins.scale = c(0,2000)
+histNAs.proteins.scale = c(0,700)
 
 source("fswe.variables.R")
 source("fswe.functions.R")

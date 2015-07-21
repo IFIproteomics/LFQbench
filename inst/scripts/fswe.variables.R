@@ -56,7 +56,7 @@ if(software_source == "Skyline"){
 }
 
 if(software_source == "PeakView"){
-    q_filter_threshold <- 1.0
+    q_filter_threshold <- 0.01
     quantitative.var.tag <- "Sample"
     fdr.var.tag <- "FDR"
     quantitative.var <- "TotalAreaFragment"
