@@ -7,7 +7,9 @@ Maintainer: Jorg Kuharev <kuharev@uni-mainz.de>,
             Yasset Perez-Riverol <yperez@ebi.ac.uk>
 Description: The package LFQbench comprises functions to compare different Label Free Quantitation pipelines and softwares in proteomics.
 Depends: R (>= 3.1.0), RColorBrewer, SDMTools
-Imports: tools (>= 3.1.0), RColorBrewer (>= 1.1.0), SDMTools (>= 1.1.0)
+Imports: tools (>= 3.1.0), 
+         RColorBrewer (>= 1.1.0), 
+         SDMTools (>= 1.1.0)
 Suggests: RUnit, bibtex, knitcitations (>= 1.0-1), knitr
 License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License
 URL: https://github.com/IFIproteomics/LFQbench
