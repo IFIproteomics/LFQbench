@@ -7,6 +7,8 @@
 #' @param showScatterAndBoxPlot
 #' @param showBoxPlot 
 #' @param showDensityPlot 
+#' 
+#' @export
 
 plotResultSet = function( resSet, 
                           showScatterPlot=T,
@@ -35,6 +37,9 @@ plotResultSet = function( resSet,
 #' @param resultSets
 #' @param File 
 #' 
+#' @export
+#' 
+
 saveMetrics = function(resultSets = ResultSets, File = cfg$LogFilesLocation + "/metrics.txt"){
   metrics = lapply( resultSets, getMetrics )
   sink(file=File, split=T)
@@ -46,7 +51,8 @@ saveMetrics = function(resultSets = ResultSets, File = cfg$LogFilesLocation + "/
 #' explainMetrics 
 #' 
 #' This function verbose the metrics of the experiment 
-#' 
+#' @export
+
 explainMetrics = function(){
   # identification = identification rate, number of identified proteins for benchmark species
   # replication = replication variance, median CV for the background species
@@ -80,7 +86,9 @@ explainMetrics = function(){
 #' showMetrics 
 #' 
 #' This function verbose the metrics of the experiment 
-#' 
+#'
+#'  @export 
+
 showMetrics = function(m){
   cat("--------------------------------------------\n")
   cat("\n" + m$name + "\n")
@@ -108,6 +116,8 @@ showMetrics = function(m){
 #' This function trace the Statistics related with each ID
 #' 
 #' @param resultSets
+#' 
+#' @export
 
 logIdStatistics = function( resultSets ){
   cat("storing identification statistics ... ")
@@ -125,6 +135,8 @@ logIdStatistics = function( resultSets ){
 #' 
 #' This saveLogRations 
 #' @param rs 
+#' @export
+
 saveLogRatios = function( rs ){
   listLR = function(pairName)
   { 
@@ -157,6 +169,8 @@ saveLogRatios = function( rs ){
 #' 
 #' This function save the Sample Means 
 #' @param resultSet
+#' @export
+#' 
 saveSampleMeans = function( resultSet )
 {
   cat("storing sample means ... ")
@@ -177,7 +191,7 @@ saveSampleMeans = function( resultSet )
 #' 
 #' This function save the Sample RSD
 #' @param resultSet
-#' 
+#' @export 
 saveSampleRSD = function( resultSet )
 {
   cat("storing coeffiecients of in-sample variation ... ")
@@ -198,6 +212,7 @@ saveSampleRSD = function( resultSet )
 #' 
 #' This function save the IDs 
 #' @param resultSet
+#' @export
 
 saveIDs = function( resultSet ){
   cat("storing identified protein names ... ")
@@ -212,6 +227,7 @@ saveIDs = function( resultSet ){
 #' 
 #' This function enable to save the species 
 #' @param resultSet
+#' @export
 #' 
 saveSpeciesSeparation = function( resultSet ){
   cat("storing species separation scores ... ")
@@ -229,6 +245,7 @@ saveSpeciesSeparation = function( resultSet ){
 #' 
 #' This fucntion get single number metrics
 #' @param resultSet
+#' @export
 #' 
 getMetrics = function(resultSet){
   # identification rate
@@ -292,6 +309,7 @@ getMetrics = function(resultSet){
 #' This function get the Combined Log Ratios 
 #' 
 #' @param ResultSets 
+#' @export
 #' 
 getCombinedLogRatios = function( ResultSets ){
   listLR = function(pairName, rs)
@@ -315,6 +333,7 @@ getCombinedLogRatios = function( ResultSets ){
 #' 
 #' This fucntion return the combined protein RSDs 
 #' @param ResultsSets 
+#' @export
 #' 
 getCombinedProteinRSDs = function( ResultSets ){
   CVs = lapply( ResultSets, function(rs) as.vector(rs$data$cv) )
@@ -326,6 +345,7 @@ getCombinedProteinRSDs = function( ResultSets ){
 #' 
 #' This function construct the DocSet 
 #' @param inFile 
+#' @export
 #' 
 makeDocSet = function( inFile ){
   fileBase = sub(cfg$InputExtensionPattern, "", inFile)

@@ -2,6 +2,7 @@
 #' 
 #' This function process the Data before generate the charts
 #' @param DocSet is the Data to be processed 
+#' @export
 
 processData = function( DocSet ) {
   #DocSet = DocSets[[1]]    
@@ -326,7 +327,7 @@ processData = function( DocSet ) {
 #' @param dataBySpecies
 #' @param ranges 
 #' @param spcNames
-#' 
+#' @export
 getRangedAccuracy = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spcNames = cfg$AllSpeciesNames){
   el2r = sapply(spcNames, function(sn) dataBySpecies[[sn]]$expectation, USE.NAMES = F )  
   l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
@@ -350,6 +351,7 @@ getRangedAccuracy = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spcN
 #'@param dataBySpecies
 #'@param ranges
 #'@param spcNames
+#'@export
  
 getRangedPrecision = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spcNames = cfg$AllSpeciesNames ){
   l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
@@ -374,7 +376,7 @@ getRangedPrecision = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spc
 #'  @param dataBySpecies
 #'  @param spcNames 
 #'  @param ranges
-#'  
+#'  @export
 getRangedSepRate = function(dataBySpecies, spcNames, ranges=cfg$Log2IntensityRanges){
   l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
   l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
@@ -394,6 +396,7 @@ getRangedSepRate = function(dataBySpecies, spcNames, ranges=cfg$Log2IntensityRan
 #' This function calculate species separation ROC-AUC for a species pair
 #' @param dataBySpecies
 #' @param spcNames
+#' @export 
 
 getSepRate = function(dataBySpecies, spcNames){
   l2rs = unlist( lapply( spcNames, function( x ) dataBySpecies[[x]]$y ) )

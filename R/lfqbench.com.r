@@ -1,6 +1,7 @@
 #' loadLibrary
 #' This function load an specific library for the package.
 #' @param x The library to be load
+#' @export
 
 loadLibrary <- function(x) 
 {
@@ -11,7 +12,10 @@ loadLibrary <- function(x)
 }
 
 
-# define + for String concatenation
+#' +
+#' This define + for String concatenation
+#' @export
+
 "+"=function(...) UseMethod("+")
 "+.default"=.Primitive("+")
 "+.character"=function(...) paste(...,sep="")
@@ -20,7 +24,8 @@ loadLibrary <- function(x)
 #' 
 #'  This recursively create a directory if it does not exist
 #'  @param dirName the directory to create the directory
-#'  
+#'  @export
+ 
 mkdir = function(dirName){
 	if(!file.exists(dirName))
 	{
@@ -37,6 +42,7 @@ mkdir = function(dirName){
 #' 
 #' @param from
 #' @param to
+#' @export
  
 createNumericPairs = function(from, to) {
   pairs = rbind(from:(from+1))
@@ -55,6 +61,7 @@ createNumericPairs = function(from, to) {
 #' 
 #' This root mean square
 #' @param x 
+#' @export
 #' 
 rms = function(x) sqrt( sum(x^2) / length(x) )
 
@@ -65,6 +72,8 @@ rms = function(x) sqrt( sum(x^2) / length(x) )
 #' @param labs a vector of names for each dataset
 #' @param lims overrides yLim parameter of boxplot
 #' @param whiskerQuantile whiskers range from (this value) to (1 - this value)
+#' @export 
+#' 
 qboxplot = function( vals, labs=NULL, lims=NULL, whiskerQuantile=0.05, horizontal=F, ... ){
   if( is.matrix(vals) ){
     cnames = colnames(vals)
@@ -72,7 +81,6 @@ qboxplot = function( vals, labs=NULL, lims=NULL, whiskerQuantile=0.05, horizonta
     names(vals) = cnames
   }
   
-  # remove na
   vals = lapply(vals, function(x) x[!is.na(x)] )
   
   d = as.list( vals )
@@ -146,6 +154,7 @@ qboxplot = function( vals, labs=NULL, lims=NULL, whiskerQuantile=0.05, horizonta
 #' @param plotTitle 
 #' @param bgCols
 #' @param fgCols 
+#' @export 
 #' 
 spiner = function(samples, sampleNames=colnames(samples), partNames=rownames(samples), plotTitle="", bgCols=NULL, fgCols="black"){
   # calculate relative values of a vector
@@ -203,8 +212,7 @@ spiner = function(samples, sampleNames=colnames(samples), partNames=rownames(sam
 
 #' evalCommandLineArguments
 #' This function eval the commandLine Arguments 
-#' 
-
+#' @export
 evalCommandLineArguments = function(){
   args=commandArgs(trailingOnly = T)
   sapply(args[grep("=", args)], 
