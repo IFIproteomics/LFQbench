@@ -34,7 +34,7 @@ cfg$LogRatioValidityRange  = c(-10, 10)
 
 # log-ratio range for plots
 cfg$LogRatioPlotRange   = c(-4, 4)
-cfg$XaxisPlotRange = c(10, 26)
+cfg$XaxisPlotRange = c(9, 26)
 
 # value used as maximum for AUQC quantification
 cfg$MaxLogRatioForAUQC  = 2
