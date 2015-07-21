@@ -1,11 +1,19 @@
-################################################################################
+#' plotResultSet
+#' 
+#' Function to generate the scatter plot
+#' @param resSet
+#' @param showScatterPlot
+#' @param showScatterAndDensityPlot
+#' @param showScatterAndBoxPlot
+#' @param showBoxPlot 
+#' @param showDensityPlot 
+
 plotResultSet = function( resSet, 
                           showScatterPlot=T,
                           showScatterAndDensityPlot=T,
                           showScatterAndBoxPlot=T,
                           showBoxPlot=T,
-                          showDensityPlot=T)
-{
+                          showDensityPlot=T){
   cat("creating "+resSet$docSet$pdfFile+" ...")
   pdf(file=resSet$docSet$pdfFile, onefile=T, width=cfg$PlotWidth, height=cfg$PlotHeight, family="Helvetica", pointsize=9)
   
@@ -19,22 +27,27 @@ plotResultSet = function( resSet,
   dev.off()
   cat("[done]\n")
 }
-################################################################################
 
-################################################################################
-saveMetrics = function(resultSets = ResultSets, File = cfg$LogFilesLocation + "/metrics.txt")
-{
+#' saveMetrics 
+#' 
+#' This function save all the metrics related with the experiment 
+#' 
+#' @param resultSets
+#' @param File 
+#' 
+saveMetrics = function(resultSets = ResultSets, File = cfg$LogFilesLocation + "/metrics.txt"){
   metrics = lapply( resultSets, getMetrics )
   sink(file=File, split=T)
   explainMetrics()
   x = lapply(metrics, showMetrics)
   sink()
 }
-################################################################################
 
-################################################################################
-explainMetrics = function()
-{
+#' explainMetrics 
+#' 
+#' This function verbose the metrics of the experiment 
+#' 
+explainMetrics = function(){
   # identification = identification rate, number of identified proteins for benchmark species
   # replication = replication variance, median CV for the background species
   # accuracy = accuracy of relative quantification, AUQC for background species
@@ -63,11 +76,12 @@ explainMetrics = function()
   cat("\t\tspecies separation ability,\n")
   cat("\t\tthe area under ROC curve between a species pair\n")
 }
-################################################################################
 
-################################################################################
-showMetrics = function(m)
-{
+#' showMetrics 
+#' 
+#' This function verbose the metrics of the experiment 
+#' 
+showMetrics = function(m){
   cat("--------------------------------------------\n")
   cat("\n" + m$name + "\n")
   sm = function(mn) 
@@ -88,11 +102,14 @@ showMetrics = function(m)
   nix = sapply(names(m), sm)
   cat("\n")
 }
-################################################################################
 
-################################################################################
-logIdStatistics = function( resultSets )
-{
+#' logIdStatistics
+#' 
+#' This function trace the Statistics related with each ID
+#' 
+#' @param resultSets
+
+logIdStatistics = function( resultSets ){
   cat("storing identification statistics ... ")
   idstats = t( sapply( resultSets, function(rs) rs$idstat ) )
   sums = rowSums(idstats)
@@ -103,11 +120,12 @@ logIdStatistics = function( resultSets )
       sep=cfg$CsvColumnSeparator, row.names=F, col.names=T)
   cat("[done]\n")
 }
-################################################################################
 
-################################################################################
-saveLogRatios = function( rs )
-{
+#' saveLogRations
+#' 
+#' This saveLogRations 
+#' @param rs 
+saveLogRatios = function( rs ){
   listLR = function(pairName)
   { 
     pairRes = rs$result[[pairName]]
@@ -134,10 +152,11 @@ saveLogRatios = function( rs )
   logRatios = lapply( names(rs$result), listLR )
   return(logRatios)
 }
-################################################################################
 
-################################################################################
-# store sample means
+#' saveSampleMeans
+#' 
+#' This function save the Sample Means 
+#' @param resultSet
 saveSampleMeans = function( resultSet )
 {
   cat("storing sample means ... ")
@@ -154,8 +173,11 @@ saveSampleMeans = function( resultSet )
 }
 ################################################################################
 
-################################################################################
-# store sample cv
+#' saveSampleRSD
+#' 
+#' This function save the Sample RSD
+#' @param resultSet
+#' 
 saveSampleRSD = function( resultSet )
 {
   cat("storing coeffiecients of in-sample variation ... ")
@@ -171,11 +193,13 @@ saveSampleRSD = function( resultSet )
   )
   cat("[done]\n")
 }
-################################################################################
 
-################################################################################
-saveIDs = function( resultSet )
-{
+#' saveIDs
+#' 
+#' This function save the IDs 
+#' @param resultSet
+
+saveIDs = function( resultSet ){
   cat("storing identified protein names ... ")
   write.table( 
     resultSet$data$id
@@ -183,12 +207,13 @@ saveIDs = function( resultSet )
   )
   cat("[done]\n")
 }
-################################################################################
 
-################################################################################
-# store species separation
-saveSpeciesSeparation = function( resultSet )
-{
+#' saveSpeciesSeparation
+#' 
+#' This function enable to save the species 
+#' @param resultSet
+#' 
+saveSpeciesSeparation = function( resultSet ){
   cat("storing species separation scores ... ")
   # species, a:b, a:c, ...
   d = data.frame(
@@ -199,12 +224,13 @@ saveSpeciesSeparation = function( resultSet )
   write.table( d, file=resultSet$docSet$rocFile, sep=cfg$CsvColumnSeparator, dec=cfg$CsvDecimalPointChar, col.names=T, row.names=F  )
   cat("[done]\n")
 }
-################################################################################
 
-################################################################################
-# get single number metrics
-getMetrics = function(resultSet)
-{
+#' getMetrics 
+#' 
+#' This fucntion get single number metrics
+#' @param resultSet
+#' 
+getMetrics = function(resultSet){
   # identification rate
   # number of identified proteins (only benchmark species)
   # PROBLEM? identification = sum( sapply(cfg$AllSpeciesNames, function(s) sum( resultSet$data$species == s, na.rm=T) ))
@@ -215,7 +241,7 @@ getMetrics = function(resultSet)
   # replication variance
   # median CV for background-species
   replication = median( na.exclude( resultSet$data$cv[ resultSet$data$species==cfg$BackgroundSpeciesName ] ) )
-  
+    
   # area under ROC curve in predefined ranges of intensity
   separation = lapply(resultSet$result, function(d) d$rangedSeparation )
   
@@ -260,11 +286,14 @@ getMetrics = function(resultSet)
     )
   )
 }
-################################################################################
 
-################################################################################
-getCombinedLogRatios = function( ResultSets )
-{
+#' getCombinedLogRatios
+#' 
+#' This function get the Combined Log Ratios 
+#' 
+#' @param ResultSets 
+#' 
+getCombinedLogRatios = function( ResultSets ){
   listLR = function(pairName, rs)
   { 
     fileName = rs$docSet$fileBase
@@ -281,20 +310,24 @@ getCombinedLogRatios = function( ResultSets )
   
   return(logRatios)
 }
-################################################################################
 
-################################################################################
-getCombinedProteinRSDs = function( ResultSets )
-{
+#' getCombinedProteinRSDs 
+#' 
+#' This fucntion return the combined protein RSDs 
+#' @param ResultsSets 
+#' 
+getCombinedProteinRSDs = function( ResultSets ){
   CVs = lapply( ResultSets, function(rs) as.vector(rs$data$cv) )
   names(CVs) = as.vector( lapply(ResultSets, function(rs) rs$docSet$fileBase ) )
   return(CVs)
 }
-################################################################################
 
-################################################################################
-makeDocSet = function( inFile )
-{
+#' makeDocSet
+#' 
+#' This function construct the DocSet 
+#' @param inFile 
+#' 
+makeDocSet = function( inFile ){
   fileBase = sub(cfg$InputExtensionPattern, "", inFile)
   return( 
     list(
@@ -313,4 +346,3 @@ makeDocSet = function( inFile )
     )
   )
 }
-################################################################################

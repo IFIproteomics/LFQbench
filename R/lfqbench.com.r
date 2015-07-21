@@ -1,4 +1,7 @@
-################################################################################
+#' loadLibrary
+#' This function load an specific library for the package.
+#' @param x The library to be load
+
 loadLibrary <- function(x) 
 {
   if(!require(x, character.only=T, quietly = T)) 
@@ -6,19 +9,19 @@ loadLibrary <- function(x)
     install.packages(x); require(x, character.only=T) 
   } 
 }
-################################################################################
 
-################################################################################
+
 # define + for String concatenation
 "+"=function(...) UseMethod("+")
 "+.default"=.Primitive("+")
 "+.character"=function(...) paste(...,sep="")
-################################################################################
 
-################################################################################
-# recursively create a directory if it does not exist
-mkdir = function(dirName)
-{
+#' mkdir
+#' 
+#'  This recursively create a directory if it does not exist
+#'  @param dirName the directory to create the directory
+#'  
+mkdir = function(dirName){
 	if(!file.exists(dirName))
 	{
     	cat("folder '"+dirName+"' does not exist, creating ... ")
@@ -26,13 +29,16 @@ mkdir = function(dirName)
     	cat("done!\n")
   	}
 }
-################################################################################
 
-################################################################################
-# create pairs for a range of integer numbers
-# e.g. for from=1, to=4 the result is rbind(c(1,2),c(1,3),c(1,4),c(2,3),c(2,4),c(3,4))
-createNumericPairs = function(from, to) 
-{
+
+#' createNumericPairs
+#' 
+#' This function creates pairs for a range of integer numbers (e.g. for from=1, to=4 the result is rbind(c(1,2),c(1,3),c(1,4),c(2,3),c(2,4),c(3,4))
+#' 
+#' @param from
+#' @param to
+ 
+createNumericPairs = function(from, to) {
   pairs = rbind(from:(from+1))
   for(num1 in from:(to-1)) {
     for(num2 in (num1+1):to) {
@@ -45,21 +51,21 @@ createNumericPairs = function(from, to)
 }
 ################################################################################
 
-################################################################################
-# root mean square
+#' rms
+#' 
+#' This root mean square
+#' @param x 
+#' 
 rms = function(x) sqrt( sum(x^2) / length(x) )
-################################################################################
 
-################################################################################
-# boxplots for matrix columns or list of vectors
-# using controllable quantile based whiskers
+#'qboxplot
+#' This boxplots for matrix columns or list of vectors using controllable quantile based whiskers
 # 
-# @param vals a dataset as list or matrix of values
-# @param labs a vector of names for each dataset
-# @param lims overrides yLim parameter of boxplot
-# @param whiskerQuantile whiskers range from (this value) to (1 - this value)
-qboxplot = function( vals, labs=NULL, lims=NULL, whiskerQuantile=0.05, horizontal=F, ... )
-{
+#' @param vals a dataset as list or matrix of values
+#' @param labs a vector of names for each dataset
+#' @param lims overrides yLim parameter of boxplot
+#' @param whiskerQuantile whiskers range from (this value) to (1 - this value)
+qboxplot = function( vals, labs=NULL, lims=NULL, whiskerQuantile=0.05, horizontal=F, ... ){
   if( is.matrix(vals) ){
     cnames = colnames(vals)
     vals = lapply( 1:ncol(vals), function(i) vals[,i] )
@@ -129,11 +135,19 @@ qboxplot = function( vals, labs=NULL, lims=NULL, whiskerQuantile=0.05, horizonta
       , ...
   )
 }
-################################################################################
 
-################################################################################
-spiner = function(samples, sampleNames=colnames(samples), partNames=rownames(samples), plotTitle="", bgCols=NULL, fgCols="black")
-{
+
+#' spiner
+#' 
+#' This function compute the spiner 
+#' @param samples
+#' @param sampleNames 
+#' @param partNames 
+#' @param plotTitle 
+#' @param bgCols
+#' @param fgCols 
+#' 
+spiner = function(samples, sampleNames=colnames(samples), partNames=rownames(samples), plotTitle="", bgCols=NULL, fgCols="black"){
   # calculate relative values of a vector
   rel = function(v) v/sum(v)
   # additive middle positions for vector values
@@ -186,15 +200,14 @@ spiner = function(samples, sampleNames=colnames(samples), partNames=rownames(sam
   
   axis(4, labels=partNames, at=sy, tick=F)
 }
-################################################################################
 
+#' evalCommandLineArguments
+#' This function eval the commandLine Arguments 
+#' 
 
-################################################################################
-evalCommandLineArguments = function()
-{
+evalCommandLineArguments = function(){
   args=commandArgs(trailingOnly = T)
   sapply(args[grep("=", args)], 
          function(arg) eval(expr = parse(text=arg), envir = globalenv())
   ) 
 }
-################################################################################
