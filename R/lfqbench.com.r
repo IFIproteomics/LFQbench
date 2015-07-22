@@ -12,13 +12,13 @@ loadLibrary <- function(x)
 }
 
 
-#' +
-#' This define + for String concatenation
-#' @export
+# +
+# This define + for String concatenation
+# @export
 
-"+"=function(...) UseMethod("+")
-"+.default"=.Primitive("+")
-"+.character"=function(...) paste(...,sep="")
+#"+"=function(...) UseMethod("+")
+#"+.default"=.Primitive("+")
+#"+.character"=function(...) paste(...,sep="")
 
 #' mkdir
 #' 

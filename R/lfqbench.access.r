@@ -355,11 +355,11 @@ makeDocSet = function( inFile ){
       csvFile  = paste(cfg$InputFilesLocation,"/",inFile, sep = ""),
       pdfFile  = paste(cfg$PlotFilesLocation,"/",fileBase,".pdf", sep = ""),
       logFile  = paste(cfg$LogFilesLocation,"/",fileBase,".log", sep = ""),
-      avgFile  = paste(cfg$LogFilesLocation, "/", fileBase, " sample_means.csv", sep = ""),
-      rsdFile  = paste(cfg$LogFilesLocation, "/", fileBase, " cv.csv", sep = ""),
-      l2rFile =  paste(cfg$LogFilesLocation, "/", fileBase, " log2_ratio.csv", sep=""),
-      rocFile =  paste(cfg$LogFilesLocation, "/", fileBase, " species_separation.csv", sep = ""),
-      idsFile =  paste(cfg$LogFilesLocation, "/", fileBase, " ids.csv", sep = "")
+      avgFile  = paste(cfg$LogFilesLocation, "/", fileBase, "sample_means.csv", sep = ""),
+      rsdFile  = paste(cfg$LogFilesLocation, "/", fileBase, "cv.csv", sep = ""),
+      l2rFile =  paste(cfg$LogFilesLocation, "/", fileBase, "log2_ratio.csv", sep=""),
+      rocFile =  paste(cfg$LogFilesLocation, "/", fileBase, "species_separation.csv", sep = ""),
+      idsFile =  paste(cfg$LogFilesLocation, "/", fileBase, "ids.csv", sep = "")
     )
   )
 }
