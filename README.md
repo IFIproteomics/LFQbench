@@ -1,5 +1,4 @@
-[LFQbench](https://github.com/IFIproteomics/LFQbench)
-[<img src="https://raw.githubusercontent.com/IFIproteomics/LFQbench/master/logo.png">]
+[<img src="https://raw.githubusercontent.com/IFIproteomics/LFQbench/master/logo.png">](https://github.com/IFIproteomics/LFQbench)
 
 [![Build Status](https://travis-ci.org/IFIproteomics/LFQbench.svg)](https://travis-ci.org/IFIproteomics/LFQbench) [![DOI](https://zenodo.org/badge/15862/IFIproteomics/LFQbench.svg)](https://zenodo.org/badge/latestdoi/15862/IFIproteomics/LFQbench)
 ======
