@@ -1,19 +1,15 @@
 rm(list=ls())
 
-loadLibrary <- function(lib) { 
-    if(!require(lib, character.only = T)) { 
-        install.packages(lib)
-        library(lib, character.only = T)
-    } 
-}
+library(LFQbench)
 
-#loadLibrary("data.table")
-#loadLibrary("reshape2")
-#loadLibrary("dplyr")
-#loadLibrary("tidyr")
-#loadLibrary("tools")
-#loadLibrary("ggplot2")
-#loadLibrary("readxl")
+
+loadLibrary("data.table")
+loadLibrary("reshape2")
+loadLibrary("dplyr")
+loadLibrary("tidyr")
+loadLibrary("tools")
+loadLibrary("ggplot2")
+loadLibrary("readxl")
 
 
 working_dir <- "../../ext/data/example_spectronaut"
@@ -50,6 +46,9 @@ top.N.min = 2
 
 #histNAs.peptides.scale = c(0,2000)
 histNAs.proteins.scale = c(0,700)
+
+#Override config parameters with command line parameters
+LFQbench::evalCommandLineArguments()
 
 source("fswe.variables.R")
 source("fswe.functions.R")
