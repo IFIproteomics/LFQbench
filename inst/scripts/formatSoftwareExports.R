@@ -2,7 +2,6 @@ rm(list=ls())
 
 library(LFQbench)
 
-
 loadLibrary("data.table")
 loadLibrary("reshape2")
 loadLibrary("dplyr")
@@ -11,16 +10,12 @@ loadLibrary("tools")
 loadLibrary("ggplot2")
 loadLibrary("readxl")
 
-
 working_dir <- "../../ext/data/example_spectronaut"
 working_dir <- "../../ext/data/example_peakview"
 
-
 # Options: "Spectronaut", "PeakView", "Skyline", "openSWATH", "DIAumpire", "PeakView_builtin_proteins", "DIAumpire_builtin_proteins"
 software_source <- "PeakView"    
-
 suffix <- "r1"
-
 results_dir <- "input"
 supplementary <- "supplementary"
 
@@ -201,8 +196,8 @@ generateReports <- function(experiment_file,
     experiment.order <- match(experiments[[experiment]], names(peptides_wide[-c(1:3)])) + 3
     peptides_wide <- peptides_wide[, c(c(1:3), experiment.order)]
 
-    #Rename the samples is unnecessary, but...
-    names(peptides_wide) <- c("sequenceID", "proteinID", "specie", "A1", "A2", "A3", "B1", "B2", "B3") 
+    #Rename the samples 
+    names(peptides_wide) <- c("sequenceID", "proteinID", "specie", sample.names) 
     
     # add a sequence column (just to remove it afterwards)
     peptides_wide$sequence <- gsub( "*\\[.*?\\]", "", peptides_wide$sequenceID )
@@ -227,8 +222,13 @@ generateReports <- function(experiment_file,
     }
     
     peptides_wide <- peptides_wide %>% select(-sequence) 
-    # Remove "empty" proteins (all values are NAs). I wish I could find a more elegant way to do it. I am tired.
-    peptides_wide <- filter(peptides_wide, !is.na(A1) | !is.na(A2) | !is.na(A3) | !is.na(B1) | !is.na(B2) | !is.na(B3))
+    # Remove "empty" peptides (all values are NAs).
+    common_names <- !sapply(peptides_wide, is.numeric)
+    nums <- sapply(peptides_wide, is.numeric)
+    peptides_wide <- peptides_wide %>% ungroup() %>%
+        mutate(totalIntensity = rowSums(.[nums], na.rm=T)) %>%
+        filter(totalIntensity > 0) %>%
+        select(-totalIntensity)
     
     if(protein_input){
         # If the input was already a protein report, we can finish here
@@ -245,8 +245,6 @@ generateReports <- function(experiment_file,
     write.table(peptides_wide, file=file.path(working_dir, results_dir ,paste0(expfile_noext, "_peptides.tsv")), 
                 sep="\t", row.names=F, col.names=T)
     
-    
-
     
     ## PROTEIN REPORT
     cat(paste0("Generating protein report for ", experiment_file,"\n"))
@@ -270,8 +268,9 @@ generateReports <- function(experiment_file,
                 summarise_each(funs(avg_top_n(., top.N, top.N.min))) 
         }else{
             print("using consensus TOP3")
+            nums <- sapply(peptides_wide, is.numeric)
             proteins_wide <- peptides_wide %>% ungroup() %>%
-                mutate(totalIntensity = rowSums(.[4:9], na.rm=T))  %>% #TODO: This 4:9 is a work-around I need to remove somehow
+                mutate(totalIntensity = rowSums(.[nums], na.rm=T))  %>% 
                 group_by(proteinID) %>%
                 arrange(desc(totalIntensity)) %>%
                 filter(row_number() <= top.N & n() >= top.N.min) %>%
@@ -290,7 +289,12 @@ generateReports <- function(experiment_file,
     }  
     
     # Remove "empty" proteins (all values are NAs). TODO: I wish I could find a more elegant way to do it. I am tired.
-    proteins_wide <- filter(proteins_wide, !is.na(A1) | !is.na(A2) | !is.na(A3) | !is.na(B1) | !is.na(B2) | !is.na(B3))
+    common_names <- !sapply(proteins_wide, is.numeric)
+    nums <- sapply(proteins_wide, is.numeric)
+    proteins_wide <- proteins_wide %>% ungroup() %>%
+        mutate(totalIntensity = rowSums(.[nums], na.rm=T)) %>%
+        filter(totalIntensity > 0) %>%
+        select(-totalIntensity)
     
     write.table(proteins_wide, file=file.path(working_dir, results_dir ,
                 paste0(expfile_noext, "_proteins.tsv")), 
@@ -313,9 +317,6 @@ generateReports <- function(experiment_file,
     ## Histograms: missing values across samples (peptides and proteins)
     peptides_wide$numNAs <- apply(peptides_wide, 1, function(elt) sum(is.na(elt)))
     proteins_wide$numNAs <- apply(proteins_wide, 1, function(elt) sum(is.na(elt)))
-    
-    peptides_wide$numNAs_A <- apply(peptides_wide, 1, function(elt) sum(is.na(elt)[1:3]))
-    peptides_wide$numNAs_B <- apply(peptides_wide, 1, function(elt) sum(is.na(elt)[4:6]))
     
     if(plotHistNAs){
         p <- ggplot(proteins_wide, aes(x = numNAs))
