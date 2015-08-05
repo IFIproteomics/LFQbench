@@ -12,9 +12,11 @@ loadLibrary("readxl")
 
 working_dir <- "../../ext/data/example_spectronaut"
 working_dir <- "../../ext/data/example_peakview"
+working_dir="/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/TTOF6600_64w"
 
-# Options: "Spectronaut", "PeakView", "Skyline", "openSWATH", "DIAumpire", "PeakView_builtin_proteins", "DIAumpire_builtin_proteins"
-software_source <- "PeakView"    
+# Options: "Spectronaut", "PeakView", "Skyline", "openSWATH", "DIAumpire", "PeakViewBuiltinProteins", "DIAumpireBuiltinProteins", "guess"
+## With the option "guess", input files must start with the software_source name. Then input files from different software sources can be analysed together.
+software_source <- "guess"    
 suffix <- "r1"
 results_dir <- "input"
 supplementary <- "supplementary"
@@ -46,19 +48,18 @@ histNAs.proteins.scale = c(0,700)
 LFQbench::evalCommandLineArguments()
 
 source("fswe.variables.R")
+setup_softwaresource_variables(software_source)
 source("fswe.functions.R")
 source("fswe.datasets.R")
 
 if(!file.exists(file.path(working_dir, results_dir))) { dir.create(file.path(working_dir, results_dir)) }
 if(!file.exists(file.path(working_dir, results_dir, supplementary))) { dir.create(file.path(working_dir, results_dir, supplementary)) }
 AllInputFiles = list.files( path=working_dir, pattern=input.extension, full.names= FALSE )
+if(software_source == "guess") {
+    AllInputFiles = list.files( path=working_dir, pattern=".[\\.].", full.names= FALSE, include.dirs = F, recursive = F, all.files = F)
+}
 
-
-## Ops related to the quantitation variable ##
-sumquant <- paste0("sum(", quantitative.var, ")")
-medianquant <- paste0("median(", quantitative.var,")")
-####
-
+parameter.software_source <- software_source
 generateReports <- function(experiment_file, 
                             plotHistogram = F, 
                             plotHistNAs = F, 
@@ -66,6 +67,16 @@ generateReports <- function(experiment_file,
                             sequence.list = NULL,
                             singleHits = F){
 
+    if(parameter.software_source == "guess") {
+        software_source <- guessSoftwareSource(experiment_file)
+    }
+    
+    setup_softwaresource_variables(software_source)
+    
+    ## Ops related to the quantitation variable ##
+    sumquant <- paste0("sum(", quantitative.var, ")")
+    medianquant <- paste0("median(", quantitative.var,")")
+    
     qvalue.filtered = FALSE
     # Read file
     #  experiment_file <- AllInputFiles[1]

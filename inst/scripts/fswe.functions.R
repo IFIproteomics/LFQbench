@@ -1,5 +1,6 @@
 ### Common functions for formatting Software inputs 
 
+## Depends on: fswe.variables.R 
 
 substrRight <- function(x, n) { substr(x, nchar(x)-n+1, nchar(x)) }
 rmlastchars <- function(x, n) { substr(x, 1, nchar(x) - n) }
@@ -9,6 +10,19 @@ stopHere = function() {
     on.exit(options(opt))
     stop()
 }
+
+
+guessSoftwareSource <- function(filename){
+    softsource <- NULL
+    grepsw <- function(a, filen) { return(substring(filen, 1, nchar(a)) == a) }
+    softsource <- software_sources[unlist(lapply(software_sources, grepsw, filename))]
+    
+    if(length(softsource) == 0) {
+        stop("Software source can not be guessed by filename! Review file names: they should start by the software source.")
+    }
+    return(softsource)    
+}
+
 
 take1stentry <- function(entries){
     first_entry <- strsplit(as.character(entries), "\\||\\/", fixed=F, perl=T)
