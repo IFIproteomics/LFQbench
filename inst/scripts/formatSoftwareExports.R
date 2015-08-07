@@ -17,6 +17,7 @@ working_dir="/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwar
 # Options: "Spectronaut", "PeakView", "Skyline", "openSWATH", "DIAumpire", "PeakViewBuiltinProteins", "DIAumpireBuiltinProteins", "guess"
 ## With the option "guess", input files must start with the software_source name. Then input files from different software sources can be analysed together.
 software_source <- "guess"    
+keep_original_names <- FALSE
 suffix <- "r1"
 results_dir <- "input"
 supplementary <- "supplementary"
@@ -80,6 +81,7 @@ generateReports <- function(experiment_file,
     qvalue.filtered = FALSE
     # Read file
     #  experiment_file <- AllInputFiles[1]
+    original.experiment_file <- experiment_file
     experiment_file <- file.path(working_dir, experiment_file)
     cat(paste0("Generating peptide report for ", experiment_file, "\n"))
     
@@ -219,12 +221,27 @@ generateReports <- function(experiment_file,
     peptides_wide[, nums] <- peptides_wide[, nums] * intensity.scale 
     
     #expfile_noext <- file_path_sans_ext(basename(experiment_file))
-    expfile_noext <- paste(software_source, names(experiment)[1], suffix,  sep="_")
+    expfile_noext <- paste(software_source, names(experiment)[1], suffix, sep="_")
+    peptidereportname <- paste0(expfile_noext, "_peptides.tsv")
+    proteinreportname <- paste0(expfile_noext, "_proteins.tsv")
+    sequencereportname <- paste0(expfile_noext, "_sequencelist.csv")
+    histPepProteinreportname <- paste0(expfile_noext, "_HistogramPeptidesProtein.pdf")
+    histNAsProteinsreportname <- paste0(expfile_noext, "_proteins_HistogramNAs.pdf")
+    histNAsPeptidesreportname <- paste0(expfile_noext, "_peptides_HistogramNAs.pdf")
+    if(keep_original_names) {
+        peptidereportname  <- paste(original.experiment_file, suffix, "peptides.tsv", sep="_") 
+        proteinreportname  <- paste(original.experiment_file, suffix, "proteins.tsv", sep="_") 
+        sequencereportname <- paste(original.experiment_file, suffix, "sequencelist.csv", sep="_")
+        histPepProteinreportname <- paste(original.experiment_file, suffix, "HistogramPeptidesProtein.pdf", sep="_")
+        histNAsProteinsreportname <- paste(original.experiment_file, suffix, "_proteins_HistogramNAs.pdf", sep="_")
+        histNAsPeptidesreportname <- paste(original.experiment_file, suffix, "_peptides_HistogramNAs.pdf", sep="_")
+    }
+    
     if(reportSequences){
         sequence_list <- as.data.frame(unique(peptides_wide$sequence))
         write.table(sequence_list, 
                     file=file.path(working_dir, results_dir, supplementary, 
-                                paste0(expfile_noext, "_sequencelist.csv")),
+                                   sequencereportname),
                     sep=",", row.names=F, col.names=F)
     }
     
@@ -240,11 +257,13 @@ generateReports <- function(experiment_file,
         mutate(totalIntensity = rowSums(.[nums], na.rm=T)) %>%
         filter(totalIntensity > 0) %>%
         select(-totalIntensity)
-    
+
+
+        
     if(protein_input){
         # If the input was already a protein report, we can finish here
         protein_report <- peptides_wide %>% select(-sequenceID)
-        write.table(protein_report, file=file.path(working_dir, results_dir ,paste0(expfile_noext, "_proteins.tsv")), 
+        write.table(protein_report, file=file.path(working_dir, results_dir , proteinreportname), 
                     sep="\t", row.names=F, col.names=T)
         
         cat("Protein report as input -- No peptide report generated.\n")
@@ -252,8 +271,9 @@ generateReports <- function(experiment_file,
         return(NA)
         
     }
-        
-    write.table(peptides_wide, file=file.path(working_dir, results_dir ,paste0(expfile_noext, "_peptides.tsv")), 
+    
+
+    write.table(peptides_wide, file=file.path(working_dir, results_dir , peptidereportname), 
                 sep="\t", row.names=F, col.names=T)
     
     
@@ -307,8 +327,7 @@ generateReports <- function(experiment_file,
         filter(totalIntensity > 0) %>%
         select(-totalIntensity)
     
-    write.table(proteins_wide, file=file.path(working_dir, results_dir ,
-                paste0(expfile_noext, "_proteins.tsv")), 
+    write.table(proteins_wide, file=file.path(working_dir, results_dir , proteinreportname), 
                 sep="\t", row.names=F, col.names=T)
     
     ## Histogram: Peptides per protein
@@ -318,8 +337,7 @@ generateReports <- function(experiment_file,
         summarise(pep.protein = n_distinct(sequenceID))
     
     if(plotHistogram){
-        pdf(file=file.path(working_dir, results_dir, supplementary, 
-            paste0(expfile_noext, "_HistogramPeptidesProtein.pdf")), width=6, height=4)
+        pdf(file=file.path(working_dir, results_dir, supplementary, histPepProteinreportname), width=6, height=4)
         h <- hist(x=peptides_per_protein$pep.protein, breaks=c(0:20,30,40,50,100,1000), main=NULL, xlab="Peptides per protein",
                   xlim = c(0,20), plot=T,freq=T)
         dev.off()
@@ -346,10 +364,8 @@ generateReports <- function(experiment_file,
         }
         hNApep <- p + facet_wrap( ~ specie, ncol = 3)
         
-        ggsave(filename = file.path(working_dir, results_dir, supplementary, 
-                paste0(expfile_noext, "_proteins_HistogramNAs.pdf")), plot = hNAprot , width=6, height=4 )
-        ggsave(filename = file.path(working_dir, results_dir, supplementary, 
-                paste0(expfile_noext, "_peptides_HistogramNAs.pdf")), plot = hNApep,  width=6, height=4)
+        ggsave(filename = file.path(working_dir, results_dir, supplementary, histNAsProteinsreportname), plot = hNAprot , width=6, height=4)
+        ggsave(filename = file.path(working_dir, results_dir, supplementary, histNAsPeptidesreportname), plot = hNApep,  width=6, height=4)
         
     }
 }
