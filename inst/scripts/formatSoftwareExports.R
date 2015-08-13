@@ -356,7 +356,8 @@ generateReports <- function(experiment_file,
         if(exists("histNAs.proteins.scale")){
             p <- p + scale_y_continuous(limits = histNAs.proteins.scale)
         }
-        hNAprot <- p + facet_wrap( ~ specie, ncol = 3)  + scale_fill_discrete(drop=FALSE) + scale_x_discrete(drop=FALSE)
+        hNAprot <- p + facet_wrap( ~ specie, ncol = 3)  + theme_classic() +
+                        scale_fill_discrete(drop=FALSE) + scale_x_discrete(drop=FALSE)
  
         p <- ggplot(peptides_wide, aes(x = numNAs))
         p <- p + geom_histogram()
@@ -364,7 +365,8 @@ generateReports <- function(experiment_file,
         if(exists("histNAs.peptides.scale")){
             p <- p + scale_y_continuous(limits = histNAs.peptides.scale)
         }
-        hNApep <- p + facet_wrap( ~ specie, ncol = 3)  + scale_fill_discrete(drop=FALSE) + scale_x_discrete(drop=FALSE)
+        hNApep <- p + facet_wrap( ~ specie, ncol = 3)  + theme_classic() +
+                       scale_fill_discrete(drop=FALSE) + scale_x_discrete(drop=FALSE)
         
         ggsave(filename = file.path(working_dir, results_dir, supplementary, histNAsProteinsreportname), plot = hNAprot , width=6, height=4)
         ggsave(filename = file.path(working_dir, results_dir, supplementary, histNAsPeptidesreportname), plot = hNApep,  width=6, height=4)
