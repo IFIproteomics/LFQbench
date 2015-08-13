@@ -1,23 +1,34 @@
-software_sources <- c("Spectronaut", "PeakView", "Skyline", "openSWATH", "DIAumpire", "PeakViewBuiltinProteins", "DIAumpireBuiltinProteins")
-quantitative.var <- NA
-quantitative.var.tag <- NA
-protein.var <- NA
-filename.var <- NA
-sequence.mod.var <- NA
-charge.var <- NA
-q_filter_threshold <- NA
-decoy.var <- NA
-sheet.fdr <- NULL
-protein_input <- F
-input.extension <- "*.csv$"
-nastrings = "NA"
-decoy.tags <- c("DECOY_","reverse")
-intensity.scale <- 1.0
+software_sources <- c("DIAumpire",  "DIAumpBuiltinProteins",
+                      "OpenSWATH",
+                      "PeakView", "PViewNoFilter", "PViewBuiltinProteins",
+                      "Skyline", 
+                      "Spectronaut" 
+                      )
 
+setDefaultVariables <- function(){
+    quantitative.var <<- NA
+    quantitative.var.tag <<- NA
+    protein.var <<- NA
+    filename.var <<- NA
+    sequence.mod.var <<- NA
+    charge.var <<- NA
+    q_filter_threshold <<- NA
+    decoy.var <<- NA
+    sheet.fdr <<- NULL
+    protein_input <<- F
+    input.extension <<- "*.csv$"
+    nastrings <<- "NA"
+    decoy.tags <<- c("DECOY_","reverse")
+    intensity.scale <<- 1.0
+}
+
+setDefaultVariables()
 
 setup_softwaresource_variables <- function(software_source){
+    
+    setDefaultVariables()
+    
     ## Select Software-depending variable names #########
-
     if(software_source == "Spectronaut"){
         qvalue.var <<- "EG.Qvalue"
         quantitative.var <<- "FG.NormalizedTotalPeakArea"
@@ -76,7 +87,24 @@ setup_softwaresource_variables <- function(software_source){
         intensity.scale <<- 1.0
     }
     
-    if(software_source == "openSWATH"){
+    if(software_source == "PViewNoFilter"){
+        q_filter_threshold <<- 1.0
+        quantitative.var.tag <<- "Sample"
+        fdr.var.tag <<- "FDR"
+        quantitative.var <<- "TotalAreaFragment"
+        protein.var <<- "Protein"
+        filename.var <<- "R.FileName"
+        sequence.mod.var <<- "Peptide"
+        charge.var <<- "Precursor Charge"
+        #input.extension <- "*.tsv$"
+        input.extension <<- "*.xls*"
+        sheet.data <<- "Area - peptides"
+        sheet.fdr <<- "FDR"
+        input_format <<- "wide"  # Options: "long", "wide"  
+        intensity.scale <<- 1.0
+    }
+    
+    if(software_source == "OpenSWATH"){
         q_filter_threshold <<- 0.01
         qvalue.var <<- "m_score"
         quantitative.var <<- "Intensity"
@@ -113,7 +141,7 @@ setup_softwaresource_variables <- function(software_source){
         
     }
     
-    if(software_source == "PeakViewBuiltinProteins"){
+    if(software_source == "PViewBuiltinProteins"){
         quantitative.var.tag <<- "Sample"
         quantitative.var <<- "TotalAreaFragment"
         sheet.data <<- "Area - proteins"
@@ -124,7 +152,7 @@ setup_softwaresource_variables <- function(software_source){
         protein_input <<- T
     }
     
-    if(software_source == "DIAumpireBuiltinProteins"){
+    if(software_source == "DIAumpBuiltinProteins"){
         quantitative.var.tag <<- "Top6Top6Freq"
         quantitative.var <<- "top6Area"
         protein.var <<- "Protein.Key"

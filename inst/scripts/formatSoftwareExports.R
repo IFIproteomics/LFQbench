@@ -12,9 +12,9 @@ loadLibrary("readxl")
 
 working_dir <- "../../ext/data/example_spectronaut"
 working_dir <- "../../ext/data/example_peakview"
-working_dir="/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/TTOF6600_64w"
+working_dir="/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/iteration1/TTOF6600_64w"
 
-# Options: "Spectronaut", "PeakView", "Skyline", "openSWATH", "DIAumpire", "PeakViewBuiltinProteins", "DIAumpireBuiltinProteins", "guess"
+# Options: see fswe.variables.R file
 ## With the option "guess", input files must start with the software_source name. Then input files from different software sources can be analysed together.
 software_source <- "guess"    
 keep_original_names <- FALSE
@@ -43,7 +43,7 @@ top.N.min = 2
 ##
 
 #histNAs.peptides.scale = c(0,2000)
-histNAs.proteins.scale = c(0,700)
+#histNAs.proteins.scale = c(0,700)
 
 #Override config parameters with command line parameters
 LFQbench::evalCommandLineArguments()
@@ -346,6 +346,8 @@ generateReports <- function(experiment_file,
     ## Histograms: missing values across samples (peptides and proteins)
     peptides_wide$numNAs <- apply(peptides_wide, 1, function(elt) sum(is.na(elt)))
     proteins_wide$numNAs <- apply(proteins_wide, 1, function(elt) sum(is.na(elt)))
+    peptides_wide$numNAs <- factor(peptides_wide$numNAs, levels = seq(0, length(which(nums))))
+    proteins_wide$numNAs <- factor(proteins_wide$numNAs, levels = seq(0, length(which(nums))))
     
     if(plotHistNAs){
         p <- ggplot(proteins_wide, aes(x = numNAs))
@@ -354,7 +356,7 @@ generateReports <- function(experiment_file,
         if(exists("histNAs.proteins.scale")){
             p <- p + scale_y_continuous(limits = histNAs.proteins.scale)
         }
-        hNAprot <- p + facet_wrap( ~ specie, ncol = 3) 
+        hNAprot <- p + facet_wrap( ~ specie, ncol = 3)  + scale_fill_discrete(drop=FALSE) + scale_x_discrete(drop=FALSE)
  
         p <- ggplot(peptides_wide, aes(x = numNAs))
         p <- p + geom_histogram()
@@ -362,7 +364,7 @@ generateReports <- function(experiment_file,
         if(exists("histNAs.peptides.scale")){
             p <- p + scale_y_continuous(limits = histNAs.peptides.scale)
         }
-        hNApep <- p + facet_wrap( ~ specie, ncol = 3)
+        hNApep <- p + facet_wrap( ~ specie, ncol = 3)  + scale_fill_discrete(drop=FALSE) + scale_x_discrete(drop=FALSE)
         
         ggsave(filename = file.path(working_dir, results_dir, supplementary, histNAsProteinsreportname), plot = hNAprot , width=6, height=4)
         ggsave(filename = file.path(working_dir, results_dir, supplementary, histNAsPeptidesreportname), plot = hNApep,  width=6, height=4)
