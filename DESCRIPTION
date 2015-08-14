@@ -8,7 +8,7 @@ Maintainer: Jorg Kuharev <kuharev@uni-mainz.de>,
 Description: The package LFQbench comprises functions to compare different Label Free Quantitation pipelines and softwares in proteomics.
 Depends: R (>= 3.1.0), RColorBrewer, SDMTools,
          dplyr,tidyr,ggplot2,readxl,classInt,
-         scales,pander,GGally
+         scales,pander,GGally,tools
 Imports: tools (>= 3.1.0), 
          RColorBrewer (>= 1.1.0), 
          SDMTools (>= 1.1.0),
