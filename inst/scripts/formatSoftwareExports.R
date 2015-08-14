@@ -2,13 +2,13 @@ rm(list=ls())
 
 library(LFQbench)
 
-loadLibrary("data.table")
-loadLibrary("reshape2")
-loadLibrary("dplyr")
-loadLibrary("tidyr")
-loadLibrary("tools")
-loadLibrary("ggplot2")
-loadLibrary("readxl")
+#loadLibrary("data.table")
+#loadLibrary("reshape2")
+#loadLibrary("dplyr")
+#loadLibrary("tidyr")
+#loadLibrary("tools")
+#loadLibrary("ggplot2")
+#loadLibrary("readxl")
 
 working_dir <- "../../ext/data/example_spectronaut"
 working_dir <- "../../ext/data/example_peakview"
@@ -69,7 +69,7 @@ generateReports <- function(experiment_file,
                             singleHits = F){
 
     if(parameter.software_source == "guess") {
-        software_source <- guessSoftwareSource(experiment_file)
+        software_source <- guessSoftwareSource(experiment_file, software_sources)
     }
     
     setup_softwaresource_variables(software_source)
@@ -144,7 +144,7 @@ generateReports <- function(experiment_file,
     
     # Attach specie and remove peptides belonging to multiple species, and not considered species ("NA"s)
     df <- df %>% rowwise()
-    df <- eval( substitute(mutate(df, "specie" = guessSpecie(var)), list(var = as.name(protein.var)) ) ) 
+    df <- eval( substitute(mutate(df, "specie" = guessOrganism(var, species)), list(var = as.name(protein.var)) ) ) 
     df <- filter(df, specie != "NA", specie != "multiple")
     
     experiment <- NA

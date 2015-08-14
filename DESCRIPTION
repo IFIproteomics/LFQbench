@@ -10,7 +10,7 @@ Depends: R (>= 3.1.0), RColorBrewer, SDMTools
 Imports: tools (>= 3.1.0), 
          RColorBrewer (>= 1.1.0), 
          SDMTools (>= 1.1.0),
-         data.table, dplyr, tidyr, tools, ggplot2, readxl
+         data.table, dplyr, tidyr, tools, ggplot2, readxl, reshape2
 Suggests: RUnit, bibtex, knitcitations (>= 1.0-1), knitr
 License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License
 URL: https://github.com/IFIproteomics/LFQbench
