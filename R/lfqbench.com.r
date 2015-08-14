@@ -237,12 +237,12 @@ guessSep <- function(filename){
 #' @param filename The file name should start by one of the software sources
 #' @param software_sources a list defined at the variables file.
 #' @export
-guessSoftwareSource <- function(filename, software_sources){
-    softsource <- NULL
+guessSoftwareSource <- function(filename, software_sources, allowNA = FALSE){
+    softsource <- NA
     grepsw <- function(a, filen) { return(substring(filen, 1, nchar(a)) == a) }
     softsource <- software_sources[unlist(lapply(software_sources, grepsw, filename))]
     
-    if(length(softsource) == 0) {
+    if(length(softsource) == 0 & !allowNA) {
         stop("Software source can not be guessed by filename! Review file names: they should start by the software source.")
     }
     return(softsource)    

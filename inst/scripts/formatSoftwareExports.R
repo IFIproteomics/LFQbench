@@ -4,15 +4,6 @@ library(LFQbench)
 
 DEBUG = T
 
-
-#loadLibrary("data.table")
-#loadLibrary("reshape2")
-#loadLibrary("dplyr")
-#loadLibrary("tidyr")
-#loadLibrary("tools")
-#loadLibrary("ggplot2")
-#loadLibrary("readxl")
-
 #working_dir <- "../../ext/data/example_spectronaut"
 working_dir <- "../../ext/data/example_peakview"
 #working_dir = "/Users/yperez/temp/pedro/"

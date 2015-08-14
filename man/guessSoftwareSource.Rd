@@ -4,7 +4,7 @@
 \alias{guessSoftwareSource}
 \title{guessSoftwareSource}
 \usage{
-guessSoftwareSource(filename, software_sources)
+guessSoftwareSource(filename, software_sources, allowNA = FALSE)
 }
 \arguments{
 \item{filename}{The file name should start by one of the software sources}
