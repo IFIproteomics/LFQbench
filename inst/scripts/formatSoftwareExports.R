@@ -1,6 +1,9 @@
-rm(list=ls())
+rm(list = ls())
 
 library(LFQbench)
+
+DEBUG = T
+
 
 #loadLibrary("data.table")
 #loadLibrary("reshape2")
@@ -10,9 +13,9 @@ library(LFQbench)
 #loadLibrary("ggplot2")
 #loadLibrary("readxl")
 
-working_dir <- "../../ext/data/example_spectronaut"
+#working_dir <- "../../ext/data/example_spectronaut"
 working_dir <- "../../ext/data/example_peakview"
-working_dir="/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/iteration1/TTOF6600_64w"
+#working_dir = "/Users/yperez/temp/pedro/"
 
 # Options: see fswe.variables.R file
 ## With the option "guess", input files must start with the software_source name. Then input files from different software sources can be analysed together.
@@ -53,11 +56,11 @@ setup_softwaresource_variables(software_source)
 source("fswe.functions.R")
 source("fswe.datasets.R")
 
-if(!file.exists(file.path(working_dir, results_dir))) { dir.create(file.path(working_dir, results_dir)) }
-if(!file.exists(file.path(working_dir, results_dir, supplementary))) { dir.create(file.path(working_dir, results_dir, supplementary)) }
-AllInputFiles = list.files( path=working_dir, pattern=input.extension, full.names= FALSE )
-if(software_source == "guess") {
-    AllInputFiles = list.files( path=working_dir, pattern=".[\\.].", full.names= FALSE, include.dirs = F, recursive = F, all.files = F)
+if( !file.exists(file.path(working_dir, results_dir))) { dir.create(file.path(working_dir, results_dir)) }
+if( !file.exists(file.path(working_dir, results_dir, supplementary))) { dir.create(file.path(working_dir, results_dir, supplementary)) }
+AllInputFiles = list.files( path = working_dir, pattern = input.extension, full.names= FALSE )
+if( software_source == "guess") {
+    AllInputFiles = list.files( path=working_dir, pattern = ".[\\.].", full.names = FALSE, include.dirs = F, recursive = F, all.files = F)
 }
 
 parameter.software_source <- software_source
