@@ -39,7 +39,7 @@ setup_softwaresource_variables <- function(software_source){
         nastrings <<- "NaN"
         input.extension <<- "*.tsv$"
         input_format <<- "long"  # Options: "long", "wide"
-        intensity.scale <<- 393.5628154
+        #intensity.scale <<- 393.5628154
     }
     
     if(software_source == "DIAumpire"){
@@ -52,7 +52,7 @@ setup_softwaresource_variables <- function(software_source){
         nastrings <<- "NA"
         input.extension <<- "*.tsv$"
         input_format <<- "wide"  # Options: "long", "wide"
-        intensity.scale <<- 65.0507483
+        #intensity.scale <<- 65.0507483
     }
     
     if(software_source == "Skyline"){
@@ -67,7 +67,7 @@ setup_softwaresource_variables <- function(software_source){
         nastrings <<- "#N/A"
         input.extension <<- "*.tsv$"
         input_format <<- "long"  # Options: "long", "wide"
-        intensity.scale <<- 0.8087744    
+        #intensity.scale <<- 0.8087744    
     }
     
     if(software_source == "PeakView"){
@@ -84,7 +84,7 @@ setup_softwaresource_variables <- function(software_source){
         sheet.data <<- "Area - peptides"
         sheet.fdr <<- "FDR"
         input_format <<- "wide"  # Options: "long", "wide"  
-        intensity.scale <<- 1.0
+        #intensity.scale <<- 1.0
     }
     
     if(software_source == "PViewNoFilter"){
@@ -101,7 +101,7 @@ setup_softwaresource_variables <- function(software_source){
         sheet.data <<- "Area - peptides"
         sheet.fdr <<- "FDR"
         input_format <<- "wide"  # Options: "long", "wide"  
-        intensity.scale <<- 1.0
+        #intensity.scale <<- 1.0
     }
     
     if(software_source == "OpenSWATH"){
@@ -115,7 +115,7 @@ setup_softwaresource_variables <- function(software_source){
         decoy.var <<- "decoy"
         input.extension <<- "*.tsv.gz$"
         input_format <<- "long"  # Options: "long", "wide"
-        intensity.scale <<- 3.6483363
+        #intensity.scale <<- 3.6483363
         ### Wide format
         # q_filter_threshold <- 0.05
         # qvalue.var <- "score"
