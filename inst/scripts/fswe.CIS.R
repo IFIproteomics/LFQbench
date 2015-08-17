@@ -38,6 +38,7 @@ ProteinsFiles <- list.files( path=working_dir, pattern="._proteins.tsv$",
 
 ## sum all quantitative values
 readAndsumQuantFile <- function(qfile, working_dir, software_sources){
+    print(paste("Reading ", qfile))
     df <- read.table(file =file.path(working_dir, qfile), header = T, sep = "\t")
     quant.cols <- sapply(df, is.numeric)
     quant.val <- rowSums(df[,quant.cols], na.rm = T)
