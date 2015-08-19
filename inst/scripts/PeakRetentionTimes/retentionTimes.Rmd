@@ -1,0 +1,551 @@
+---
+output: pdf_document
+---
+Peak retention times 
+========================================================
+
+We want to know whether the different software tools choose (in general) the same peak (based on retention time).
+
+```{r set_options, echo=FALSE, message=FALSE}
+require(knitr)
+opts_chunk$set(echo = FALSE)
+
+```
+
+```{r loadlibs}
+
+loadLibrary <- function(x) 
+{
+  if(!require(x, character.only=T, quietly = T, warn.conflicts=F)) 
+  { 
+    install.packages(x); library(x, character.only=T, warn.conflicts=F) 
+  } 
+}
+
+loadLibrary("VennDiagram")
+loadLibrary("tidyr")
+loadLibrary("dplyr")
+loadLibrary("ggplot2")
+loadLibrary("readxl")
+loadLibrary("classInt")
+loadLibrary("scales")
+loadLibrary("pander")
+loadLibrary("GGally")
+
+```
+
+
+Following software tool results are analyzed:  
+1. Spectronaut    
+2. Skyline  
+3. PeakView  
+4. OpenSWATH  
+5. DIAumpire  
+
+We choose one of the injections: lgillet_I150211_008.wiff    
+
+```{r loaddata, cache=TRUE, cache.lazy=TRUE, cache.comments=TRUE}
+# , cache=TRUE, cache.lazy=TRUE
+
+injection <- "lgillet_I150211_008"
+
+
+## File names ##
+spectronaut.file <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/iteration2/TTOF6600_64w/Spectronaut_20150522_140931_TTOF6600_64w_newLib_Report.tsv"
+skyline.file <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/iteration2/TTOF6600_64w/Skyline_TTOF6600_64w_centroid_10minAs5_100Krp.tsv"
+peakview.file <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/iteration2/TTOF6600_64w/PeakView_TTOF6600_64w_shift_iRT_extractionWindow10min_30ppm.xlsx"
+openswath.file <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/iteration2/TTOF6600_64w/OpenSWATH_6600SW64_round2_30ppm_E1508100902_feature_alignment.tsv.gz"
+diaumpire.file <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/iteration1/TTOF6600_64w/DIAumpire_6600_64_PeptideSummary.tsv"
+
+q_filter_threshold <- 0.01
+
+## PeakView ##
+sequence.mod.var <- "Peptide"
+charge.var <- "Precursor Charge"
+fdr.var.tag <- "FDR"
+quantitative.var <- "TotalAreaFragment"
+quantitative.var.tag <- "Sample"
+
+df.rt <- read_excel(peakview.file, sheet="Observed RT", col_names=T )
+df.int <- read_excel(peakview.file, sheet="Area - peptides", col_names=T )
+df.fdr <- read_excel(peakview.file, sheet="FDR", col_names=T )
+
+df.fdr_rt <- cbind(df.fdr, df.rt[, 8:13])
+
+df.fdr_rt <- df.fdr_rt[, grepl(injection, colnames(df.fdr_rt), ignore.case=T)]
+df.fdr_rt <- cbind(df.rt[, 2:5], df.rt[, 7], df.fdr_rt)
+df.fdr_rt$Label <- NULL
+names(df.fdr_rt) <- c("Peptide", "mz", "z", "Decoy", "FDR", "RT" )
+df.fdr_rt <- df.fdr_rt %>% filter(FDR <= q_filter_threshold)
+
+df.int <- cbind(df.int[, 2:4], 
+                df.int[, grepl(injection, colnames(df.int), ignore.case=T)])
+names(df.int) <- c("Peptide", "mz", "z", "Intensity")
+
+
+df.fdr_rt$sequence_z <- paste(df.fdr_rt$Peptide, df.fdr_rt$z, sep="_")
+df.int$sequence_z <- paste(df.int$Peptide, df.int$z, sep="_" )
+
+#remove possible duplicates
+df.int <- df.int %>% filter(!duplicated(sequence_z))
+df.fdr_rt <- df.fdr_rt %>% filter(!duplicated(sequence_z))
+
+df <- inner_join(df.int, df.fdr_rt, by="sequence_z")
+df <- df %>% filter(!is.na(FDR) & Decoy == "False") 
+
+peakview <- as.data.frame(cbind(
+                                df$sequence_z,
+                                gsub( "*\\[.*?\\]", "", df$Peptide.x ),
+                                df$Peptide.x, 
+                                df$mz.x, 
+                                df$z.x, 
+                                df$Intensity, 
+                                df$RT, 
+                                rep("Peakview", nrow(df))
+                                )
+                          )
+names(peakview) <- c("sequence_z", "Sequence", "Peptide", "mz", "z", "Intensity", "RT", "tool")
+rm(df.fdr); rm(df.fdr_rt); rm(df.int); rm(df.rt); rm(df)
+
+## DIA-Umpire ##
+quantitative.var.tag <- "top6"
+quantitative.var <- "top6Area"
+protein.var <- "Protein"
+filename.var <- "ReplicateName"
+sequence.mod.var <- "ModSeq"
+charge.var <- "Charge"
+
+df <- read.table(diaumpire.file, na.strings= "NA", header=T, 
+                         sep="\t", stringsAsFactors =F, fill = T) 
+df.vars <- df[, grepl(injection, colnames(df) , ignore.case=T)]
+
+diaumpire <- as.data.frame(cbind(
+            paste(df$Sequence, df$Charge, sep="_"),
+            df$Sequence,
+            df$ModSeq,
+            df$mz,
+            df$Charge,
+            df.vars[, grepl(quantitative.var.tag, colnames(df.vars) , ignore.case=T)],
+            df.vars[, grepl("RT", colnames(df.vars) , ignore.case=T)],
+            rep("DIAumpire", nrow(df))
+                            )
+                    )
+names(diaumpire) <- c("sequence_z", "Sequence", "Peptide", "mz", "z", "Intensity", "RT", "tool")
+rm(df.vars); rm(df)
+
+
+## Skyline ##
+q_filter_threshold <- 0.01
+nastrings <- "#N/A"
+
+df <- read.table(skyline.file, na.strings= nastrings, header=T, 
+                         sep="\t", stringsAsFactors =F, fill = T) 
+df <- df %>% filter(grepl(injection, FileName)) %>%
+        filter(IsDecoy == "False") %>%
+        filter(annotation_QValue <= q_filter_threshold)
+
+skyline <- as.data.frame(cbind(
+                                paste(df$PeptideModifiedSequence, df$PrecursorCharge, sep="_"),
+                                df$PeptideSequence,
+                                df$PeptideModifiedSequence,
+                                df$PrecursorNeutralMass,
+                                df$PrecursorCharge,
+                                df$TotalArea,
+                                df$BestRetentionTime,
+                                rep("Skyline", nrow(df))
+                            )
+                        )
+
+names(skyline) <- c("sequence_z", "Sequence", "Peptide", "mz", "z", "Intensity", "RT", "tool")
+
+
+## Spectronaut ##
+nastrings <- "NaN"
+
+qvalue.var <- "EG.Qvalue"
+protein.var <- "EG.ProteinId"
+input.extension <- "*.tsv$"
+input_format <- "long"  # Options: "long", "wide"
+
+df <- read.table(spectronaut.file, na.strings= nastrings, header=T, 
+                         sep="\t", stringsAsFactors =F, fill = T) 
+
+df <- df %>% filter(grepl(injection, R.FileName)) 
+
+spectronaut <- as.data.frame(cbind(
+                                paste(df$EG.ModifiedSequence, df$FG.Charge, sep="_"),
+                                df$EG.StrippedSequence,
+                                df$EG.ModifiedSequence,
+                                df$FG.PrecMz,
+                                df$FG.Charge,
+                                df$FG.NormalizedTotalPeakArea,
+                                df$EG.MeanApexRT,
+                                rep("Spectronaut", nrow(df))
+                                )
+                            )
+names(spectronaut) <- c("sequence_z", "Sequence", "Peptide", "mz", "z", "Intensity", "RT", "tool")
+
+## OpenSWATH ##
+q_filter_threshold <- 0.01
+quantitative.var <- "Intensity"
+protein.var <- "ProteinName"
+sequence.mod.var <- "FullPeptideName"
+charge.var <- "Charge"  
+
+df <- read.table(openswath.file, header=T, 
+                         sep="\t", stringsAsFactors =F, fill = T) 
+
+df <- df %>% filter(grepl(injection, filename, ignore.case=T)) %>%
+        filter(decoy == F) %>%
+        filter(m_score <= q_filter_threshold)
+
+openswath <- as.data.frame(cbind(
+                           paste(df$FullPeptideName, df$Charge, sep="_"),
+                           df$Sequence,
+                           df$FullPeptideName,
+                           df$m.z,
+                           df$Charge,
+                           df$Intensity,
+                           df$RT / 60, 
+                           rep("OpenSWATH", nrow(df))
+                           ))
+
+names(openswath) <- c("sequence_z", "Sequence", "Peptide", "mz", "z", "Intensity", "RT", "tool")
+rm(df)
+
+# join all to a single data frame
+rts <- rbind(spectronaut, skyline)
+rts <- rbind(rts, peakview)
+rts <- rbind(rts, openswath)
+rts <- rbind(rts, diaumpire)
+
+rts <- rts %>%
+    mutate( 
+        sequence_z = as.character(sequence_z),
+        Sequence = as.character(Sequence),
+        Peptide = as.character(Peptide),
+        mz = as.numeric(as.character(mz)),
+        z = as.numeric(as.character(z)),
+        Intensity = as.numeric(as.character(Intensity)),
+        RT = as.numeric(as.character(RT)),
+        tool = as.character(tool)
+        )
+
+```
+
+
+Modifications are reported differently in each software. As a first approach I use only non modified peptides.
+
+```{r filterMods}
+
+# remove modifications
+total_assays = length(unique(rts$Peptide))
+total_peptides = length(unique(rts$Sequence))
+removed_assays = total_assays - total_peptides
+rts <- rts %>% filter( Sequence == Peptide )
+
+rts_count <- rts %>% group_by(tool) %>% summarise(n())
+
+rts_w <- rts %>% select(Sequence, z, tool, RT) %>% spread(key=tool, value=RT)
+rts_w$numNAs <- numNAs <- apply(rts_w[, 3:7], 1, function(z) sum(is.na(z)))
+rts_w <- rts_w %>% filter(numNAs < 3)
+
+
+```
+
+This excludes `r removed_assays` assays from the analysis (out of a total of `r total_assays`).
+
+
+```{r outlierthreshold}
+outlier.threshold <- 0.2
+```
+
+We are only interested on peaks identified by all software tools. Otherwise it is hard to interpret, since some software tools identify more peptides than others. To define when a tool picked a different peak to other software tools, for each peptide/z we estimate the standard deviation of the retention time. We consider that the peptide/z has at least one outlier if the standard deviation is higher than `r outlier.threshold` minutes, and we define as outlier the tool that has the largest deviation from the mean retention time. 
+
+
+```{r outliers_3sw}
+
+detectOutlier <- function(x){
+    delta_median <- abs(x - median(as.numeric(x), na.rm = T))
+    outl <- names(x)[which(delta_median == max(delta_median, na.rm=T))]
+    return(outl[1])
+}
+
+detectVarianceReduction <- function(x){
+    delta_median <- abs(x - median(as.numeric(x), na.rm = T))
+    outl <- names(x)[which(delta_median == max(delta_median, na.rm=T))]
+    x_nooutlier = x[ !names(x) %in% outl]
+    stdev_nooutlier = sd(x_nooutlier, na.rm=T)
+    return(stdev_nooutlier)
+}
+
+rts_w$stdev <- sqrt(apply(rts_w[, 3:7], 1, var, na.rm=T) )
+rts_w$isoutlier <- rts_w$stdev >= outlier.threshold
+rts_w$outlier <- apply(rts_w[, 3:7], 1, detectOutlier)
+rts_w$stdev_nooutlier <- apply(rts_w[, 3:7], 1, detectVarianceReduction)
+
+# exclude ambigous cases, i.e. where the removal of the outlier does not reduce the variance
+# this means that at least one other tool also does not agree on the peak position
+rts_w_unambig <- subset(rts_w, stdev_nooutlier < outlier.threshold)
+
+rts_w_complete <- rts_w_unambig[complete.cases(rts_w_unambig[,3:7]),] 
+
+# table(subset(rts_w_complete, isoutlier == TRUE)$outlier)
+# table(subset(rts_w_complete, isoutlier == TRUE & stdev_nooutlier < outlier.threshold)$outlier)
+
+summary_outliers <- rts_w_unambig %>% group_by(isoutlier) %>% summarise(cases = n())
+num_outliers <- (summary_outliers %>% filter(isoutlier == T))$cases
+num_no_outliers <- (summary_outliers %>% filter(isoutlier == F))$cases
+percent_outliers <- round( (num_outliers / num_no_outliers) * 100, digits=1)
+
+p <- ggplot(rts_w_unambig, aes(x=isoutlier))
+p <- p + geom_histogram()
+#print(p)
+
+p <- ggplot(filter(rts_w_unambig, isoutlier == T), aes(factor(outlier)))
+p <- p + geom_bar()
+#print(p)
+```
+
+Using only complete cases (peaks detected by all tools): 
+
+```{r outliers_all}
+
+p <- ggplot(rts_w_complete, aes(x=isoutlier))
+p <- p + geom_histogram() 
+p <- p + theme_classic(base_size=15) + xlab("Is outlier") + ylab("number of cases")
+print(p)
+
+summary_outliers <- rts_w_complete %>% group_by(isoutlier) %>% summarise(cases = n())
+num_outliers <- (summary_outliers %>% filter(isoutlier == T))$cases
+num_no_outliers <- (summary_outliers %>% filter(isoutlier == F))$cases
+percent_outliers <- round( (num_outliers / num_no_outliers) * 100, digits=1)
+
+p <- ggplot(filter(rts_w_complete, isoutlier == T), aes(factor(outlier), fill = outlier))
+p <- p + theme_classic(base_size=15) + xlab("Tools") + ylab("number of outliers") + xlab("")
+p <- p + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 20),
+               axis.text.y = element_text(size = 20),
+               axis.title.y = element_text(size = 20))
+p <- p + geom_bar() 
+print(p)
+
+ggsave(filename="Figure5A.pdf", plot=p)
+```
+
+We estimate there are `r percent_outliers`% of wrong peaks in the total number of peaks identified by all software tools.
+
+```{r summaryByTool}
+
+summary_by_tool <- rts_w_complete %>% filter(isoutlier == T) %>%
+    group_by(outlier) %>%
+    summarise(Outlier.count = n(), Outlier.ratio = round(n()/nrow(rts_w_complete) , digits=3) )
+
+pander(summary_by_tool, style='rmarkdown')
+
+```
+
+
+Relate with peak intensities. 
+
+```{r intensities, warning=FALSE}
+
+panel.diff <- function(x, y, ...) {
+    delta = (x - y)
+    points(x=x, y=delta, bty="n", ...)
+    box(lwd=2)
+}
+
+panel.pair2 <- function(x, y, ...) {
+    points(x=x, y=y, bty="n", ...)
+    box(lwd=2)
+}
+
+panel.paired_outliers <- function(x, y, outl.threshold=0.2, ...){
+    colorpal = c("red", "black")
+    outliers = ifelse( abs(x-y) >= outl.threshold, 1, 2 )
+    points(x=x, y=y, col=colorpal[outliers], ...)
+}
+
+panel.hist <- function(x, ...)
+{
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(usr[1:2], 0, 1.5) )
+    h <- hist(x, plot = FALSE)
+    breaks <- h$breaks; nB <- length(breaks)
+    y <- h$counts; y <- y/max(y)
+    rect(breaks[-nB], 0, breaks[-1], y, ...)
+}
+
+int_w <- rts %>% select(Sequence, z, tool, Intensity) %>% spread(key=tool, value=Intensity)
+int_w$numNAs <- apply(int_w[, 3:7], 1, function(z) sum(is.na(z)))
+int_w$stdev_nooutlier <- rep(0, dim(int_w)[1])
+int_w <- int_w %>% filter(numNAs < 3)
+
+int_rt_w <- cbind(rts_w, int_w)
+names(int_rt_w) <- c(names(rts_w), paste(names(int_w), "int", sep="_"))
+int_rt_w <- select(int_rt_w, -Sequence_int, -z_int, -numNAs_int)
+int_rt_w$numNAs <- as.factor(int_rt_w$numNAs)
+int_rt_w$isoutlier <- as.factor(int_rt_w$isoutlier)
+int_rt_w$z <- as.factor(int_rt_w$z)
+
+int_rt_w <- int_rt_w %>% arrange(isoutlier)
+
+rt_paired <- ggpairs(data = int_rt_w, 
+                      columns = 3:7,
+                      title = "Peak Retention times for all tools", 
+                      #axisLabels="none",
+                      colour="isoutlier",
+                      params=c(xlim=c(-2,130), ylim=c(-2,130)) )
+rt_paired <- rt_paired + theme_classic()
+
+#print(rt_paired)
+
+
+
+#pairs(x=int_rt_w[, 3:7], 
+#      main = "Peak Retention times for all tools",
+#      col = factor(int_rt_w$isoutlier),
+#      xlim=c(0, 130), ylim=c(0, 130), pch=20, 
+#      )
+
+pairs(x=int_rt_w[, 3:7], 
+      main = "Peak Retention times for all tools",
+      upper.panel = panel.paired_outliers,
+      lower.panel = NULL,
+      #col = factor(int_rt_w$isoutlier),
+      xlim=c(0, 130), ylim=c(0, 130), pch=20, cex=0.1
+      )
+
+
+
+int_paired <- ggpairs(data = int_rt_w, 
+                      columns = 13:17,
+                      title = "Peak Intensities for all tools", 
+                      axisLabels="none",
+                      colour="isoutlier",
+                      diag=list(continuous = 'blank')
+                      )
+int_paired <- int_paired + theme_classic()
+
+#print(int_paired)
+
+pairs.greek <- function(x, ...)
+{
+  panel.txt <- function(x, y, labels, cex, font, ...)
+  {
+    lab <- labels
+    text(0.5, 0.5, parse(text=lab), cex=cex, font=font)
+  }
+  pairs(x, text.panel=panel.txt)
+}
+dat <- data.frame(alpha=runif(10), beta=runif(10), gamma=runif(10))
+#pairs.greek(dat)
+
+panel.txt <- function(x, y, labels, cex, font, ...)
+{
+    lab <- labels
+    lab <- gsub(pattern="_int", "", lab)
+    text(0.5, 0.5, lab, cex=cex, font=font)
+}
+
+pairs(x=log10(int_rt_w[, 13:17]), 
+      main = "Peak Intensities for all tools",
+      col = factor(int_rt_w$isoutlier),
+      upper.panel=NULL,
+      pch=20,  
+      cex=0.1,
+      text.panel = panel.txt
+      )
+
+
+int_rt_w <- int_rt_w %>% 
+        mutate(
+            outlier_DIAumpire_OpenSWATH   = ifelse(abs(DIAumpire - OpenSWATH)   >= outlier.threshold, TRUE, FALSE),
+            outlier_DIAumpire_Peakview    = ifelse(abs(DIAumpire - Peakview)    >= outlier.threshold, TRUE, FALSE),
+            outlier_DIAumpire_Skyline     = ifelse(abs(DIAumpire - Skyline)     >= outlier.threshold, TRUE, FALSE),
+            outlier_DIAumpire_Spectronaut = ifelse(abs(DIAumpire - Spectronaut) >= outlier.threshold, TRUE, FALSE),
+            outlier_OpenSWATH_Peakview    = ifelse(abs(OpenSWATH - Peakview)    >= outlier.threshold, TRUE, FALSE),
+            outlier_OpenSWATH_Skyline     = ifelse(abs(OpenSWATH - Skyline)     >= outlier.threshold, TRUE, FALSE),
+            outlier_OpenSWATH_Spectronaut = ifelse(abs(OpenSWATH - Spectronaut) >= outlier.threshold, TRUE, FALSE),
+            outlier_Peakview_Skyline      = ifelse(abs(Peakview  - Skyline)     >= outlier.threshold, TRUE, FALSE),
+            outlier_Peakview_Spectronaut  = ifelse(abs(Peakview  - Spectronaut) >= outlier.threshold, TRUE, FALSE),
+            outlier_Skyline_Spectronaut   = ifelse(abs(Skyline  -  Spectronaut) >= outlier.threshold, TRUE, FALSE)
+            )
+
+pair_outliers_summary <- int_rt_w %>%
+    summarise(
+        DIAumpire_OpenSWATH   = sum(outlier_DIAumpire_OpenSWATH, na.rm = T)   / (n() - sum(is.na(outlier_DIAumpire_OpenSWATH))),
+        DIAumpire_Peakview    = sum(outlier_DIAumpire_Peakview, na.rm = T)    / (n() - sum(is.na(outlier_DIAumpire_Peakview))),
+        DIAumpire_Skyline     = sum(outlier_DIAumpire_Skyline, na.rm = T)     / (n() - sum(is.na(outlier_DIAumpire_Skyline))),
+        DIAumpire_Spectronaut = sum(outlier_DIAumpire_Spectronaut, na.rm = T) / (n() - sum(is.na(outlier_DIAumpire_Spectronaut))),
+        OpenSWATH_Peakview    = sum(outlier_OpenSWATH_Peakview, na.rm = T)    / (n() - sum(is.na(outlier_OpenSWATH_Peakview))),
+        OpenSWATH_Skyline     = sum(outlier_OpenSWATH_Skyline, na.rm = T)     / (n() - sum(is.na(outlier_OpenSWATH_Skyline))),
+        OpenSWATH_Spectronaut = sum(outlier_OpenSWATH_Spectronaut, na.rm = T) / (n() - sum(is.na(outlier_OpenSWATH_Spectronaut))),
+        Peakview_Skyline      = sum(outlier_Peakview_Skyline, na.rm = T)      / (n() - sum(is.na(outlier_Peakview_Skyline))),
+        Peakview_Spectronaut  = sum(outlier_Peakview_Spectronaut, na.rm = T)  / (n() - sum(is.na(outlier_Peakview_Spectronaut))),
+        Skyline_Spectronaut   = sum(outlier_Skyline_Spectronaut, na.rm = T)   / (n() - sum(is.na(outlier_Skyline_Spectronaut)))
+              )
+pair_outliers_summary <- round(pair_outliers_summary * 100, 1)
+
+```
+
+If we plot peaks identified in __all__ software tools, the plots are not so powerful, but you can see also very clear that those points in PeakView are actually aligned in other software tools, which shows clearly that PeakView has most likely a retention time alignment issue for lower retention times. 
+
+```{r int_rt_complete}
+
+int_rt_w_complete <- int_rt_w %>% filter(numNAs == 0)
+
+pairs(x=int_rt_w_complete[, 3:7], 
+      main = "Peak Retention times for all tools (only commonly identified peptides)",
+      upper.panel = panel.paired_outliers,
+      lower.panel = NULL,
+      #col = factor(int_rt_w$isoutlier),
+      xlim=c(0, 130), ylim=c(0, 130), pch=20, cex=0.1
+      )
+
+pairs(x=log10(int_rt_w_complete[, 13:17]), 
+      main = "Peak Intensities for all tools (only commonly identified peptides)",
+      col = factor(int_rt_w_complete$isoutlier),
+      upper.panel=NULL,
+      pch=20,
+      cex=0.1,
+      text.panel = panel.txt
+      )
+
+invisible(pdf("Figure5B2.pdf", width=3.15*3, height=3.15*3))
+pairs(x=log10(int_rt_w_complete[, 13:17]), 
+      col = factor(int_rt_w_complete$isoutlier),
+      pch=20,
+      cex=0.8,
+      cex.axis=1.5,
+      upper.panel=NULL,
+      lower.panel=panel.pair2,
+      text.panel = panel.txt
+      )
+invisible(dev.off())
+
+```
+
+
+```{r, echo=FALSE}
+
+int_rt_w_sorted <- select(int_rt_w, DIAumpire, Peakview, OpenSWATH, Skyline, Spectronaut, isoutlier)
+
+invisible(pdf("Figure5B1.pdf", width=3.15*3, height=3.15*3))
+pairs(x=int_rt_w_sorted[, 1:5], 
+      #main = "Peak Retention times for all tools",
+      col = factor(int_rt_w_sorted$isoutlier),
+      xlim=c(0, 130), ylim=c(-40, 40), 
+      pch=20,
+      cex=.8, 
+      cex.axis=1.5,
+      upper.panel = panel.diff,
+      lower.panel = NULL,
+      text.panel = panel.txt
+      )
+
+invisible(dev.off())
+
+```
+
+

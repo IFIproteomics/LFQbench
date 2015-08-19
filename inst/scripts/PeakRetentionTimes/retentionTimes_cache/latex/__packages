@@ -1,0 +1,11 @@
+base
+knitr
+VennDiagram
+tidyr
+dplyr
+ggplot2
+readxl
+classInt
+scales
+pander
+GGally

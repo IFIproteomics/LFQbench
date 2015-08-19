@@ -6,7 +6,7 @@ DEBUG = T
 
 #working_dir <- "../../ext/data/example_spectronaut"
 working_dir <- "../../ext/data/example_peakview"
-#working_dir = "/Users/yperez/temp/pedro/"
+working_dir = "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/iteration1/TTOF6600_64w_commonproteins"
 
 # Options: see fswe.variables.R file
 ## With the option "guess", input files must start with the software_source name. Then input files from different software sources can be analysed together.
@@ -20,7 +20,9 @@ supplementary <- "supplementary"
 #sequencelist <- read.csv("/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/common_peptides/commonPeptides_Spectronaut_DIAumpire.csv", stringsAsFactors=F)$V1
 #sequencelist <- read.csv("/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/common_peptides/commonPeptides_allSoftwares_6600_64w.csv", stringsAsFactors=F)$V1
 sequencelist <- NULL
-
+proteinlist  <- NULL
+proteinlist="/Users/napedro/github_prj/LFQbench_package/LFQbench/inst/scripts/protein_overlap/list_common_proteins.txt"
+    
 plotHistogram = T 
 plotHistNAs = T
 reportSequences = T
@@ -42,6 +44,13 @@ top.N.min = 2
 #Override config parameters with command line parameters
 LFQbench::evalCommandLineArguments()
 
+if(!is.null(sequencelist)){
+    sequencelist <- read.table(sequencelist, quote = "", header = F, sep = "\t")$V1
+}
+if(!is.null(proteinlist)){
+    proteinlist <- read.table(proteinlist, quote = "", header = F, sep = "\t")$V1
+}
+
 source("fswe.variables.R")
 setup_softwaresource_variables(software_source)
 source("fswe.functions.R")
@@ -60,8 +69,11 @@ generateReports <- function(experiment_file,
                             plotHistNAs = F, 
                             reportSequences = F, 
                             sequence.list = NULL,
+                            protein.list = NULL,
                             singleHits = F){
-
+    
+    #  experiment_file <- AllInputFiles[6]
+    
     if(parameter.software_source == "guess") {
         software_source <- guessSoftwareSource(experiment_file, software_sources)
     }
@@ -74,7 +86,6 @@ generateReports <- function(experiment_file,
     
     qvalue.filtered = FALSE
     # Read file
-    #  experiment_file <- AllInputFiles[1]
     original.experiment_file <- experiment_file
     experiment_file <- file.path(working_dir, experiment_file)
     cat(paste0("Generating peptide report for ", experiment_file, "\n"))
@@ -240,7 +251,16 @@ generateReports <- function(experiment_file,
     }
     
     if(!is.null(sequence.list)){
-        peptides_wide <- peptides_wide %>% filter(sequence %in% sequence.list)
+        peptides_wide <- peptides_wide %>% filter(sequenceID %in% sequence.list)
+    }
+
+    if(!is.null(protein.list)){
+        filterProtein <- function(myprotein, listtosearch){
+            which(grepl(myprotein, listtosearch))
+        }
+        
+        matches <- unique(unlist(sapply(protein.list, filterProtein, peptides_wide$proteinID)))
+        peptides_wide <- peptides_wide[matches, ] 
     }
     
     peptides_wide <- peptides_wide %>% select(-sequence) 
@@ -374,5 +394,6 @@ nix <- sapply(AllInputFiles, generateReports,
               plotHistNAs = plotHistNAs, 
               reportSequences = reportSequences, 
               sequence.list = sequencelist,
+              protein.list = proteinlist,
               singleHits = singleHits)
 
