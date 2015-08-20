@@ -212,29 +212,29 @@ openswath.r1.id <- openswath.r1 %>%
 
 
 proteinoverlap.r1 <- merge(spectronaut.r1.id, diaump.id,       by="protein", all=T)
-proteinoverlap.r1 <- merge(proteinoverlap   , peakview.r1.id,  by="protein", all=T)
-proteinoverlap.r1 <- merge(proteinoverlap   , skyline.r1.id,   by="protein", all=T)
-proteinoverlap.r1 <- merge(proteinoverlap   , openswath.r1.id, by="protein", all=T)
+proteinoverlap.r1 <- merge(proteinoverlap.r1   , peakview.r1.id,  by="protein", all=T)
+proteinoverlap.r1 <- merge(proteinoverlap.r1   , skyline.r1.id,   by="protein", all=T)
+proteinoverlap.r1 <- merge(proteinoverlap.r1   , openswath.r1.id, by="protein", all=T)
 
 proteinoverlap.r1[is.na(proteinoverlap.r1)] <- FALSE
 
 
 
 #List of proteins present in all tools
-commonproteins <- proteinoverlap %>% (filter(Spectronaut == T & 
+commonproteins <- proteinoverlap %>% filter(Spectronaut == T & 
                                             PeakView    == T & 
                                             OpenSWATH   == T & 
                                             Skyline     == T & 
-                                            DIAumpire   == T))
+                                            DIAumpire   == T)
 
 commonproteins.list <- commonproteins$protein
 write.table(commonproteins.list, file="list_common_proteins.txt", sep="\t", row.names = F, col.names = F, quote = F)
 
-commonproteins.r1 <- proteinoverlap.r1 %>% (filter(Spectronaut == T & 
+commonproteins.r1 <- proteinoverlap.r1 %>% filter(Spectronaut == T & 
                                             PeakView    == T & 
                                             OpenSWATH   == T & 
                                             Skyline     == T & 
-                                            DIAumpire   == T))
+                                            DIAumpire   == T)
 
 commonproteins.r1.list <- commonproteins.r1$protein
 write.table(commonproteins.r1.list, file="list_common_proteins.txt", sep="\t", row.names = F, col.names = F, quote = F)
