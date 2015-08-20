@@ -49,11 +49,22 @@ skyline.file <- "/Users/napedro/github_prj/swath-evaluation-manuscript/benchmark
 peakview.file <- "/Users/napedro/github_prj/swath-evaluation-manuscript/benchmarks/draft.v2/dataanalysis_TOF6600_64w/input/PeakView_r2.tsv"
 openswath.file <- "/Users/napedro/github_prj/swath-evaluation-manuscript/benchmarks/draft.v2/dataanalysis_TOF6600_64w/input/OpenSWATH_r2.tsv"
 
+spectronaut.r1.file <- "/Users/napedro/github_prj/swath-evaluation-manuscript/benchmarks/draft.v2/dataanalysis_TOF6600_64w/input/Spectronaut_r1.tsv"
+skyline.r1.file <- "/Users/napedro/github_prj/swath-evaluation-manuscript/benchmarks/draft.v2/dataanalysis_TOF6600_64w/input/Skyline_r1.tsv"
+peakview.r1.file <- "/Users/napedro/github_prj/swath-evaluation-manuscript/benchmarks/draft.v2/dataanalysis_TOF6600_64w/input/PeakView_r1.tsv"
+openswath.r1.file <- "/Users/napedro/github_prj/swath-evaluation-manuscript/benchmarks/draft.v2/dataanalysis_TOF6600_64w/input/OpenSWATH_r1.tsv"
+
+
 diaump <- read.table(diaump.file, header=T, sep="\t", stringsAsFactors=F)
 spectronaut <- read.table(spectronaut.file, header=T, sep="\t", stringsAsFactors=F)
 skyline <- read.table(skyline.file, header=T, sep="\t", stringsAsFactors=F)
 peakview <- read.table(peakview.file, header=T, sep="\t", stringsAsFactors=F)
 openswath <- read.table(openswath.file, header=T, sep="\t", stringsAsFactors=F)
+
+spectronaut.r1 <- read.table(spectronaut.r1.file, header=T, sep="\t", stringsAsFactors=F)
+skyline.r1 <- read.table(skyline.r1.file, header=T, sep="\t", stringsAsFactors=F)
+peakview.r1 <- read.table(peakview.r1.file, header=T, sep="\t", stringsAsFactors=F)
+openswath.r1 <- read.table(openswath.r1.file, header=T, sep="\t", stringsAsFactors=F)
 
 ```
 
@@ -139,6 +150,76 @@ proteinoverlap <- merge(proteinoverlap, openswath.id, by="protein", all=T)
 
 proteinoverlap[is.na(proteinoverlap)] <- FALSE
 
+
+# for the iteration 1
+
+spectronaut.r1 <- spectronaut.r1 %>% 
+    mutate( proteinID = substring(proteinID, first=4, last=nchar(proteinID))) %>%
+    mutate( proteins = strsplit(proteinID, split="/")) %>%
+    unnest(proteins) %>%
+    mutate( protein = gsub("\\|", "", regmatches(proteins, gregexpr("\\|.*?\\|", proteins))) ) %>%
+    select(-proteins) %>% 
+    distinct(protein) %>% 
+    group_by(protein) %>%
+    mutate( meanIntensity = mean(c(A1, A2, A3, B1, B2, B3), na.rm=T))
+
+spectronaut.r1.id <- spectronaut.r1 %>%
+    select(protein) %>%
+    mutate(Spectronaut = TRUE)
+
+skyline.r1 <- skyline.r1 %>% 
+    mutate( proteins = strsplit(proteinID, split="/")) %>%
+    unnest(proteins) %>%
+    filter(nchar(proteins) > 2) %>%
+    mutate( protein = gsub("\\|", "", regmatches(proteins, gregexpr("\\|.*?\\|", proteins))) ) %>%
+    select(-proteins) %>% 
+    distinct(protein) %>% 
+    group_by(protein) %>%
+    mutate( meanIntensity = mean(c(A1, A2, A3, B1, B2, B3), na.rm=T))
+
+skyline.r1.id <- skyline.r1 %>%
+    select(protein) %>%
+    mutate(Skyline = TRUE)
+
+peakview.r1 <- peakview.r1 %>% 
+    mutate( proteins = strsplit(proteinID, split="/")) %>%
+    unnest(proteins) %>%
+    filter(nchar(proteins) > 2) %>%
+    mutate( protein = gsub("\\|", "", regmatches(proteins, gregexpr("\\|.*?\\|", proteins))) ) %>%
+    select(-proteins) %>% 
+    distinct(protein) %>% 
+    group_by(protein) %>%
+    mutate( meanIntensity = mean(c(A1, A2, A3, B1, B2, B3), na.rm=T))
+
+peakview.r1.id <- peakview.r1 %>%
+    select(protein) %>%
+    mutate(PeakView = TRUE)
+
+
+openswath.r1 <- openswath.r1 %>% 
+    mutate( proteins = strsplit(proteinID, split="/")) %>%
+    unnest(proteins) %>%
+    filter(nchar(proteins) > 2) %>%
+    mutate( protein = gsub("\\|", "", regmatches(proteins, gregexpr("\\|.*?\\|", proteins))) ) %>%
+    select(-proteins) %>% 
+    distinct(protein) %>% 
+    group_by(protein) %>%
+    mutate( meanIntensity = mean(c(A1, A2, A3, B1, B2, B3), na.rm=T))
+
+openswath.r1.id <- openswath.r1 %>%
+    select(protein) %>%
+    mutate(OpenSWATH = TRUE)
+
+
+proteinoverlap.r1 <- merge(spectronaut.r1.id, diaump.id,       by="protein", all=T)
+proteinoverlap.r1 <- merge(proteinoverlap   , peakview.r1.id,  by="protein", all=T)
+proteinoverlap.r1 <- merge(proteinoverlap   , skyline.r1.id,   by="protein", all=T)
+proteinoverlap.r1 <- merge(proteinoverlap   , openswath.r1.id, by="protein", all=T)
+
+proteinoverlap.r1[is.na(proteinoverlap.r1)] <- FALSE
+
+
+
 #List of proteins present in all tools
 commonproteins <- proteinoverlap %>% (filter(Spectronaut == T & 
                                             PeakView    == T & 
@@ -148,6 +229,17 @@ commonproteins <- proteinoverlap %>% (filter(Spectronaut == T &
 
 commonproteins.list <- commonproteins$protein
 write.table(commonproteins.list, file="list_common_proteins.txt", sep="\t", row.names = F, col.names = F, quote = F)
+
+commonproteins.r1 <- proteinoverlap.r1 %>% (filter(Spectronaut == T & 
+                                            PeakView    == T & 
+                                            OpenSWATH   == T & 
+                                            Skyline     == T & 
+                                            DIAumpire   == T))
+
+commonproteins.r1.list <- commonproteins.r1$protein
+write.table(commonproteins.r1.list, file="list_common_proteins.txt", sep="\t", row.names = F, col.names = F, quote = F)
+
+
 ```
 
 
@@ -162,6 +254,20 @@ l <- venn.diagram(
                     Skyline = unlist(proteinoverlap %>% filter(Skyline == T) %>% select(protein))
                     ),
                 filename = "Figure5C.tiff",
+                fontfamily="Arial",
+                fill=c("yellow", "red", "green", "cyan"),
+                cex=1.5, cat.cex=1.1, cat.dist=0.07
+                #,category.names = rep("", 4)
+                )
+
+l <- venn.diagram(
+                x = list(
+                    Spectronaut = unlist(proteinoverlap.r1 %>% filter(Spectronaut == T) %>% select(protein)),
+                    PeakView = unlist(proteinoverlap.r1 %>% filter(PeakView == T) %>% select(protein)),
+                    OpenSWATH = unlist(proteinoverlap.r1 %>% filter(OpenSWATH == T) %>% select(protein)),
+                    Skyline = unlist(proteinoverlap.r1 %>% filter(Skyline == T) %>% select(protein))
+                    ),
+                filename = "Figure5C.r1.tiff",
                 fontfamily="Arial",
                 fill=c("yellow", "red", "green", "cyan"),
                 cex=1.5, cat.cex=1.1, cat.dist=0.07
@@ -188,6 +294,18 @@ l <-  venn.diagram(
                 fill=c("blue", "yellow", "red", "green", "cyan"),
                 cex=1, cat.cex=1.1, cat.dist=0.07)
 
+l <-  venn.diagram(
+                x = list(
+                    DIA_Umpire = unlist(proteinoverlap.r1 %>% filter(DIAumpire == T) %>% select(protein)),
+                    Spectronaut = unlist(proteinoverlap.r1 %>% filter(Spectronaut == T) %>% select(protein)),
+                    PeakView = unlist(proteinoverlap.r1 %>% filter(PeakView == T) %>% select(protein)),
+                    OpenSWATH = unlist(proteinoverlap.r1 %>% filter(OpenSWATH == T) %>% select(protein)),
+                    Skyline = unlist(proteinoverlap.r1 %>% filter(Skyline == T) %>% select(protein))
+                    ), 
+                filename = "ProteinOverlap_allTools.r1.tiff",
+                fill=c("blue", "yellow", "red", "green", "cyan"),
+                cex=1, cat.cex=1.1, cat.dist=0.07)
+
 ```
 
 
@@ -203,6 +321,18 @@ venn.plot <- venn.diagram(
         ),
     fontfamily="Arial",
     filename = "Figure5D.tiff",
+    fill=c("yellow", rgb(0,191/255,196/255)),
+    cex=1.5, cat.cex=1.1, cat.dist=0.07,
+    category.names = c("Library-based", "DIA-Umpire")  # rep("", 2)
+    )
+
+venn.plot <- venn.diagram(
+    x = list(
+        library_based = unlist(proteinoverlap.r1 %>% filter(Spectronaut == T | PeakView == T |  Skyline == T | OpenSWATH == T) %>% select(protein)),
+        DIA_Umpire = unlist(proteinoverlap.r1 %>% filter(DIAumpire == T) %>% select(protein))
+        ),
+    fontfamily="Arial",
+    filename = "Figure5D.r1.tiff",
     fill=c("yellow", rgb(0,191/255,196/255)),
     cex=1.5, cat.cex=1.1, cat.dist=0.07,
     category.names = c("Library-based", "DIA-Umpire")  # rep("", 2)
