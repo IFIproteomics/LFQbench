@@ -60,7 +60,17 @@ peptides.all <- peptides.all[complete.cases(peptides.all),]
 # 4. Model each tool against the software_base.
 callm <- function(y, x, thedata){
     if(!(x == y)){
-        slope = lm(formula =  get(x) ~ get(y) - 1,data = thedata)    
+        thedata98 = thedata[thedata[, y] < quantile(thedata[, y], 0.98), ]
+        print("num of rows thedata98: ")
+        print(nrow(thedata98))
+        slope = lm(formula =  get(x) ~ get(y) - 1,data = thedata98) 
+        pdf(file = file.path(working_dir, paste("CIS", x, y, "pdf", sep=".")), width = 6, height = 6)
+            plot(thedata[,y], thedata[,x], xlab = y, ylab = x, pch=19)
+            abline(slope, col="red")
+            midx = (max(thedata[, y]) - min(thedata[, x])) / 2
+            lowy = (max(thedata[, y]) - min(thedata[, x])) / 5
+            text(midx, lowy, adj=c(0,0), labels = paste("slope = " , round(slope$coefficients, 2), sep=" ") )
+        dev.off()
         return(as.vector(slope$coefficients))
     }else{
         return(1.0)
