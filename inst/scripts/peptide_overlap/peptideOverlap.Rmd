@@ -1,5 +1,5 @@
 ---
-title: "Sequence Overlap"
+title: "Peptide Overlap"
 output:
   html_document:
     echo: no
@@ -14,7 +14,7 @@ opts_chunk$set(echo = FALSE)
 ```
 
 
-Sequence overlap among results of 6600_64w of:
+Peptide overlap among results of 6600_64w of:
 
 1. Spectronaut  
 1. SWATH2.0  
