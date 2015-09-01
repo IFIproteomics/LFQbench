@@ -17,7 +17,7 @@ opts_chunk$set(echo = FALSE)
 Sequence overlap among results of 6600_64w of:
 
 1. Spectronaut  
-1. PeakView  
+1. SWATH2.0  
 1. Skyline  
 1. OpenSWATH  
 1. DIAumpire  
@@ -73,7 +73,7 @@ diaump <- diaump %>% rowwise() %>%
     mutate( meanIntensity = mean(c(A1, A2, A3, B1, B2, B3), na.rm=T))
 
 diaump$sequenceID <- gsub("\\[15\\.995\\(M\\)\\]M", "M\\[Oxi\\]", diaump$sequenceID)
-diaump$sequenceID <- gsub("\\[57\\.021\\(C\\)\\]M", "M\\[CAM\\]", diaump$sequenceID)
+diaump$sequenceID <- gsub("\\[57\\.021\\(C\\)\\]C", "C\\[CAM\\]", diaump$sequenceID)
 
 diaump.id <- diaump %>%
     select(sequenceID) %>%
@@ -94,7 +94,7 @@ peakview <- peakview %>% rowwise() %>%
 
 peakview.id <- peakview %>%
     select(sequenceID) %>%
-    mutate(PeakView = TRUE)
+    mutate(SWATH2.0 = TRUE)
 
 
 openswath <- openswath %>% rowwise() %>%
@@ -121,47 +121,10 @@ We are interested on how many sequences of all library-based tools are not cover
 
 ```{r}
 
-A = nrow(common.sequences %>% filter(Spectronaut == T))
-B = nrow(common.sequences %>% filter(PeakView == T))
-C = nrow(common.sequences %>% filter(Skyline == T))
-D = nrow(common.sequences %>% filter(OpenSWATH == T))
-E = nrow(common.sequences %>% filter(DIAumpire == T))
-
-
-AB = nrow(common.sequences %>% filter(Spectronaut == T & PeakView == T))
-AC = nrow(common.sequences %>% filter(Spectronaut == T & Skyline == T))
-AD = nrow(common.sequences %>% filter(Spectronaut == T & OpenSWATH == T))
-AE = nrow(common.sequences %>% filter(Spectronaut == T & DIAumpire == T))
-BC = nrow(common.sequences %>% filter(PeakView == T & Skyline == T))
-BD = nrow(common.sequences %>% filter(PeakView == T & OpenSWATH == T))
-BE = nrow(common.sequences %>% filter(PeakView == T & DIAumpire == T))
-CD = nrow(common.sequences %>% filter(Skyline == T & OpenSWATH == T))
-CE = nrow(common.sequences %>% filter(Skyline == T & DIAumpire == T))
-DE = nrow(common.sequences %>% filter(OpenSWATH == T & DIAumpire == T))
-    
-ABC = nrow(common.sequences %>% filter(Spectronaut == T & PeakView == T &  Skyline == T))
-ABD = nrow(common.sequences %>% filter(Spectronaut == T & PeakView == T &  OpenSWATH == T))
-ABE = nrow(common.sequences %>% filter(Spectronaut == T & PeakView == T &  DIAumpire == T))
-ACD = nrow(common.sequences %>% filter(Spectronaut == T & Skyline == T & OpenSWATH == T))
-ACE = nrow(common.sequences %>% filter(Spectronaut == T & Skyline == T & DIAumpire == T))
-ADE = nrow(common.sequences %>% filter(Spectronaut == T & OpenSWATH == T & DIAumpire == T))
-BCD = nrow(common.sequences %>% filter(PeakView == T &  Skyline == T & OpenSWATH == T))
-BDE = nrow(common.sequences %>% filter(PeakView == T & OpenSWATH == T & DIAumpire == T))
-BCE = nrow(common.sequences %>% filter(PeakView == T &  Skyline == T & DIAumpire == T))
-CDE = nrow(common.sequences %>% filter(Skyline == T & OpenSWATH == T & DIAumpire == T))
-
-ABCD = nrow(common.sequences %>% filter(Spectronaut == T & PeakView == T &  Skyline == T & OpenSWATH == T))
-ABCE = nrow(common.sequences %>% filter(Spectronaut == T & PeakView == T &  Skyline == T & DIAumpire == T))
-ABDE = nrow(common.sequences %>% filter(Spectronaut == T & PeakView == T &  OpenSWATH == T & DIAumpire == T))
-ACDE = nrow(common.sequences %>% filter(Spectronaut == T & Skyline == T & OpenSWATH == T & DIAumpire == T))
-BCDE = nrow(common.sequences %>% filter(PeakView == T &  Skyline == T & OpenSWATH == T & DIAumpire == T))
-
-ABCDE = nrow(common.sequences %>% filter(Spectronaut == T & PeakView == T &  Skyline == T & OpenSWATH == T & DIAumpire == T))
-
 l <- venn.diagram(
                 x = list(
                     Spectronaut = unlist(common.sequences %>% filter(Spectronaut == T) %>% select(sequenceID)),
-                    PeakView = unlist(common.sequences %>% filter(PeakView == T) %>% select(sequenceID)),
+                    SWATH2.0 = unlist(common.sequences %>% filter(SWATH2.0 == T) %>% select(sequenceID)),
                     OpenSWATH = unlist(common.sequences %>% filter(OpenSWATH == T) %>% select(sequenceID)),
                     Skyline = unlist(common.sequences %>% filter(Skyline == T) %>% select(sequenceID))
                     ),
@@ -173,7 +136,7 @@ l <- venn.diagram(
 l <- venn.diagram(
                 x = list(
                     Spectronaut = unlist(common.sequences %>% filter(Spectronaut == T) %>% select(sequenceID)),
-                    PeakView = unlist(common.sequences %>% filter(PeakView == T) %>% select(sequenceID)),
+                    SWATH2.0 = unlist(common.sequences %>% filter(SWATH2.0 == T) %>% select(sequenceID)),
                     OpenSWATH = unlist(common.sequences %>% filter(OpenSWATH == T) %>% select(sequenceID)),
                     DIAumpire = unlist(common.sequences %>% filter(DIAumpire == T) %>% select(sequenceID))
                     ),
@@ -194,7 +157,7 @@ l <-  venn.diagram(
                 x = list(
                     DIA_Umpire = unlist(common.sequences %>% filter(DIAumpire == T) %>% select(sequenceID)),
                     Spectronaut = unlist(common.sequences %>% filter(Spectronaut == T) %>% select(sequenceID)),
-                    PeakView = unlist(common.sequences %>% filter(PeakView == T) %>% select(sequenceID)),
+                    SWATH2.0 = unlist(common.sequences %>% filter(SWATH2.0 == T) %>% select(sequenceID)),
                     OpenSWATH = unlist(common.sequences %>% filter(OpenSWATH == T) %>% select(sequenceID)),
                     Skyline = unlist(common.sequences %>% filter(Skyline == T) %>% select(sequenceID))
                     ), 
@@ -212,7 +175,7 @@ We then check the overlap between sequences identified in all library-based tool
 
 venn.plot <- venn.diagram(
     x = list(
-        library_based = unlist(common.sequences %>% filter(Spectronaut == T | PeakView == T |  Skyline == T | OpenSWATH == T) %>% select(sequenceID)),
+        library_based = unlist(common.sequences %>% filter(Spectronaut == T | SWATH2.0 == T |  Skyline == T | OpenSWATH == T) %>% select(sequenceID)),
         DIA_Umpire = unlist(common.sequences %>% filter(DIAumpire == T) %>% select(sequenceID))
         ),
     filename = "Figure5E_peptides.tiff",
@@ -257,15 +220,15 @@ venn.plot <- venn.diagram(
 
 
 
-diaump.only.nrow <- nrow(common.sequences %>% filter(Spectronaut == F & Skyline == F & PeakView == F & OpenSWATH == F & DIAumpire == T))
+diaump.only.nrow <- nrow(common.sequences %>% filter(Spectronaut == F & Skyline == F & SWATH2.0 == F & OpenSWATH == F & DIAumpire == T))
 
 ```
 
-There are `r B -AB` sequences reported in DIA-Umpire that were not detected in any other tool. If we plot the intensities of these sequences (in blue) compared to the intensities of the sequences detected in several tools (in red) we observe that they are in the low range. 
+There are `r diaump.only.nrow` sequences reported in DIA-Umpire that were not detected in any other tool. If we plot the intensities of these sequences (in blue) compared to the intensities of the sequences detected in several tools (in red) we observe that they are in the low range. 
 
 
 ```{r seq.intensities}
-diaump.only.id <- (common.sequences %>% filter(Spectronaut == F & Skyline == F & PeakView == F & OpenSWATH == F & DIAumpire == T))$sequenceID
+diaump.only.id <- (common.sequences %>% filter(Spectronaut == F & Skyline == F & SWATH2.0 == F & OpenSWATH == F & DIAumpire == T))$sequenceID
 diaump <- diaump %>% 
         mutate( onlyDIAump = ifelse(sequenceID %in% diaump.only.id, T, F) ) 
 
