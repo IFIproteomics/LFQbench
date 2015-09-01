@@ -7,6 +7,7 @@ library(LFQbench)
 
 # 0. Parameters
 working_dir = "./"
+subfolder = "input"
 software_scale_base = ""
 software_sources = c("PViewNoFilter")
 
@@ -17,7 +18,8 @@ software_sources = c("PViewNoFilter")
 
 evalCommandLineArguments()
 
-working_dir = file.path(working_dir, "input")
+# working_dir = file.path(working_dir, "input")
+working_dir = file.path(working_dir, subfolder)
 
 # 1. Read all peptide files in folder (scaling will be based on these files).
 AllInputFiles = list.files( path=working_dir, pattern=".[\\.].", full.names= FALSE, include.dirs = F, recursive = F, all.files = F)
