@@ -10,6 +10,19 @@ source('lfqbench.config.r')
 source('lfqbench.defs.r')
 #source('lfqbench.access.r')
 
+
+#if(DEBUG) cat( "R working directory: " + getwd() + "\n")
+
+working_dir = "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/dataanalysis_TOF6600_64w"
+evalCommandLineArguments()
+datafile <- file.path(working_dir, "log","ResultSets.rda")
+outDir= file.path(working_dir, "output_figures")
+load(file = datafile)
+mkdir(outDir)
+
+
+experimentNames = names(ResultSets)
+
 ####################################################################################################
 plotWithCfg = function(func, ...)
 {
@@ -18,16 +31,16 @@ plotWithCfg = function(func, ...)
     par(cfg$parBackup)
 }
 ####################################################################################################
-getFirstSamplePair = function(rsName) 
+getFirstSamplePair = function(rsName, xlims) 
 {
     sp = ResultSets[[rsName]]$result[[1]]
-    sp$xlim=c(9, 26)
+    sp$xlim= xlims #c(13, 26)
     return(sp)
 }
 ####################################################################################################
-plotRS = function(rsName, scatter=T, box=F, kde=F, showRegLines=F)
+plotRS = function(rsName, scatter=T, box=F, kde=F, showRegLines=F, xlims = c(13,26))
 {
-    sp = getFirstSamplePair(rsName)
+    sp = getFirstSamplePair(rsName, xlims)
     if(scatter) showScatterPlot( sp, showRegLines=showRegLines )
     if(box) showScatterAndBoxPlot( sp, showRegLines=showRegLines )
     if(kde) showScatterAndDensityPlot(sp, showRegLines=showRegLines)
@@ -37,14 +50,12 @@ plotRsToFile = function(rsName, ...)
 {
     cat(paste("plotting dataset", rsName, " ... "))
     pdf(file.path(outDir, paste0(rsName,".pdf")) , family = "Helvetica", pointsize = 9, width = cfg$PlotWidth, height = cfg$PlotHeight)
-    #   tiff(outDir+"/"+rsName+".tiff", 
-    #        compression = "zip", family = "Helvetica", pointsize = 9, width = cfg$PlotWidth, height = cfg$PlotHeight, 
-    #        units="in", res=600)
-    #   png(outDir+"/"+rsName+".png", family = "Helvetica", pointsize = 9, width = cfg$PlotWidth, height = cfg$PlotHeight, 
-    #      units="in", res=600)
-    #   jpeg(outDir+"/"+rsName+".jpg", quality=75, family = "Helvetica", pointsize = 9, width = cfg$PlotWidth, height = cfg$PlotHeight, 
-    #     units="in", res=600)
-    plotRS(rsName, ...)
+
+    xlims = c(13,26)
+    if(grepl("_peptides", rsName)){
+        xlims = c(9,26)
+    }
+    plotRS(rsName, xlims = xlims, ...)
     dev.off()  
     cat("done!\n")
 }
@@ -215,6 +226,14 @@ protein.experiments.r1 = c(
     "Spectronaut_r1"
 )
 
+protein.experiments.r1.nobuiltin = c(
+    "DIAumpire_r1",
+    "OpenSWATH_r1", 
+    "PeakView_r1",
+    "Skyline_r1", 
+    "Spectronaut_r1"
+)
+
 protein.experiments.r2 = c(
     "OpenSWATH_r2",
     "PeakView_r2",
@@ -247,34 +266,8 @@ names(experimentColors) = c(
 )
 
 
-#if(DEBUG) cat( "R working directory: " + getwd() + "\n")
-
-working_dir = "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/dataanalysis_TOF6600_64w"
-evalCommandLineArguments()
-datafile <- file.path(working_dir, "log","ResultSets.rda")
-outDir= file.path(working_dir, "output_figures")
-load(file = datafile)
-mkdir(outDir)
 
 
-experimentNames = names(ResultSets)
-
-# r1.names = experimentNames[grep("r1", experimentNames)]
-# r2.names = experimentNames[grep("(OpenSWATH|PeakView|Spectronaut)", experimentNames)]
-# r1.cols = experimentColors[r1.names]
-# r2.cols = experimentColors[r2.names]
-
-# plotRound(r1.names, species = "ECOLI", filePrefix = "round1", cols=r1.cols)
-# plotRound(r1.names, species = "YEAST", filePrefix = "round1", cols=r1.cols)
-# r1.labsAndCols = plotRound(r1.names, species = "HUMAN", filePrefix = "round1", cols=r1.cols)
-# plotBarLegend(r1.labsAndCols$labs, r1.labsAndCols$cols, nCol=2, outDir+"/round1_legend_h.pdf")
-# plotBarLegend(r1.labsAndCols$labs, r1.labsAndCols$cols, nCol=1, outDir+"/round1_legend_v.pdf")
-
-# plotRound(r2.names, species = "ECOLI", filePrefix = "round2", cols=r2.cols)
-# plotRound(r2.names, species = "YEAST", filePrefix = "round2", cols=r2.cols)
-# r2.labsAndCols = plotRound(r2.names, species = "HUMAN", filePrefix = "round2", cols=r2.cols)
-# plotBarLegend(r2.labsAndCols$labs, r2.labsAndCols$cols, nCol=2, outDir+"/round2_legend_h.pdf")
-# plotBarLegend(r2.labsAndCols$labs, r2.labsAndCols$cols, nCol=1, outDir+"/round2_legend_v.pdf")
 
 mvAnteil = function(spc="HUMAN", mv)
 {
@@ -322,12 +315,16 @@ plotMissingValues = function( missingValues, file=NULL, labXSize=cfg$AxisAnnotat
     par(cfg$parBackup)
 }
 
-# figure 2: missing values in round 1 peptides
+# figure 2: missing values in round 1
 mvs = sapply(ResultSets[peptide.experiments.r1], mv4rs)
 plotMissingValues( mvs, file = file.path(outDir, "missing_values_peptides_r1.pdf"), labXSize=cfg$AxisAnnotationSize*.70, catNameShift=0)
 
 mvs = sapply(ResultSets[protein.experiments.r1], mv4rs)
 plotMissingValues( mvs, file = file.path(outDir, "missing_values_proteins_r1.pdf"), labXSize=cfg$AxisAnnotationSize*.70, catNameShift=0)
+
+mvs = sapply(ResultSets[protein.experiments.r1.nobuiltin], mv4rs)
+plotMissingValues( mvs, file = file.path(outDir, "missing_values_proteins_r1_nobuiltin.pdf"), labXSize=cfg$AxisAnnotationSize*.70, catNameShift=0)
+
 
 # Supp. to figure 2: missing values in round 2 
 mvs = sapply(ResultSets[peptide.experiments.r2], mv4rs)
@@ -340,6 +337,7 @@ plotMissingValues( mvs, file = file.path(outDir, "missing_values_proteins_r2.pdf
 # make scatterplot files for all datasets
 sapply( experimentNames,  plotRsToFile,  scatter=F, box=T, kde=F, showRegLines=T )
 speciesLegendH(file.path(outDir, "species_legend_h.pdf"))
+speciesLegendV(file.path(outDir, "species_legend_v.pdf"))
 
 # figure 5
 # ECOLI log-ratios as boxplots combined for each software Built-in, R1, R2
@@ -384,6 +382,17 @@ getPartialLogRatios = function( rsIndex=1, species="ECOLI", fromPart=0.0, toPart
     }		
 }
 
+getPartialProteinLogRatiosNoBuiltIn = function( software="DIAumpire", species="ECOLI", fromPart=0, toPart=1 )
+{
+    cat(paste0("selecting log ratios for software: ", software, " ...\n"))    
+    # r1
+    r1LR = getPartialLogRatios( grep(paste0(software, "_r1"), experimentNames), species=species, fromPart, toPart)
+    # r2
+    r2LR = getPartialLogRatios( grep(paste0(software, "_r2"), experimentNames), species=species, fromPart, toPart)
+    return( list("Iteration 1"=r1LR, "Iteration 2"=r2LR) )
+}
+
+
 getPartialProteinLogRatios = function( software="DIAumpire", species="ECOLI", fromPart=0, toPart=1 )
 {
     cat(paste0("selecting log ratios for software: ", software, " ...\n"))	
@@ -394,6 +403,16 @@ getPartialProteinLogRatios = function( software="DIAumpire", species="ECOLI", fr
     # r2
     r2LR = getPartialLogRatios( grep(paste0(software, "_r2"), experimentNames), species=species, fromPart, toPart)
     return( list("Built-in"=biLR, "Iteration 1"=r1LR, "Iteration 2"=r2LR) )
+}
+
+getPartialPeptideLogRatios = function( software="DIAumpire", species="ECOLI", fromPart=0, toPart=1 )
+{
+    cat(paste0("selecting log ratios for software: ", software, " ...\n"))    
+    # r1
+    r1LR = getPartialLogRatios( grep(paste0(software, "_peptides_r1"), experimentNames), species=species, fromPart, toPart)
+    # r2
+    r2LR = getPartialLogRatios( grep(paste0(software, "_peptides_r2"), experimentNames), species=species, fromPart, toPart)
+    return( list("Iteration 1"=r1LR, "Iteration 2"=r2LR) )
 }
 
 expectedLogRatios = log2( cfg$AllExpectedAmounts[,1] / cfg$AllExpectedAmounts[,2] )
@@ -444,9 +463,7 @@ showBoxPlot4Softwares = function( species="ECOLI", file=NULL  )
 showBoxPlot4Softwares( species="ECOLI", file = file.path(outDir, "software_boxplots_ecoli.pdf" ))
 
 
-
-# boxplots for low/mid/high intensity ranges
-showPartialBoxPlot4Softwares = function( species="ECOLI", fromPart=0, toPart=1, file=NULL  )
+showPartialBoxPlot4SoftwaresNoBuiltIn = function( species="ECOLI", fromPart=0, toPart=1, file=NULL)
 {
     if(!is.null(file)) 
     {
@@ -456,7 +473,66 @@ showPartialBoxPlot4Softwares = function( species="ECOLI", fromPart=0, toPart=1, 
     mgp=c( 3.6, 1.0, 0 )
     par( cfg$par )
     par( mar=mar, mgp=mgp )
+    
+    lrs = unlist( lapply( software.names, getPartialProteinLogRatiosNoBuiltIn, species, fromPart, toPart ), recursive = F )
+    
+    
+    boxPos = c( 1:2, 4:5, 7:8, 10:11, 13:14 )
+    sepPos = c( 3, 6, 9, 12 )
+    
+    qboxplot( lrs, whiskerQuantile = cfg$BoxPlotWhiskerQuantile, lims=c(expectedLogRatios[species] - 3, expectedLogRatios[species] + 3.2), 
+              ylab=as.expression( bquote( Log[2]~"(A:B)" ) ),
+              horizontal = F, pch=20, cex=cfg$PlotPointSize, axes=F,
+              cex.lab=cfg$AxisLabelSize, at=boxPos
+    )
+    
+    plotArea = par()$usr
+    
+    # plot expectation line
+    abline(h=expectedLogRatios[species], lty=2, lwd=cfg$PlotCurveLineWidth )
+    abline(v=sepPos, lty="dotted", lwd=cfg$PlotCurveLineWidth, col="gray" )
+    
+    addAxes(lwd = cfg$AxisLineThickness, showXlab = F, showYlab = T, showXAxis = T, showYAxis = T, cex.axis = cfg$AxisAnnotationSize )
+    
+    if(!is.null(file)) 
+    {
+        yAxRange = par()$usr[3:4]
+        yAxSize = max(yAxRange) - min(yAxRange)
+        
+        axis(1, labels=names(lrs), at=boxPos, lwd.ticks = cfg$AxisLineThickness, lwd=0, cex.axis=cfg$AxisAnnotationSize, las=2)
+        axis(1, pos=min(yAxRange)-0.36*yAxSize , labels=nams2labs(software.names), at=boxPos[(1:5)*3-1], tick=F, cex.axis=cfg$AxisAnnotationSize, las=1)    
+    }
+    
+    if(!is.null(file)) dev.off()
+    par(cfg$parBackup)
+    return( list(
+        usr=plotArea, 
+        boxPos=boxPos, 
+        sepPos=sepPos, 
+        labs=names(lrs), 
+        cats=nams2labs(software.names),
+        mar=mar,
+        mgp=mgp
+    ))
+}
+
+
+
+
+# boxplots for low/mid/high intensity ranges
+showPartialBoxPlot4Softwares = function( species="ECOLI", fromPart=0, toPart=1, file=NULL, usebuiltin = T  )
+{
+    if(!is.null(file)) 
+    {
+        pdf(file=file, onefile=T, width=cfg$PlotWidth*2, height=cfg$PlotHeight*1.5, family="Helvetica", pointsize=9)
+    }
+    mar = c( 0.5, 5.5, .5, 0.5 )
+    mgp=c( 3.6, 1.0, 0 )
+    par( cfg$par )
+    par( mar=mar, mgp=mgp )
+
     lrs = unlist( lapply( software.names, getPartialProteinLogRatios, species, fromPart, toPart ), recursive = F )
+
     
     boxPos = c( 1:3, 5:7, 9:11, 13:15, 17:19 )
     sepPos = c( 4, 8, 12, 16 )
@@ -510,6 +586,7 @@ softwareBoxPlotsByIntensityRange = function(species="ECOLI", file=NULL)
     pa = showPartialBoxPlot4Softwares( species=species, fromPart=2/3, toPart=1 )
     par( cfg$par )
     par(  mar = c( 1, 5.5, .5, 0.5 ), mgp=c( 0, 0, 0 ) )
+    
     emptyPlot(xRange = c(min(pa$boxPos)-0.5, max(pa$boxPos)+0.5), yRange = 0:1, axes = F, grid=F)
     axis(1, pos=1, labels=pa$labs, at=pa$boxPos, tick=F, cex.axis=cfg$AxisAnnotationSize, las=2)
     axis(1, pos=0, labels=pa$cats, at=pa$boxPos[(1:5)*3-1], tick=F, cex.axis=cfg$AxisAnnotationSize, las=1)
@@ -523,6 +600,88 @@ softwareBoxPlotsByIntensityRange("YEAST", file.path(outDir, "software_boxplots_b
 softwareBoxPlotsByIntensityRange("HUMAN", file.path(outDir, "software_boxplots_by_range_human.pdf"))
 
 
+# BoxPlots by intensity range for Peptides
+
+# boxplots for low/mid/high intensity ranges
+showPartialBoxPlot4SoftwaresPeptides = function( species="ECOLI", fromPart=0, toPart=1, file=NULL  )
+{
+    if(!is.null(file)) 
+    {
+        pdf(file=file, onefile=T, width=cfg$PlotWidth*2, height=cfg$PlotHeight*1.5, family="Helvetica", pointsize=9)
+    }
+    mar = c( 0.5, 5.5, .5, 0.5 )
+    mgp=c( 3.6, 1.0, 0 )
+    par( cfg$par )
+    par( mar=mar, mgp=mgp )
+    lrs = unlist( lapply( software.names, getPartialPeptideLogRatios, species, fromPart, toPart ), recursive = F )
+    
+    boxPos = c( 1:2, 4:5, 7:8, 10:11, 13:14 )
+    sepPos = c( 3, 6, 9, 12 )
+    
+    qboxplot( lrs, whiskerQuantile = cfg$BoxPlotWhiskerQuantile, lims=c(expectedLogRatios[species] - 3, expectedLogRatios[species] + 3.2), 
+              ylab=as.expression( bquote( Log[2]~"(A:B)" ) ),
+              horizontal = F, pch=20, cex=cfg$PlotPointSize, axes=F,
+              cex.lab=cfg$AxisLabelSize, at=boxPos
+    )
+    
+    plotArea = par()$usr
+    
+    # plot expectation line
+    abline(h=expectedLogRatios[species], lty=2, lwd=cfg$PlotCurveLineWidth )
+    abline(v=sepPos, lty="dotted", lwd=cfg$PlotCurveLineWidth, col="gray" )
+    
+    addAxes(lwd = cfg$AxisLineThickness, showXlab = F, showYlab = T, showXAxis = T, showYAxis = T, cex.axis = cfg$AxisAnnotationSize )
+    
+    if(!is.null(file)) 
+    {
+        yAxRange = par()$usr[3:4]
+        yAxSize = max(yAxRange) - min(yAxRange)
+        
+        axis(1, labels=names(lrs), at=boxPos, lwd.ticks = cfg$AxisLineThickness, lwd=0, cex.axis=cfg$AxisAnnotationSize, las=2)
+        axis(1, pos=min(yAxRange)-0.36*yAxSize , labels=nams2labs(software.names), at=boxPos[(1:5)*2-1], tick=F, cex.axis=cfg$AxisAnnotationSize, las=1)    
+    }
+    
+    if(!is.null(file)) dev.off()
+    par(cfg$parBackup)
+    return( list(
+        usr=plotArea, 
+        boxPos=boxPos, 
+        sepPos=sepPos, 
+        labs=names(lrs), 
+        cats=nams2labs(software.names),
+        mar=mar,
+        mgp=mgp
+    ))
+}
+
+softwareBoxPlotsByIntensityRangePeptides = function(species="ECOLI", file=NULL)
+{
+    if(!is.null(file)) 
+    {
+        pdf(file=file, onefile=T, width=cfg$PlotWidth*1.5, height=cfg$PlotHeight*3, family="Helvetica", pointsize=9)
+    }
+    par( cfg$par )
+    layout( matrix(c(1,2,3,4), ncol=1, byrow = TRUE), heights=c(1,1,1,.4))
+    showPartialBoxPlot4SoftwaresPeptides( species=species, fromPart=0, toPart=1/3 )
+    showPartialBoxPlot4SoftwaresPeptides( species=species, fromPart=1/3, toPart=2/3 )
+    pa = showPartialBoxPlot4SoftwaresPeptides( species=species, fromPart=2/3, toPart=1 )
+    par( cfg$par )
+    par(  mar = c( 1, 5.5, .5, 0.5 ), mgp=c( 0, 0, 0 ) )
+    
+    emptyPlot(xRange = c(min(pa$boxPos)-0.5, max(pa$boxPos)+0.5), yRange = 0:1, axes = F, grid=F)
+    axis(1, pos=1, labels=pa$labs, at=pa$boxPos, tick=F, cex.axis=cfg$AxisAnnotationSize, las=2)
+    axis(1, pos=0, labels=pa$cats, at=pa$boxPos[(1:5)*2-1], tick=F, cex.axis=cfg$AxisAnnotationSize, las=1)
+    abline(v=pa$sepPos, lty="dotted", lwd=cfg$PlotCurveLineWidth, col="gray" )
+    if(!is.null(file)) dev.off()
+    par(cfg$parBackup)
+}
+
+softwareBoxPlotsByIntensityRangePeptides("ECOLI", file.path(outDir, "software_boxplots_by_range_peptides_ecoli.pdf"))
+softwareBoxPlotsByIntensityRangePeptides("YEAST", file.path(outDir, "software_boxplots_by_range_peptides_yeast.pdf"))
+softwareBoxPlotsByIntensityRangePeptides("HUMAN", file.path(outDir, "software_boxplots_by_range_peptides_human.pdf"))
+
+
+
 softwareBoxPlotsLowIntensityRange = function(species="ECOLI", file=NULL)
 {
     if(!is.null(file)) 
@@ -533,7 +692,8 @@ softwareBoxPlotsLowIntensityRange = function(species="ECOLI", file=NULL)
     layout( matrix(c(1,2,3,4), ncol=1, byrow = TRUE), heights=c(1,1,1,.4))
     pa = showPartialBoxPlot4Softwares( species=species, fromPart=0, toPart=1/3 )
     par( cfg$par )
-    par(  mar = c( 5.5, 5.5, .5, 0.5 ), mgp=c( 0, 0, 0 ) )
+    #par(  mar = c( 5.5, 5.5, .5, 0.5 ), mgp=c( 0, 0, 0 ) )
+    par(  mar = c( 10.5, 5.5, .5, 0.5 ), mgp=c( 3.6, 1.0, 0 ) )
     emptyPlot(xRange = c(min(pa$boxPos)-0.5, max(pa$boxPos)+0.5), yRange = c(0,1.1), axes = F, grid=F)
     axis(1, pos=1, labels=pa$labs, at=pa$boxPos, tick=F, cex.axis=cfg$AxisAnnotationSize, las=2)
     axis(1, pos=0.6, labels=pa$cats, at=pa$boxPos[(1:5)*3-1], tick=F, cex.axis=cfg$AxisAnnotationSize, las=1)
@@ -543,6 +703,50 @@ softwareBoxPlotsLowIntensityRange = function(species="ECOLI", file=NULL)
 }
 
 softwareBoxPlotsLowIntensityRange("ECOLI", file.path(outDir, "software_boxplots_low_intensity_range_ecoli.pdf") )
+
+softwareBoxPlotsLowIntensityRangeNoBuiltIn = function(species="ECOLI", file=NULL)
+{
+    if(!is.null(file)) 
+    {
+        pdf(file=file, onefile=T, width=cfg$PlotWidth*1.5, height=cfg$PlotHeight*3, family="Helvetica", pointsize=9)
+    }
+    par( cfg$par )
+    layout( matrix(c(1,2,3,4), ncol=1, byrow = TRUE), heights=c(1,1,1,.4))
+    pa = showPartialBoxPlot4SoftwaresNoBuiltIn( species=species, fromPart=0, toPart=1/3 )
+    par( cfg$par )
+    #par(  mar = c( 5.5, 5.5, .5, 0.5 ), mgp=c( 0, 0, 0 ) )
+    par(  mar = c( 10.5, 5.5, .5, 0.5 ), mgp=c( 3.6, 1.0, 0 ) )
+    emptyPlot(xRange = c(min(pa$boxPos)-0.5, max(pa$boxPos)+0.5), yRange = c(0,1.1), axes = F, grid=F)
+    axis(1, pos=1, labels=pa$labs, at=pa$boxPos, tick=F, cex.axis=cfg$AxisAnnotationSize, las=2)
+    axis(1, pos=0.6, labels=pa$cats, at=pa$boxPos[(1:5)*2-1], tick=F, cex.axis=cfg$AxisAnnotationSize, las=1)
+    abline(v=pa$sepPos, lty="dotted", lwd=cfg$PlotCurveLineWidth, col="gray" )
+    if(!is.null(file)) dev.off()
+    par(cfg$parBackup)
+}
+
+softwareBoxPlotsLowIntensityRangeNoBuiltIn("ECOLI", file.path(outDir, "software_boxplots_low_intensity_range_ecoli_nobuiltin.pdf") )
+
+softwareBoxPlotsLowIntensityRangePeptidesNoBuiltIn = function(species="ECOLI", file=NULL)
+{
+    if(!is.null(file)) 
+    {
+        pdf(file=file, onefile=T, width=cfg$PlotWidth*1.5, height=cfg$PlotHeight*3, family="Helvetica", pointsize=9)
+    }
+    par( cfg$par )
+    layout( matrix(c(1,2,3,4), ncol=1, byrow = TRUE), heights=c(1,1,1,.4))
+    pa = showPartialBoxPlot4SoftwaresPeptides( species=species, fromPart=0, toPart=1/3 )
+    par( cfg$par )
+    #par(  mar = c( 5.5, 5.5, .5, 0.5 ), mgp=c( 0, 0, 0 ) )
+    par(  mar = c( 10.5, 5.5, .5, 0.5 ), mgp=c( 3.6, 1.0, 0 ) )
+    emptyPlot(xRange = c(min(pa$boxPos)-0.5, max(pa$boxPos)+0.5), yRange = c(0,1.1), axes = F, grid=F)
+    axis(1, pos=1, labels=pa$labs, at=pa$boxPos, tick=F, cex.axis=cfg$AxisAnnotationSize, las=2)
+    axis(1, pos=0.6, labels=pa$cats, at=pa$boxPos[(1:5)*2-1], tick=F, cex.axis=cfg$AxisAnnotationSize, las=1)
+    abline(v=pa$sepPos, lty="dotted", lwd=cfg$PlotCurveLineWidth, col="gray" )
+    if(!is.null(file)) dev.off()
+    par(cfg$parBackup)
+}
+
+softwareBoxPlotsLowIntensityRangePeptidesNoBuiltIn("ECOLI", file.path(outDir, "software_boxplots_low_intensity_range_peptides_ecoli.pdf") )
 
 
 ### Table 1 
@@ -599,6 +803,8 @@ getDynamicRange <- function(softwarename=1, round=1, species="HUMAN", peptides=T
     minInt = quantile(ResultSets[[rsIndex]]$result[[1]]$data[[species]]$x, probs = 0.01, na.rm=T)
     maxInt = max(ResultSets[[rsIndex]]$result[[1]]$data[[species]]$x, na.rm=T)
     dynRange = maxInt - minInt
+    #transform to log10-scale
+    dynRange = dynRange / log(10,base = 2)
     return(dynRange)
 }
 
@@ -621,4 +827,152 @@ colnames(dynamicranges) = software.names
 write.table(x=dynamicranges, file.path(outDir, "Supplementary.Table.C.tsv"), sep="\t", 
             row.names=T, col.names = T)
 
+
+# Table with standard deviations and deviations from expectation of each population (Yeast, Human, E.Coli) and dataset
+
+
+get_SD <- function(softwarename=1, round=1, species="HUMAN", peptides=T, from=0, to=1){
+    rsIndex = grep(paste0(softwarename, "_r", round), experimentNames)
+    print(paste("SD for:", rsIndex, "range:", from, "-", to))
+    if(peptides) rsIndex = grep(paste0(softwarename, "_peptides_r", round), experimentNames)
+    if(length(rsIndex) == 0) return (NA)
+    
+    lrs = unlist(getPartialLogRatios( rsIndex, species, from, to))
+    return(sd(lrs))
+    #stdev = sd(ResultSets[[rsIndex]]$result[[1]]$data[[species]]$y)
+    #return(stdev)
+}
+
+get_Deviation <- function(softwarename=1, round=1, species="HUMAN", peptides=T, from=0, to=1){
+    rsIndex = grep(paste0(softwarename, "_r", round), experimentNames)
+    if(peptides) rsIndex = grep(paste0(softwarename, "_peptides_r", round), experimentNames)
+    if(length(rsIndex) == 0) return (NA)
+
+    lrs = unlist(getPartialLogRatios( rsIndex, species, from, to))
+    return(abs(median(lrs) - ResultSets[[rsIndex]]$result[[1]]$data[[species]]$expectation))
+    
+    #devfromexpectation = abs(ResultSets[[rsIndex]]$result[[1]]$data[[species]]$median - 
+    #                             ResultSets[[rsIndex]]$result[[1]]$data[[species]]$expectation)
+    
+    #return(devfromexpectation)
+}
+
+SD = as.data.frame(
+    rbind(
+        #softwarename=1, round=1, species="HUMAN", peptides=T, from=0, to=1
+        sapply(software.names, get_SD, round=1, species="HUMAN", peptides=T, from=0, to=1/3),
+        sapply(software.names, get_SD, round=1, species="HUMAN", peptides=T, from=1/3, to=2/3),
+        sapply(software.names, get_SD, round=1, species="HUMAN", peptides=T, from=2/3, to=1),
+        sapply(software.names, get_SD, round=1, species="YEAST", peptides=T, from=0, to=1/3),
+        sapply(software.names, get_SD, round=1, species="YEAST", peptides=T, from=1/3, to=2/3),
+        sapply(software.names, get_SD, round=1, species="YEAST", peptides=T, from=2/3, to=1),
+        sapply(software.names, get_SD, round=1, species="ECOLI", peptides=T, from=0, to=1/3),
+        sapply(software.names, get_SD, round=1, species="ECOLI", peptides=T, from=1/3, to=2/3),
+        sapply(software.names, get_SD, round=1, species="ECOLI", peptides=T, from=2/3, to=1),
+
+        sapply(software.names, get_SD, round=1, species="HUMAN", peptides=F, from=0, to=1/3),
+        sapply(software.names, get_SD, round=1, species="HUMAN", peptides=F, from=1/3, to=2/3),
+        sapply(software.names, get_SD, round=1, species="HUMAN", peptides=F, from=2/3, to=1),
+        sapply(software.names, get_SD, round=1, species="YEAST", peptides=F, from=0, to=1/3),
+        sapply(software.names, get_SD, round=1, species="YEAST", peptides=F, from=1/3, to=2/3),
+        sapply(software.names, get_SD, round=1, species="YEAST", peptides=F, from=2/3, to=1),
+        sapply(software.names, get_SD, round=1, species="ECOLI", peptides=F, from=0, to=1/3),
+        sapply(software.names, get_SD, round=1, species="ECOLI", peptides=F, from=1/3, to=2/3),
+        sapply(software.names, get_SD, round=1, species="ECOLI", peptides=F, from=2/3, to=1),
+        
+        sapply(software.names, get_SD, round=2, species="HUMAN", peptides=T, from=0, to=1/3),
+        sapply(software.names, get_SD, round=2, species="HUMAN", peptides=T, from=1/3, to=2/3),
+        sapply(software.names, get_SD, round=2, species="HUMAN", peptides=T, from=2/3, to=1),
+        sapply(software.names, get_SD, round=2, species="YEAST", peptides=T, from=0, to=1/3),
+        sapply(software.names, get_SD, round=2, species="YEAST", peptides=T, from=1/3, to=2/3),
+        sapply(software.names, get_SD, round=2, species="YEAST", peptides=T, from=2/3, to=1),
+        sapply(software.names, get_SD, round=2, species="ECOLI", peptides=T, from=0, to=1/3),
+        sapply(software.names, get_SD, round=2, species="ECOLI", peptides=T, from=1/3, to=2/3),
+        sapply(software.names, get_SD, round=2, species="ECOLI", peptides=T, from=2/3, to=1),
+        
+        sapply(software.names, get_SD, round=2, species="HUMAN", peptides=F, from=0, to=1/3),
+        sapply(software.names, get_SD, round=2, species="HUMAN", peptides=F, from=1/3, to=2/3),
+        sapply(software.names, get_SD, round=2, species="HUMAN", peptides=F, from=2/3, to=1),
+        sapply(software.names, get_SD, round=2, species="YEAST", peptides=F, from=0, to=1/3),
+        sapply(software.names, get_SD, round=2, species="YEAST", peptides=F, from=1/3, to=2/3),
+        sapply(software.names, get_SD, round=2, species="YEAST", peptides=F, from=2/3, to=1),
+        sapply(software.names, get_SD, round=2, species="ECOLI", peptides=F, from=0, to=1/3),
+        sapply(software.names, get_SD, round=2, species="ECOLI", peptides=F, from=1/3, to=2/3),
+        sapply(software.names, get_SD, round=2, species="ECOLI", peptides=F, from=2/3, to=1)
+        
+        )
+)
+
+
+deviation = as.data.frame(
+    rbind(
+        sapply(software.names, get_Deviation, round=1, species="HUMAN", peptides=T, from=0, to=1/3),
+        sapply(software.names, get_Deviation, round=1, species="HUMAN", peptides=T, from=1/3, to=2/3),
+        sapply(software.names, get_Deviation, round=1, species="HUMAN", peptides=T, from=2/3, to=1),
+        sapply(software.names, get_Deviation, round=1, species="YEAST", peptides=T, from=0, to=1/3),
+        sapply(software.names, get_Deviation, round=1, species="YEAST", peptides=T, from=1/3, to=2/3),
+        sapply(software.names, get_Deviation, round=1, species="YEAST", peptides=T, from=2/3, to=1),
+        sapply(software.names, get_Deviation, round=1, species="ECOLI", peptides=T, from=0, to=1/3),
+        sapply(software.names, get_Deviation, round=1, species="ECOLI", peptides=T, from=1/3, to=2/3),
+        sapply(software.names, get_Deviation, round=1, species="ECOLI", peptides=T, from=2/3, to=1),
+           
+        sapply(software.names, get_Deviation, round=1, species="HUMAN", peptides=F, from=0, to=1/3),
+        sapply(software.names, get_Deviation, round=1, species="HUMAN", peptides=F, from=1/3, to=2/3),
+        sapply(software.names, get_Deviation, round=1, species="HUMAN", peptides=F, from=2/3, to=1),
+        sapply(software.names, get_Deviation, round=1, species="YEAST", peptides=F, from=0, to=1/3),
+        sapply(software.names, get_Deviation, round=1, species="YEAST", peptides=F, from=1/3, to=2/3),
+        sapply(software.names, get_Deviation, round=1, species="YEAST", peptides=F, from=2/3, to=1),
+        sapply(software.names, get_Deviation, round=1, species="ECOLI", peptides=F, from=0, to=1/3),
+        sapply(software.names, get_Deviation, round=1, species="ECOLI", peptides=F, from=1/3, to=2/3),
+        sapply(software.names, get_Deviation, round=1, species="ECOLI", peptides=F, from=2/3, to=1),
+       
+        sapply(software.names, get_Deviation, round=2, species="HUMAN", peptides=T, from=0, to=1/3),
+        sapply(software.names, get_Deviation, round=2, species="HUMAN", peptides=T, from=1/3, to=2/3),
+        sapply(software.names, get_Deviation, round=2, species="HUMAN", peptides=T, from=2/3, to=1),
+        sapply(software.names, get_Deviation, round=2, species="YEAST", peptides=T, from=0, to=1/3),
+        sapply(software.names, get_Deviation, round=2, species="YEAST", peptides=T, from=1/3, to=2/3),
+        sapply(software.names, get_Deviation, round=2, species="YEAST", peptides=T, from=2/3, to=1),
+        sapply(software.names, get_Deviation, round=2, species="ECOLI", peptides=T, from=0, to=1/3),
+        sapply(software.names, get_Deviation, round=2, species="ECOLI", peptides=T, from=1/3, to=2/3),
+        sapply(software.names, get_Deviation, round=2, species="ECOLI", peptides=T, from=2/3, to=1),
+        
+        sapply(software.names, get_Deviation, round=2, species="HUMAN", peptides=F, from=0, to=1/3),
+        sapply(software.names, get_Deviation, round=2, species="HUMAN", peptides=F, from=1/3, to=2/3),
+        sapply(software.names, get_Deviation, round=2, species="HUMAN", peptides=F, from=2/3, to=1),
+        sapply(software.names, get_Deviation, round=2, species="YEAST", peptides=F, from=0, to=1/3),
+        sapply(software.names, get_Deviation, round=2, species="YEAST", peptides=F, from=1/3, to=2/3),
+        sapply(software.names, get_Deviation, round=2, species="YEAST", peptides=F, from=2/3, to=1),
+        sapply(software.names, get_Deviation, round=2, species="ECOLI", peptides=F, from=0, to=1/3),
+        sapply(software.names, get_Deviation, round=2, species="ECOLI", peptides=F, from=1/3, to=2/3),
+        sapply(software.names, get_Deviation, round=2, species="ECOLI", peptides=F, from=2/3, to=1)        
+    )
+)
+
+
+quantile_names = c("1st.quantile", "2nd.quantile", "3rd.quantile")
+
+names.for.SD.and.dev = c(
+    paste(rep("HUMAN", 3), rep("it1", 3), rep("peptides",3), quantile_names, sep="_"),
+    paste(rep("YEAST", 3), rep("it1", 3), rep("peptides",3), quantile_names, sep="_"),
+    paste(rep("ECOLI", 3), rep("it1", 3), rep("peptides",3), quantile_names, sep="_"),
+    paste(rep("HUMAN", 3), rep("it1", 3), rep("proteins",3), quantile_names, sep="_"),
+    paste(rep("YEAST", 3), rep("it1", 3), rep("proteins",3), quantile_names, sep="_"),
+    paste(rep("ECOLI", 3), rep("it1", 3), rep("proteins",3), quantile_names, sep="_"),
+
+    paste(rep("HUMAN", 3), rep("it2", 3), rep("peptides",3), quantile_names, sep="_"),
+    paste(rep("YEAST", 3), rep("it2", 3), rep("peptides",3), quantile_names, sep="_"),
+    paste(rep("ECOLI", 3), rep("it2", 3), rep("peptides",3), quantile_names, sep="_"),
+    paste(rep("HUMAN", 3), rep("it2", 3), rep("proteins",3), quantile_names, sep="_"),
+    paste(rep("YEAST", 3), rep("it2", 3), rep("proteins",3), quantile_names, sep="_"),
+    paste(rep("ECOLI", 3), rep("it2", 3), rep("proteins",3), quantile_names, sep="_")
+    )
+
+row.names(SD) = names.for.SD.and.dev
+row.names(deviation) = names.for.SD.and.dev
+
+
+write.table(x=SD, file.path(outDir, "Standard_deviations.tsv"), sep="\t", 
+            row.names=T, col.names = T)
+write.table(x=deviation, file.path(outDir, "Deviations_from_expectation.tsv"), sep="\t", 
+            row.names=T, col.names = T)
 
