@@ -3,12 +3,12 @@
 \name{evalCommandLineArguments}
 \alias{evalCommandLineArguments}
 \title{evalCommandLineArguments
-This function eval the commandLine Arguments}
+This function evaluates the commandLine Arguments}
 \usage{
 evalCommandLineArguments()
 }
 \description{
 evalCommandLineArguments
-This function eval the commandLine Arguments
+This function evaluates the commandLine Arguments
 }
 
