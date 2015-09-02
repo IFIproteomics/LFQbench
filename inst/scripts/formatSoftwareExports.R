@@ -21,7 +21,7 @@ supplementary <- "supplementary"
 #sequencelist <- read.csv("/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/common_peptides/commonPeptides_allSoftwares_6600_64w.csv", stringsAsFactors=F)$V1
 sequencelist <- NULL
 proteinlist  <- NULL
-proteinlist="/Users/napedro/github_prj/LFQbench_package/LFQbench/inst/scripts/protein_overlap/list_common_proteins.txt"
+#proteinlist="/Users/napedro/github_prj/LFQbench_package/LFQbench/inst/scripts/protein_overlap/list_common_proteins.txt"
     
 plotHistogram = T 
 plotHistNAs = T
