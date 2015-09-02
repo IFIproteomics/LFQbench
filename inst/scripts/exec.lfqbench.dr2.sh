@@ -75,29 +75,25 @@ cp ./layout/* /Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwa
 cp ./layout/* /Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/dataanalysis_TOF6600_64w/output_figures/
 
 cd /Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/dataanalysis_TOF5600_32w/output_figures/
-pdflatex figure2 
-pdflatex figure3
-pdflatex figure4
-pdflatex figure4_new
-rm *.log *aux *.sh *.tex
+pdflatex figure2_new
+pdflatex figure2_new_peptides
+pdflatex Supp.Figure.H
+rm *.log *aux *.tex
 
 cd /Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/dataanalysis_TOF5600_64w/output_figures/
-pdflatex figure2 
-pdflatex figure3
-pdflatex figure4
-pdflatex figure4_new
-rm *.log *aux *.sh *.tex
+pdflatex figure2_new
+pdflatex figure2_new_peptides
+pdflatex Supp.Figure.H
+rm *.log *aux  *.tex
 
 cd /Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/dataanalysis_TOF6600_32w/output_figures/
-pdflatex figure2 
-pdflatex figure3
-pdflatex figure4
-pdflatex figure4_new
-rm *.log *aux *.sh *.tex
+pdflatex figure2_new
+pdflatex figure2_new_peptides
+pdflatex Supp.Figure.H
+rm *.log *aux  *.tex
 
 cd /Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/dataanalysis_TOF6600_64w/output_figures/
-pdflatex figure2 
-pdflatex figure3
-pdflatex figure4
-pdflatex figure4_new
-rm *.log *aux *.sh *.tex
+pdflatex figure2_new
+pdflatex figure2_new_peptides
+pdflatex Supp.Figure.H
+rm *.log *aux *.tex
