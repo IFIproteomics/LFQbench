@@ -210,7 +210,7 @@ spiner = function(samples, sampleNames=colnames(samples), partNames=rownames(sam
 }
 
 #' evalCommandLineArguments
-#' This function eval the commandLine Arguments 
+#' This function evaluates the commandLine Arguments 
 #' @export
 evalCommandLineArguments = function(){
   args=commandArgs(trailingOnly = T)
