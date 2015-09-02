@@ -22,7 +22,7 @@ cfg$BackgroundSpeciesName	= "HUMAN"
 
 # whiskers of boxplots will extend to given quantile
 # t.m. (1 - quantile*2) portion of data will be inside the whiskers
-cfg$BoxPlotWhiskerQuantile = 0.01
+cfg$BoxPlotWhiskerQuantile = 0.02
 
 # missing protein amounts or amounts below this threshold 
 # will be approximated to it
@@ -60,7 +60,7 @@ cfg$NormalizeAmountsToPPM = F
 # graphics settings
 # pdf canvas size in inches
 cfg$PlotWidth	= 6
-cfg$PlotHeight = 4
+cfg$PlotHeight = 5
 # line thickness
 cfg$PlotCurveLineWidth = 2
 cfg$PlotLegendLineWidth = 4
