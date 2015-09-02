@@ -1,0 +1,68 @@
+\documentclass{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[latin1]{inputenc}
+\usepackage[absolute]{textpos}
+\usepackage{graphicx, rotating, calc}
+\usepackage{helvet}\renewcommand{\familydefault}{\sfdefault}\fontfamily{phv}\selectfont
+\pagestyle{empty}\setlength{\parindent}{0pt}\raggedright
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% define parameters
+\newlength{\panelWidth} \newlength{\panelHeight}
+\newlength{\labXshift} \newlength{\labYshift}
+\newlength{\picXshift} \newlength{\picYshift}
+\newlength{\txtXshift} \newlength{\txtYshift}
+\newlength{\picWidth}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CHANGE PARAMETERS VALUES IN THIS SECTION
+% numbers of rows and cols
+% for number of cols/rows please use 1.0, 2.0, 3.0, etc. because LaTeX needs x.0 for numeric operations
+\newcommand{\nRows}{1.0}
+\newcommand{\nCols}{2.0}
+% size of a single panel
+\setlength{\panelWidth}{8cm}
+\setlength{\panelHeight}{7cm}
+% label shift from the upper left corner of the panel
+\setlength{\labXshift}{0.1cm}
+\setlength{\labYshift}{0.1cm}
+% text shift from the upper left corner of the panel
+\setlength{\txtXshift}{3.0cm}
+\setlength{\txtYshift}{0.2cm}
+% graphics shift from the upper left corner of the panel
+\setlength{\picXshift}{0.5cm}
+\setlength{\picYshift}{0.5cm}
+% graphics are scaled to the width
+\setlength{\picWidth}{7.5cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% setup page size by number of cols/rows and the panel size
+\usepackage[paperwidth=\nCols\panelWidth, paperheight=\nRows\panelHeight, left=0mm, right=0mm, top=0mm, bottom=0mm]{geometry}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% draw text to absolute coordinates
+\newcommand{\txt}[3]{\begin{textblock*}{\panelWidth}(#1+\txtXshift,#2+\txtYshift){#3}\end{textblock*}}
+% draw label
+\newcommand{\lab}[3]{\begin{textblock*}{\panelWidth}(#1+\labXshift,#2+\labYshift)\textbf{\LARGE #3}\end{textblock*}}
+% draw graphics
+\newcommand{\pic}[3]{\begin{textblock*}{\panelWidth}(#1+\picXshift,#2+\picYshift)\includegraphics[width=\picWidth]{#3}\end{textblock*}}
+\newcommand{\picVarWidth}[4]{\begin{textblock*}{\panelWidth}(#1+\picXshift,#2+\picYshift)\includegraphics[width=#4]{#3}\end{textblock*}}
+% draw multi-column graphics
+\newcommand{\widepic}[4]{\begin{textblock*}{\panelWidth}(#1+\picXshift,#2+\picYshift)\includegraphics[width=#3]{#4}\end{textblock*}}
+% draw labelled subfigure
+\newcommand{\fig}[5]{ \lab{#1}{#2}{#3} \pic{#1}{#2}{#4} \txt{#1}{#2}{#5} }
+\newcommand{\figVarWidth}[6]{ \lab{#1}{#2}{#3} \picVarWidth{#1}{#2}{#4}{#6} \txt{#1}{#2}{#5} }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+% use \lab{x}{y}{label} for labels
+% use \txt{x}{y}{label} for text
+% use \pic{x}{y}{path} for pictures
+% use \fig{x}{y}{label}{path}{text} for complete figures
+
+% \txt{0.0\panelWidth}{0.0\panelHeight}{\LARGE Iteration 1}
+% \txt{1.0\panelWidth}{0.0\panelHeight}{\LARGE Iteration 2}
+
+\fig{0.0\panelWidth}{0.0\panelHeight}{A}{./DIAumpire_builtin_r1.pdf}{SWATH 2.0 (built-in)}
+\fig{1.0\panelWidth}{0.0\panelHeight}{B}{./PeakView_builtin_r1.pdf}{DIA-Umpire (built-in)}
+
+\end{document}
