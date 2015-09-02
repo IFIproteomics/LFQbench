@@ -1,14 +1,14 @@
 library(LFQbench)
 
 working_dir <- "./"
-
+subfolder = "input"
 
 #working_dir <- "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/iteration1/TTOF6600_64w"
 evalCommandLineArguments()
 
 ################################################
 
-working_dir = file.path(working_dir, "input")
+working_dir = file.path(working_dir, subfolder)
 
 AllInputFiles = list.files( path=working_dir, pattern=".[\\.].", full.names= FALSE, include.dirs = F, recursive = F, all.files = F)
 
