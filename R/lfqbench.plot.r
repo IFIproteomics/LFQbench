@@ -1,29 +1,4 @@
 ################################################################################
-# user defined R graphics parameters
-if( !exists("cfg") ) cfg=list()
-if( is.null(cfg$initialized) )
-{
-  cfg$par = list(
-    # plot area margins: c(bottom, left, top, right)
-    mar=c(3,3.2,.5,.5),
-    # plot axis: c(title, label, line)
-    mgp=c(2,0.6,0),
-    # axis labels orientation: 0: parallel, 1: horizontal, 2: perpendicular, 3: vertical
-    las=1
-  )
-  cfg$PlotWidth  = 6
-  cfg$PlotHeight = 4
-  cfg$PlotCurveLineWidth = 2
-  cfg$PlotLegendLineWidth = 4
-  cfg$PlotPointSize = 2
-  cfg$ScatterPlotPointType = 20
-  cfg$PlotPointMinAlpha=.2
-}
-# backup original R graphics parameters
-cfg$parBackup = par()[ names(cfg$par) ]
-################################################################################
-
-################################################################################
 plotToFile = function( file, plotFunc, ... )
 {
   pdf(file=file, onefile=T, width=cfg$PlotWidth, height=cfg$PlotHeight, family="Helvetica", pointsize=9)
@@ -116,6 +91,10 @@ scaleColor=function(col, scale=1.5, alpha=1)
 ################################################################################
 
 ################################################################################
+#' plotSpeciesLegend
+#' 
+#'  This function add the species legend to a plot
+#'  @param pos the legend position on plot area
 plotSpeciesLegend = function( pos="top", ... )
 {
   legend(x=pos, legend=cfg$AllSpeciesNames, col=cfg$SpeciesColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white", ...)	
@@ -123,6 +102,10 @@ plotSpeciesLegend = function( pos="top", ... )
 ################################################################################
 
 ################################################################################
+#' plotSpeciesLegends
+#' 
+#'  plot vertical and horizontal species legends
+#'  @export
 plotSpeciesLegends = function()
 {
   pdf(file = paste(cfg$PlotFilesLocation,"/species_legend_vertical.pdf", sep = ""), width = 1.05, height = 0.66, family = "Helvetica", pointsize = 9)
@@ -231,8 +214,15 @@ addScatterPointsForSpecies2 = function(species, samplePairResult, minAlpha=.2, s
 ################################################################################
 
 ################################################################################
-# make a scatter plot with smoothed colors
-makeScatter = function(samplePair, showLegend=F, showRegLines=F, showExpLines=T, useCfgColor=T )
+#' makeScatter
+#' 
+#' make a scatter plot with smoothed colors
+#' @param samplePair the result set data of a sample pair
+#' @param showLegend display the legend
+#' @param showRegLines display regression curves
+#' @param showExpLines display expectation lines
+#' @param useCfgColor ignore result set colors and use colors from current configuration settings
+makeScatter = function( samplePair, showLegend=F, showRegLines=F, showExpLines=T, useCfgColor=T )
 {
   emptyPlot(samplePair$xlim, samplePair$ylim, grid=F, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize)
   addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ) )
@@ -248,7 +238,13 @@ makeScatter = function(samplePair, showLegend=F, showRegLines=F, showExpLines=T,
 ################################################################################
 
 ################################################################################
-# draw scatterplot
+#' showScatterPlot
+#'
+#' draw scatterplot
+#' @param samplePair the result set data of a hybrid proteome sample pair
+#' @param showLegend display the legend
+#' @param showRegLines display regression curves
+#' @export
 showScatterPlot = function( samplePair, showLegend=F, showRegLines=F )
 {
   par(cfg$par)
@@ -258,7 +254,11 @@ showScatterPlot = function( samplePair, showLegend=F, showRegLines=F )
 ################################################################################
 
 ################################################################################
-# draw log ratio quiantile based boxplot
+#' showLogRatioBoxPlot
+#'
+#' draw log ratio quiantile based boxplot
+#' @param samplePair the result set data of a hybrid proteome sample pair
+#' @export
 showLogRatioBoxPlot = function( samplePair )
 {
   par(cfg$par)
@@ -277,7 +277,11 @@ showLogRatioBoxPlot = function( samplePair )
 ################################################################################
 
 ################################################################################
-# draw barplot showing quantification bars
+#' showQuantBarPlot
+#'
+#' draw barplot showing quantification bars
+#' @param samplePair the result set data of a hybrid proteome sample pair
+#' @export
 showQuantBarPlot = function( samplePair )
 {
   par(cfg$par)
@@ -302,7 +306,14 @@ showQuantBarPlot = function( samplePair )
 ################################################################################
 
 ################################################################################
-# draw scatter- and density plot
+#' showScatterAndDensityPlot
+#'
+#' draw scatter plot with an attached density plot
+#' @param samplePair the result set data of a hybrid proteome sample pair
+#' @param showLegend display the legend
+#' @param showRegLines display regression curves
+#' @param scatterPlotWidth the window portion used for scatter plot
+#' @export
 showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8)
 {
 	par(cfg$par)
@@ -329,10 +340,17 @@ showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, s
 }
 ################################################################################
 
-loadLibrary("scales")
+# loadLibrary("scales")
 
 ################################################################################
-# draw scatter- and boxplot
+#' showScatterAndBoxPlot
+#'
+#' draw scatter plot with an attached box plot
+#' @param samplePair the result set data of a hybrid proteome sample pair
+#' @param showLegend display the legend
+#' @param showRegLines display regression curves
+#' @param scatterPlotWidth the window portion used for scatter plot
+#' @export
 showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8)
 {
   par(cfg$par)
@@ -361,7 +379,12 @@ showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F, scatt
 ################################################################################
 
 ################################################################################
-# draw log-ratio distribution kernel density plot
+#' showDistributionDensityPlot
+#'
+#' draw log-ratio distribution kernel density plot
+#' @param samplePair the result set data of a hybrid proteome sample pair
+#' @param showLegend display the legend
+#' @export
 showDistributionDensityPlot = function(samplePair, showLegend=F)
 {
   xLim=samplePair$ylim
@@ -377,7 +400,11 @@ showDistributionDensityPlot = function(samplePair, showLegend=F)
 ################################################################################
 
 ################################################################################
-# draw quantification curve
+#' showAllSpeciesQC
+#'
+#' draw quantification curves
+#' @param samplePair the result set data of a hybrid proteome sample pair
+#' @export
 showAllSpeciesQC = function(samplePair)
 {
   par(cfg$par)
@@ -397,7 +424,13 @@ showAllSpeciesQC = function(samplePair)
 ################################################################################
 
 ################################################################################
-showSingleSpeciesQC = function(samplePairsData, speciesName="MOUSE")
+#' showSingleSpeciesQC
+#'
+#' draw quantification curves
+#' @param samplePair the result set data of a hybrid proteome sample pair
+#' @param speciesName the name of a species
+#' @export
+showSingleSpeciesQC = function(samplePair, speciesName="MOUSE")
 {
   speciesIndex = which( cfg$AllSpeciesNames == speciesName )
   par( cfg$par )
@@ -408,16 +441,20 @@ showSingleSpeciesQC = function(samplePairsData, speciesName="MOUSE")
     ylab="Parts"
   )
   x = (1:500)/500*cfg$AUQCRatioRange[2]
-  sapply(samplePairsData, function(sp){ lines(x, sp$data[[speciesIndex]]$qcfunction(x), type="l", col=sp$col, lwd=cfg$PlotCurveLineWidth ) } )
-  legendLabels = sapply( samplePairsData, function(sp) paste("auqc(",sp$name1, ":", sp$name2, "): ", sp$data[[speciesIndex]]$auqc, sep = "" ))
-  legendColors = sapply( samplePairsData, function(sp) sp$col )
+  sapply(samplePair, function(sp){ lines(x, sp$data[[speciesIndex]]$qcfunction(x), type="l", col=sp$col, lwd=cfg$PlotCurveLineWidth ) } )
+  legendLabels = sapply( samplePair, function(sp) paste("auqc(",sp$name1, ":", sp$name2, "): ", sp$data[[speciesIndex]]$auqc, sep = "" ))
+  legendColors = sapply( samplePair, function(sp) sp$col )
   legend(x="bottomright", legend=legendLabels, col=legendColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white")
   par( cfg$parBackup )
 }
 ################################################################################
 
 ################################################################################
-# draw protein dispersion between replicates by species
+#' plotProteinDispersionBySpecies
+#'
+#' draw protein dispersion as cv between replicates by species
+#' @param d the data of a result set (resultSet$data)
+#' @export
 plotProteinDispersionBySpecies = function( d )
 {
   d4s = sapply( cfg$AllSpeciesNames, function(sp) as.vector( na.exclude( d$cv[ d$species==sp ] ) ) )
@@ -431,7 +468,11 @@ plotProteinDispersionBySpecies = function( d )
 ################################################################################
 
 ################################################################################
-# draw protein dispersion between replicates by sample
+#' plotProteinDispersionBySample
+#'
+#' draw protein dispersion as cv between replicates by sample
+#' @param d the data of a result set (resultSet$data)
+#' @export
 plotProteinDispersionBySample = function( d )
 {
   d4s = sapply( 1:cfg$NumberOfSamples, function(si) as.vector( na.exclude( d$cv[,si] ) ) )
@@ -497,6 +538,20 @@ plotCVs = function( CVs, File )
 ################################################################################
 
 ################################################################################
+#' plotSampleComposition
+#' 
+#' draw the sample composition as a spine plot
+#' @param sampleAmounts
+#' @param bgColors
+#' @param fgColors
+#' @param labMainSize
+#' @param pdfFile
+#' @param pdfWidth
+#' @param pdfHeight
+#' @param pdfFontSize
+#' @param pdfFontFamily
+#' @param pdfMar
+#' @export
 plotSampleComposition = function(
   sampleAmounts = data.frame( cfg$SampleComposition, row.names = 1  ),
   bgColors=NULL, fgColors=NULL, 

@@ -4,12 +4,15 @@
 \alias{logIdStatistics}
 \title{logIdStatistics}
 \usage{
-logIdStatistics(resultSets)
+logIdStatistics(resultSets, csvFile = paste(cfg$LogFilesLocation,
+  "/identification_statistics.csv", sep = ""))
 }
 \arguments{
-\item{resultSets}{}
+\item{resultSets}{the result sets}
+
+\item{csvFile}{the delimiter separated output file}
 }
 \description{
-This function trace the Statistics related with each ID
+store identification statistics from a list of result sets
 }
 

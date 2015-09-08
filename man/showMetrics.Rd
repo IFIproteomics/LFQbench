@@ -7,6 +7,6 @@
 showMetrics(m)
 }
 \description{
-This function verbose the metrics of the experiment
+verbose the metrics of the experiment
 }
 

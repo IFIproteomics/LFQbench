@@ -7,9 +7,9 @@
 saveIDs(resultSet)
 }
 \arguments{
-\item{resultSet}{}
+\item{resultSet}{the result set}
 }
 \description{
-This function save the IDs
+save identified proteins/peptides to a file
 }
 

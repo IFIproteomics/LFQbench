@@ -1,30 +1,26 @@
 #' loadLibrary
-#' This function load an specific library for the package.
-#' @param x The library to be load
+#' install and load a library
+#' @param x the name of the library to load
 #' @export
-
 loadLibrary <- function(x) 
 {
   if(!require(x, character.only=T, quietly = T)) 
   { 
-    install.packages(x); require(x, character.only=T) 
+    install.packages(x)
+    require(x, character.only=T) 
   } 
 }
 
-# +
-# This define + for String concatenation
-# @export
-
-#"+"=function(...) UseMethod("+")
-#"+.default"=.Primitive("+")
-#"+.character"=function(...) paste(...,sep="")
+# Define + for String concatenation
+"+"=function(...) UseMethod("+")
+"+.default"=.Primitive("+")
+"+.character"=function(...) paste(...,sep="")
 
 #' mkdir
 #' 
 #'  This recursively create a directory if it does not exist
 #'  @param dirName the directory to create the directory
 #'  @export
- 
 mkdir = function(dirName){
 	if(!file.exists(dirName))
 	{
@@ -42,7 +38,6 @@ mkdir = function(dirName){
 #' @param from
 #' @param to
 #' @export
- 
 createNumericPairs = function(from, to) {
   pairs = rbind(from:(from+1))
   for(num1 in from:(to-1)) {
@@ -215,8 +210,9 @@ spiner = function(samples, sampleNames=colnames(samples), partNames=rownames(sam
 evalCommandLineArguments = function(){
   args=commandArgs(trailingOnly = T)
   sapply(args[grep("=", args)], 
-         function(arg) eval(expr = parse(text=arg), envir = globalenv())
-  ) 
+         function(arg) 
+             eval(expr = parse(text=arg), envir = globalenv())
+  )
 }
 
 #' guessSep

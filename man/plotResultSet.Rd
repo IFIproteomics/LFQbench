@@ -8,7 +8,7 @@ plotResultSet(resSet, showScatterPlot = T, showScatterAndDensityPlot = T,
   showScatterAndBoxPlot = T, showBoxPlot = T, showDensityPlot = T)
 }
 \arguments{
-\item{resSet}{}
+\item{resSet}{a result set}
 
 \item{showScatterPlot}{}
 

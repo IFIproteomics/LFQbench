@@ -3,15 +3,15 @@
 \name{loadLibrary}
 \alias{loadLibrary}
 \title{loadLibrary
-This function load an specific library for the package.}
+install and load a library}
 \usage{
 loadLibrary(x)
 }
 \arguments{
-\item{x}{The library to be load}
+\item{x}{the name of the library to load}
 }
 \description{
 loadLibrary
-This function load an specific library for the package.
+install and load a library
 }
 

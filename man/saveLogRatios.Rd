@@ -2,14 +2,14 @@
 % Please edit documentation in R/lfqbench.access.r
 \name{saveLogRatios}
 \alias{saveLogRatios}
-\title{saveLogRations}
+\title{saveLogRatios}
 \usage{
 saveLogRatios(rs)
 }
 \arguments{
-\item{rs}{}
+\item{rs}{the result set}
 }
 \description{
-This saveLogRations
+extract and store calculated log-ratios from a list of result sets
 }
 

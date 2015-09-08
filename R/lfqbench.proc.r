@@ -1,16 +1,26 @@
-#' processData
+#' processDocSet
 #' 
-#' This function process the Data before generate the charts
-#' @param DocSet is the Data to be processed 
+#' This function process the data before generate the charts
+#' @param DocSet is the aata to be processed 
 #' @export
+processDocSet = function( DocSet ) {
+    rs = processFile( file = DocSet$csvFile )
+    rs$docSet = DocSet
+    return(rs)
+}
 
-processData = function( DocSet ) {
-  #DocSet = DocSets[[1]]    
-  cat(paste("processing ",DocSet$fileBase," ... \n",sep = ""))
+#' processFile
+#' 
+#' This function process the data and generates a result set
+#' @param file is the data to be processed
+#' @export
+processFile = function( file ) {
+  if(!exists("DEBUG")) DEBUG <<- F
+  cat(paste("processing ", basename(file) ," ... \n",sep = ""))
   
   ################################################################################
   # read run based data
-  csvDat = read.table(DocSet$csvFile, sep=cfg$CsvColumnSeparator, dec=cfg$CsvDecimalPointChar, header=T)
+  csvDat = read.table(file, sep=cfg$CsvColumnSeparator, dec=cfg$CsvDecimalPointChar, header=T)
   
   # csv parsing problems lead to everything being in a single column
   if( ncol(csvDat) < 2 )
@@ -206,11 +216,11 @@ processData = function( DocSet ) {
     ScatterPlotXAxisData = log2( Sample2ProteinAmounts )
     # xLim = range(ScatterPlotXAxisData[ScatterPlotXAxisData>0])
     xLim = quantile( ScatterPlotXAxisData[ScatterPlotXAxisData>0], probs=c(0.01,0.99), na.rm = T )
-    if(!is.null(cfg[["XaxisPlotRange"]])) xLim = cfg$XaxisPlotRange
+    if(!is.null(cfg[["LogIntensityPlotRange"]])) xLim = cfg$LogIntensityPlotRange
     yLim = cfg$LogRatioPlotRange
-    # ensure x-axis boundaries
-    ScatterPlotXAxisData[ ScatterPlotXAxisData < xLim[1] ] = xLim[1]
-    ScatterPlotXAxisData[ ScatterPlotXAxisData > xLim[2] ] = xLim[2]
+    # DISABLED: force log-ratio values into x-axis boundaries
+    # ScatterPlotXAxisData[ ScatterPlotXAxisData < xLim[1] ] = xLim[1]
+    # ScatterPlotXAxisData[ ScatterPlotXAxisData > xLim[2] ] = xLim[2]
     ################################################################################
     
     ################################################################################
@@ -219,7 +229,9 @@ processData = function( DocSet ) {
     {
       ValueIndices = which(SpeciesNames == TheSpecies)
       SpeciesIndex = cfg$AllSpeciesNames == TheSpecies
+      
       if(DEBUG) cat( paste(TheSpecies, " has ", length( ValueIndices ), " IDs ... \n", sep = ""))
+      
       qcFunc = as.function(
         getQCFunction( LogRatio[ValueIndices] - LogRatioMedians[SpeciesIndex], ensureValueRange=c(0, cfg$MaxLogRatioForAUQC) )
       )
@@ -302,7 +314,8 @@ processData = function( DocSet ) {
   ################################################################################
   # generate a result set
   ResultSet = list(
-      docSet = DocSet,
+      docSet = makeEverythingInOneFolderDocSet(file),
+      file = file,
       idstat = NumberOfProteinsBySpecies,
       result = SamplePairsData,
       data = list (
@@ -320,6 +333,19 @@ processData = function( DocSet ) {
   
   return( ResultSet )
 }
+
+################################################################################
+# calculate qc function
+getQCFunction = function( ratios, ensureValueRange=c(0, 1) )
+{
+    # make absolute values and sort them in ascending order
+    absRatios = sort( abs(ratios) )
+    # ensure value range
+    if( absRatios[length( absRatios )]<ensureValueRange[2] ) absRatios = c(absRatios, ensureValueRange[2])
+    if( absRatios[1]>ensureValueRange[1] ) absRatios = c(ensureValueRange[1], absRatios)
+    return( approxfun( absRatios, (1:length( absRatios ))/length( absRatios ), method="linear" ) )
+}
+################################################################################
 
 #' getRangeAccuracy
 #' 
@@ -352,7 +378,6 @@ getRangedAccuracy = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spcN
 #'@param ranges
 #'@param spcNames
 #'@export
- 
 getRangedPrecision = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spcNames = cfg$AllSpeciesNames ){
   l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
   l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
@@ -397,7 +422,6 @@ getRangedSepRate = function(dataBySpecies, spcNames, ranges=cfg$Log2IntensityRan
 #' @param dataBySpecies
 #' @param spcNames
 #' @export 
-
 getSepRate = function(dataBySpecies, spcNames){
   l2rs = unlist( lapply( spcNames, function( x ) dataBySpecies[[x]]$y ) )
   spcs = unlist( lapply( spcNames, function( x ) rep( x, length( dataBySpecies[[x]]$y ) ) ) )

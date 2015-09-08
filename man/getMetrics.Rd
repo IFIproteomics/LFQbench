@@ -10,6 +10,6 @@ getMetrics(resultSet)
 \item{resultSet}{}
 }
 \description{
-This fucntion get single number metrics
+calculate metrics for a result set
 }
 

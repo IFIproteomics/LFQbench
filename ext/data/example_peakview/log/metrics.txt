@@ -1,21 +1,24 @@
 --------------------------------------------
-
- Metrics description: 
+# Metrics description: 
 	identification:
 		identification rate,
-		the number of identified proteins for benchmark species
+		the number of identifications for benchmark species.
 	replication:
 		replication variance,
-		the median CV for the background species
+		the median CV for the background species.
 	accuracy:
 		accuracy of relative quantification,
-		the median deviation of log-ratios to the expected value
+		the median deviation of log-ratios to the expected value.
 	precision:
 		precision of quantification,
-		the standard deviation of log-ratios
+		the standard deviation of log-ratios.
 	separation:
 		species separation ability,
-		the area under ROC curve between a species pair
+		the area under ROC curve between a species pair.
+	quantification:
+		log-ratio statistics,
+		the numbers of valid quantifications, missing values,
+		and log-ratios in and out of user defined ranges.
 --------------------------------------------
 
 PeakView_6600-64w_r1_peptides

@@ -4,12 +4,13 @@
 \alias{makeDocSet}
 \title{makeDocSet}
 \usage{
-makeDocSet(inFile)
+makeDocSet(inFile, inputPath = cfg$InputFilesLocation,
+  plotPath = cfg$PlotFilesLocation, logPath = cfg$LogFilesLocation)
 }
 \arguments{
 \item{inFile}{}
 }
 \description{
-This function construct the DocSet
+construct a document set for a file by paths from user configuration
 }
 
