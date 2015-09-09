@@ -340,8 +340,6 @@ showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, s
 }
 ################################################################################
 
-# loadLibrary("scales")
-
 ################################################################################
 #' showScatterAndBoxPlot
 #'
@@ -427,10 +425,10 @@ showAllSpeciesQC = function(samplePair)
 #' showSingleSpeciesQC
 #'
 #' draw quantification curves
-#' @param samplePair the result set data of a hybrid proteome sample pair
+#' @param resultSet the result set data
 #' @param speciesName the name of a species
 #' @export
-showSingleSpeciesQC = function(samplePair, speciesName="MOUSE")
+showSingleSpeciesQC = function(resultSet, speciesName)
 {
   speciesIndex = which( cfg$AllSpeciesNames == speciesName )
   par( cfg$par )
@@ -441,9 +439,12 @@ showSingleSpeciesQC = function(samplePair, speciesName="MOUSE")
     ylab="Parts"
   )
   x = (1:500)/500*cfg$AUQCRatioRange[2]
-  sapply(samplePair, function(sp){ lines(x, sp$data[[speciesIndex]]$qcfunction(x), type="l", col=sp$col, lwd=cfg$PlotCurveLineWidth ) } )
-  legendLabels = sapply( samplePair, function(sp) paste("auqc(",sp$name1, ":", sp$name2, "): ", sp$data[[speciesIndex]]$auqc, sep = "" ))
-  legendColors = sapply( samplePair, function(sp) sp$col )
+  sapply(rs$result, 
+         function(sp){ 
+             lines(x, sp$data[[speciesIndex]]$qcfunction(x), type="l", col=sp$col, lwd=cfg$PlotCurveLineWidth ) 
+        } )
+  legendLabels = sapply( rs$result, function(sp) paste("AUQC(",sp$name1, ":", sp$name2, "): ", sp$data[[speciesIndex]]$auqc, sep = "" ))
+  legendColors = sapply( rs$result, function(sp) sp$col )
   legend(x="bottomright", legend=legendLabels, col=legendColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white")
   par( cfg$parBackup )
 }

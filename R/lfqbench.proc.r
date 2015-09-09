@@ -540,7 +540,7 @@ getSepRate = function(dataBySpecies, spcNames){
   l2rs = unlist( lapply( spcNames, function( x ) dataBySpecies[[x]]$y ) )
   spcs = unlist( lapply( spcNames, function( x ) rep( x, length( dataBySpecies[[x]]$y ) ) ) )
   spcFlags = as.numeric( factor(spcs) ) - 1
-  res = auc(spcFlags, l2rs)
+  res = auc( spcFlags, l2rs )
   return( res )
 }
 

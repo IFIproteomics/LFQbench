@@ -4,10 +4,10 @@
 \alias{showSingleSpeciesQC}
 \title{showSingleSpeciesQC}
 \usage{
-showSingleSpeciesQC(samplePair, speciesName = "MOUSE")
+showSingleSpeciesQC(resultSet, speciesName)
 }
 \arguments{
-\item{samplePair}{the result set data of a hybrid proteome sample pair}
+\item{resultSet}{the result set data}
 
 \item{speciesName}{the name of a species}
 }

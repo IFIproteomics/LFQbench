@@ -4,10 +4,10 @@
 \alias{processBatch}
 \title{processBatch}
 \usage{
-processBatch(inputFiles, storeResultSetsImage = T, storeSampleMeans = T,
-  storeSpeciesSeparation = T, storeIDs = T, storeIdStats = T,
-  storeLogRatios = T, storePlots = T, storeSampleCVs = T,
-  storeMetrics = T, returnResultSets = F)
+processBatch(inputFiles, storeResultSetsImage = T, storeSampleMeans = F,
+  storeSpeciesSeparation = F, storeIDs = F, storeIdStats = T,
+  storeLogRatios = T, storePlots = T, storeSampleCVs = F,
+  storeMetrics = T)
 }
 \arguments{
 \item{inputFiles}{a list of files to process}

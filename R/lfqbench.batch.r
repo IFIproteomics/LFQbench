@@ -15,7 +15,7 @@
 #' @export
 processRootFolder = function( rootFolder=cfg$DataRootFolder, ... )
 {
-  if(rootFolder != cfg$DataRootFolder) setBatchDirectory( rootFolder )
+  if(rootFolder != cfg$DataRootFolder) setRootFolder( rootFolder )
   inputFiles = list.files( path=cfg$InputFilesLocation, pattern=cfg$InputExtensionPattern, full.names = T )
   return( processBatch( inputFiles, ... ) )
 }
@@ -49,17 +49,17 @@ processRootFolder = function( rootFolder=cfg$DataRootFolder, ... )
 #' @export
 processBatch = function( inputFiles, 
                          storeResultSetsImage=T,
-                         storeSampleMeans=T,
-                         storeSpeciesSeparation=T,
-                         storeIDs=T,
+                         storeSampleMeans=F,
+                         storeSpeciesSeparation=F,
+                         storeIDs=F,
                          storeIdStats=T,
                          storeLogRatios=T,
                          storePlots=T,
-                         storeSampleCVs=T,
-                         storeMetrics=T,
-                         returnResultSets=F
-                         )
+                         storeSampleCVs=F,
+                         storeMetrics=T
+)
 {
+    ResultSets = NULL
     if( length(inputFiles) < 1 ) 
     {
         cat( paste("working directory: ", getwd(),"\n", sep="") )
@@ -88,6 +88,6 @@ processBatch = function( inputFiles,
         if(storeSampleCVs) nix=sapply( ResultSets, saveSampleCVs )
         if(storeMetrics) saveMetrics( ResultSets )
         if(storeIdStats) logIdStatistics( ResultSets )
-        if(returnResultSets) return(ResultSets)
     }
+    return( ResultSets )
 }
