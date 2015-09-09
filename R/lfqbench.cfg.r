@@ -18,7 +18,7 @@
 #' @param  LogRatioPlotRange the log-ratio range for plotting
 #' @param  LogIntensityPlotRange the log2-intensity range for plotting
 #' @param  MaxLogRatioForAUQC the maximum value for AUQC quantification
-#' @param  Log2IntensityRanges the log2-intensity ranges for range based plots 
+#' @param  NumberOfIntensityQuantiles the number of parts for splitting the data for metrics calculation
 #' @param  CenterLogRatioByBackground should we center all log-ratios by the median log-ratio of the background species
 #' @param  NormalizeAmountsToPPM should we normalize amounts to ppms
 #' @param  PlotWidth the plot width in inches used in pdf files
@@ -62,15 +62,8 @@ initConfiguration = function(
   ,LogIntensityPlotRange = c(9, 26)
   # value used as maximum for AUQC quantification
   ,MaxLogRatioForAUQC  = 2
-  # split positions
-  ,Log2IntensityRanges = rbind(
-    "<2"=c(0,2),
-    "<4"=c(2,4),
-    "<6"=c(4,6),
-    "<8"=c(6,8),
-    "<10"=c(8,10),
-    ">10"=c(10,100)
-  )
+  # data will be split into this number of quantiles for calculating ranged metrics
+  ,NumberOfIntensityQuantiles = 3
   # if TRUE then all log-ratios will be centered
   # by median log-ratio of background species
   ,CenterLogRatioByBackground = T
@@ -205,7 +198,7 @@ setRootFolder = function( rootFolder=ifelse(file.exists(cfg$DataRootFolder), cfg
 #' @param  LogRatioPlotRange the log-ratio range for plotting
 #' @param  LogIntensityPlotRange the log2-intensity range for plotting
 #' @param  MaxLogRatioForAUQC the maximum value for AUQC quantification
-#' @param  Log2IntensityRanges the log2-intensity ranges for range based plots 
+#' @param  NumberOfIntensityQuantiles the log2-intensity ranges for range based plots 
 #' @param  CenterLogRatioByBackground should we center all log-ratios by the median log-ratio of the background species
 #' @param  NormalizeAmountsToPPM should we normalize amounts to ppms
 #' @param  PlotWidth the plot width in inches used in pdf files
@@ -234,7 +227,7 @@ changeConfig = function(
   ,LogRatioPlotRange   = cfg$LogRatioPlotRange
   ,LogIntensityPlotRange = cfg$LogIntensityPlotRange
   ,MaxLogRatioForAUQC  = cfg$MaxLogRatioForAUQC
-  ,Log2IntensityRanges = cfg$Log2IntensityRanges
+  ,NumberOfIntensityQuantiles = cfg$NumberOfIntensityQuantiles
   ,CenterLogRatioByBackground = cfg$CenterLogRatioByBackground
   ,NormalizeAmountsToPPM = cfg$NormalizeAmountsToPPM
   ,PlotWidth = cfg$PlotWidth

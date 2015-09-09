@@ -10,6 +10,8 @@ getSepRate(dataBySpecies, spcNames)
 \item{dataBySpecies}{}
 
 \item{spcNames}{}
+
+\item{numberOfQuantiles}{}
 }
 \description{
 This function calculate species separation ROC-AUC for a species pair

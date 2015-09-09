@@ -79,6 +79,21 @@ explainMetrics = function(){
   cat("\t\tspecies separation ability,\n")
   cat("\t\tthe area under ROC curve between a species pair.\n")
   
+  cat("\tlocal accuracy:\n")
+  cat("\t\tlocal accuracy of relative quantification,\n")
+  cat("\t\tthe median deviation of log-ratios to the expected value\n")
+  cat("\t\tfor partial data split in quantiles by intensity in first sample.\n")
+  
+  cat("\tlocal precision:\n")
+  cat("\t\tprecision of quantification,\n")
+  cat("\t\tthe standard deviation of log-ratios\n")
+  cat("\t\tfor partial data split in quantiles by intensity in first sample.\n")
+    
+  cat("\tlocal separation:\n")
+  cat("\t\tspecies separation ability,\n")
+  cat("\t\tthe area under ROC curve between a species pair\n")
+  cat("\t\tfor partial data split in quantiles by intensity in first sample.\n")
+    
   cat("\tquantification:\n")
   cat("\t\tlog-ratio statistics,\n")
   cat("\t\tthe numbers of valid quantifications, missing values,\n")
@@ -254,14 +269,17 @@ getMetrics = function(resultSet){
   # median CV for background-species
   replication = median( na.exclude( resultSet$data$cv[ resultSet$data$species == cfg$BackgroundSpeciesName ] ) )
     
-  # area under ROC curve in predefined ranges of intensity
-  separation = lapply(resultSet$result, function(d) d$rangedSeparation )
+  # area under ROC curve in predefined quantiles of intensity
+  globalSeparation = lapply(resultSet$result, function(d) d$separation )
+  localSeparation = lapply(resultSet$result, function(d) d$quantileSeparation )  
   
-  # median log-ratio deviation to the expectation in predefined ranges of intensity
-  accuracy = lapply(resultSet$result, function(d) d$rangedAccuracy )
+  # median log-ratio deviation to the expectation in predefined quantiles of intensity
+  globalAccuracy = lapply(resultSet$result, function(d) d$accuracy )
+  localAccuracy = lapply(resultSet$result, function(d) d$quantileAccuracy )
   
-  # standard deviation of log-ratios in predefined ranges of intensity
-  precision = lapply(resultSet$result, function(d) d$rangedPrecision )
+  # standard deviation of log-ratios in predefined quantiles of intensity
+  globalPrecision = lapply(resultSet$result, function(d) d$precision )
+  localPrecision = lapply(resultSet$result, function(d) d$quantilePrecision )
   
   # count log ratio statistics
   lrs4spc = function(spc, sp)
@@ -291,9 +309,12 @@ getMetrics = function(resultSet){
       name = resultSet$docSet$fileBase,
       identification = identification,
       replication = replication,
-      accuracy = accuracy,
-      precision = precision,
-      separation = separation,
+      accuracy = globalAccuracy,
+      precision = globalPrecision,
+      separation = globalSeparation,
+      "local accuracy" = localAccuracy,
+      "local precision" = localPrecision,
+      "local separation" = localSeparation,
       quantification = logRatioStats
     )
   )

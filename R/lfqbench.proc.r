@@ -259,19 +259,27 @@ processFile = function( file ) {
     
     ################################################################################
     # ROC-AUC for all species pairs
-    spcPairsSepRates = apply(cfg$AllSpeciesPairs, 1, 
-         function(sp) getSepRate( dataBySpecies, cfg$AllSpeciesNames[sp] ) )
-    names(spcPairsSepRates) = cfg$AllSpeciesPairsLabels
+    globalSeparation = apply(cfg$AllSpeciesPairs, 1, function(sp) getSepRate( dataBySpecies, cfg$AllSpeciesNames[sp] ) )
+    names(globalSeparation) = cfg$AllSpeciesPairsLabels
     ################################################################################
     
     ################################################################################
-    spcPairsRangedSeparationRates = apply(cfg$AllSpeciesPairs, 1, 
-        function(sp) getRangedSepRate( dataBySpecies, cfg$AllSpeciesNames[sp] ) )
-    colnames(spcPairsRangedSeparationRates) = cfg$AllSpeciesPairsLabels
+    localSeparation = apply(
+        cfg$AllSpeciesPairs, 1, 
+        function(sp) {
+            getQuantileSeparation( 
+                dataBySpecies, 
+                cfg$AllSpeciesNames[sp],
+                cfg$NumberOfIntensityQuantiles )
+        } 
+        )
+    colnames(localSeparation) = cfg$AllSpeciesPairsLabels
     ################################################################################
     
-    rangedAccuracy = getRangedAccuracy( dataBySpecies )
-    rangedPrecision = getRangedPrecision( dataBySpecies )
+    globalAccuracy = sapply( dataBySpecies, function(d) median(d$y, na.rm=T) - d$expectation  )
+    globalPrecision = sapply( dataBySpecies, function(d) sd(d$y, na.rm = T) ) 
+    localAccuracy = getQuantileAccuracy( dataBySpecies, cfg$AllSpeciesNames, cfg$NumberOfIntensityQuantiles )
+    localPrecision = getQuantilePrecision( dataBySpecies, cfg$AllSpeciesNames, cfg$NumberOfIntensityQuantiles )
     
     ################################################################################
     # package sample pair data
@@ -285,10 +293,12 @@ processFile = function( file ) {
       ylim = yLim,
       col = SamplePairColor,
       data = dataBySpecies,
-      separation = spcPairsSepRates,
-      rangedSeparation = spcPairsRangedSeparationRates,
-      rangedAccuracy = rangedAccuracy,
-      rangedPrecision = rangedPrecision,
+      separation = globalSeparation,
+      accuracy = globalAccuracy,
+      precision = globalPrecision,
+      quantileSeparation = localSeparation,
+      quantileAccuracy = localAccuracy,
+      quantilePrecision = localPrecision,
       log2IntensityRanges = cfg$Log2IntensityRanges,
       adjustment = LogRatioAdjustmentValue,
       qcrange = cfg$AUQCRatioRange,
@@ -325,7 +335,6 @@ processFile = function( file ) {
         cv=SampleAverageCVs,
         missingvalues = numNAs_histograms
       )
-      
   )
   ################################################################################
   
@@ -347,14 +356,28 @@ getQCFunction = function( ratios, ensureValueRange=c(0, 1) )
 }
 ################################################################################
 
+################################################################################
+# RANGE BASED METRICS CALCULATION
+################################################################################
+
+################################################################################
+# removed from cfg
+Log2IntensityRanges = rbind(
+    "<2"=c(0,2),
+    "<4"=c(2,4),
+    "<6"=c(4,6),
+    "<8"=c(6,8),
+    "<10"=c(8,10),
+    ">10"=c(10,100)
+)
+
 #' getRangeAccuracy
 #' 
 #' This function compute the median deviation for log-ratios for each species in each range
 #' @param dataBySpecies
 #' @param ranges 
 #' @param spcNames
-#' @export
-getRangedAccuracy = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spcNames = cfg$AllSpeciesNames){
+getRangedAccuracy = function(dataBySpecies, ranges=Log2IntensityRanges, spcNames = cfg$AllSpeciesNames){
   el2r = sapply(spcNames, function(sn) dataBySpecies[[sn]]$expectation, USE.NAMES = F )  
   l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
   l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
@@ -377,7 +400,6 @@ getRangedAccuracy = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spcN
 #'@param dataBySpecies
 #'@param ranges
 #'@param spcNames
-#'@export
 getRangedPrecision = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spcNames = cfg$AllSpeciesNames ){
   l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
   l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
@@ -394,14 +416,12 @@ getRangedPrecision = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spc
   return( rangedSDs )
 }
 
-
 #' getRangedSepRate
 #' 
 #'  This function calculate species separation ROC-AUC for a species pair
 #'  @param dataBySpecies
 #'  @param spcNames 
 #'  @param ranges
-#'  @export
 getRangedSepRate = function(dataBySpecies, spcNames, ranges=cfg$Log2IntensityRanges){
   l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
   l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
@@ -415,18 +435,114 @@ getRangedSepRate = function(dataBySpecies, spcNames, ranges=cfg$Log2IntensityRan
   rangedAUCs = apply( ranges,  1, auc4range )
   return( rangedAUCs )
 }
+################################################################################
+
+
+################################################################################
+# QUANTILE BASED METRICS CALCULATION
+################################################################################
+
+################################################################################
+#' getQuantileSeparation
+#' 
+#'  This function calculates species separation ROC-AUC for a species pair
+#'  in equally sized quantiles of intensity in first sample.
+#'  
+#'  @param dataBySpecies data structure as stored in ResultSet$result[[SamplePairIndex]]$data
+#'  @param spcNames a vector of two species names
+#'  @param numberOfQuantiles the number of quantiles
+getQuantileSeparation = function( dataBySpecies, spcNames, numberOfQuantiles=cfg$NumberOfIntensityQuantiles ){
+    # get log-ratios
+    l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
+    # get intensities of first sample
+    l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
+    # assign species names to data
+    spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
+    # flag first species as 0 and the second as 1
+    spcFlags = as.numeric( factor(spcs) ) - 1
+    # flag quantiles of log-ratios
+    l2rFlags = as.numeric( cut( order( l2is ), numberOfQuantiles ) )
+    auc4q = function( q )
+    { 
+        idx = l2rFlags == q; 
+        auc(spcFlags[idx], l2rs[idx])
+    }
+    res = sapply( 1:numberOfQuantiles ,  auc4q )
+    names(res) = paste0("Q", 1:numberOfQuantiles)
+    return( res )
+}
+################################################################################
+
+################################################################################
+#' getQuantileAccuracy
+#' 
+#' This function compute the median deviation for log-ratios for each species in each range
+#' @param dataBySpecies
+#' @param spcNames
+#' @param numberOfQuantiles
+getQuantileAccuracy = function(dataBySpecies, spcNames = cfg$AllSpeciesNames, numberOfQuantiles=cfg$NumberOfIntensityQuantiles){
+    expectation = sapply(spcNames, function(sn) dataBySpecies[[sn]]$expectation, USE.NAMES = F )  
+    l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
+    l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
+    spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
+    l2rFlags = as.numeric( cut( order( l2is ), numberOfQuantiles ) )
+    acc4qs = function(q, s)
+    { 
+        idx4q = l2rFlags == q
+        idx4s = spcs %in% s
+        vals = l2rs[ idx4q & idx4s ]
+        dev = median(vals, na.rm = T) - expectation[s]
+        return(dev)
+    }
+    res = sapply( spcNames, function(s) sapply( 1:numberOfQuantiles, acc4qs, s) )
+    rownames(res) = paste0("Q", 1:numberOfQuantiles)
+    return( res )
+}
+################################################################################
+
+################################################################################
+#'getQuantilePrecision
+#'
+#'This function generate the standard deviation for log-ratios for each species in each range
+#'@param dataBySpecies
+#'@param spcNames
+#' @param numberOfQuantiles
+getQuantilePrecision = function(dataBySpecies, spcNames = cfg$AllSpeciesNames, numberOfQuantiles=cfg$NumberOfIntensityQuantiles ){
+    l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
+    l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
+    spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
+    l2rFlags = as.numeric( cut( order( l2is ), numberOfQuantiles ) )
+    var4qs = function(q, s)
+    { 
+        idx4q = l2rFlags == q
+        idx4s = spcs %in% s
+        vals = l2rs[ idx4q & idx4s ]
+        std = sd(vals, na.rm = T)
+        return( std )
+    }
+    res = sapply( spcNames, function(s) sapply( 1:numberOfQuantiles,  var4qs, s) )
+    rownames(res) = paste0("Q", 1:numberOfQuantiles)
+    return( res )
+}
+################################################################################
+
+################################################################################
+# OVERALL METRICS CALCULATION
+################################################################################
 
 #' getSepRate
 #' 
 #' This function calculate species separation ROC-AUC for a species pair
 #' @param dataBySpecies
 #' @param spcNames
-#' @export 
+#' @param numberOfQuantiles
 getSepRate = function(dataBySpecies, spcNames){
   l2rs = unlist( lapply( spcNames, function( x ) dataBySpecies[[x]]$y ) )
   spcs = unlist( lapply( spcNames, function( x ) rep( x, length( dataBySpecies[[x]]$y ) ) ) )
   spcFlags = as.numeric( factor(spcs) ) - 1
-  AreaUnderROCCurveByValue = auc(spcFlags, l2rs)
-  return( AreaUnderROCCurveByValue )
+  res = auc(spcFlags, l2rs)
+  return( res )
 }
+
+################################################################################
 

@@ -17,7 +17,7 @@ changeConfig(DataRootFolder = cfg$DataRootFolder,
   LogRatioPlotRange = cfg$LogRatioPlotRange,
   LogIntensityPlotRange = cfg$LogIntensityPlotRange,
   MaxLogRatioForAUQC = cfg$MaxLogRatioForAUQC,
-  Log2IntensityRanges = cfg$Log2IntensityRanges,
+  NumberOfIntensityQuantiles = cfg$NumberOfIntensityQuantiles,
   CenterLogRatioByBackground = cfg$CenterLogRatioByBackground,
   NormalizeAmountsToPPM = cfg$NormalizeAmountsToPPM,
   PlotWidth = cfg$PlotWidth, PlotHeight = cfg$PlotHeight,
@@ -57,7 +57,7 @@ changeConfig(DataRootFolder = cfg$DataRootFolder,
 
 \item{MaxLogRatioForAUQC}{the maximum value for AUQC quantification}
 
-\item{Log2IntensityRanges}{the log2-intensity ranges for range based plots}
+\item{NumberOfIntensityQuantiles}{the log2-intensity ranges for range based plots}
 
 \item{CenterLogRatioByBackground}{should we center all log-ratios by the median log-ratio of the background species}
 

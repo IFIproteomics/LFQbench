@@ -12,14 +12,12 @@ initConfiguration(DataRootFolder = getwd(),
   MinProteinAmount = 1e-06, DropInvalidLogRatio = T,
   LogRatioValidityRange = c(-10, 10), LogRatioPlotRange = c(-4, 4),
   LogIntensityPlotRange = c(9, 26), MaxLogRatioForAUQC = 2,
-  Log2IntensityRanges = rbind(`<2` = c(0, 2), `<4` = c(2, 4), `<6` = c(4, 6),
-  `<8` = c(6, 8), `<10` = c(8, 10), `>10` = c(10, 100)),
-  CenterLogRatioByBackground = T, NormalizeAmountsToPPM = F,
-  PlotWidth = 6, PlotHeight = 5, PlotCurveLineWidth = 2,
-  PlotLegendLineWidth = 4, PlotPointSize = 1.5, ScatterPlotPointType = 20,
-  PlotPointMinAlpha = 0.1, AxisLabelSize = 2, AxisAnnotationSize = 2,
-  AxisLineThickness = 2, par = list(mar = c(4.5, 6, 0.5, 0.5), mgp = c(3.7,
-  1.5, 0), las = 1))
+  NumberOfIntensityQuantiles = 3, CenterLogRatioByBackground = T,
+  NormalizeAmountsToPPM = F, PlotWidth = 6, PlotHeight = 5,
+  PlotCurveLineWidth = 2, PlotLegendLineWidth = 4, PlotPointSize = 1.5,
+  ScatterPlotPointType = 20, PlotPointMinAlpha = 0.1, AxisLabelSize = 2,
+  AxisAnnotationSize = 2, AxisLineThickness = 2, par = list(mar = c(4.5,
+  6, 0.5, 0.5), mgp = c(3.7, 1.5, 0), las = 1))
 }
 \arguments{
 \item{DataRootFolder}{the parent folder for batch processing}
@@ -48,7 +46,7 @@ initConfiguration(DataRootFolder = getwd(),
 
 \item{MaxLogRatioForAUQC}{the maximum value for AUQC quantification}
 
-\item{Log2IntensityRanges}{the log2-intensity ranges for range based plots}
+\item{NumberOfIntensityQuantiles}{the number of parts for splitting the data for metrics calculation}
 
 \item{CenterLogRatioByBackground}{should we center all log-ratios by the median log-ratio of the background species}
 
