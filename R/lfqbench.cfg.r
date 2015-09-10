@@ -107,6 +107,8 @@ initConfiguration = function(
   setRootFolder(LFQbench.Config$DataRootFolder, createSubfolders=F)
   ################################################################################
   processConfig()
+  
+  FSWE.init()
 }
 
 #' recalculate some parameters from user defined configuration
