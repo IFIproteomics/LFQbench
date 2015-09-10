@@ -4,8 +4,9 @@
 \alias{getQuantilePrecision}
 \title{getQuantilePrecision}
 \usage{
-getQuantilePrecision(dataBySpecies, spcNames = cfg$AllSpeciesNames,
-  numberOfQuantiles = cfg$NumberOfIntensityQuantiles)
+getQuantilePrecision(dataBySpecies,
+  spcNames = LFQbench.Config$AllSpeciesNames,
+  numberOfQuantiles = LFQbench.Config$NumberOfIntensityQuantiles)
 }
 \arguments{
 \item{dataBySpecies}{}

@@ -5,7 +5,7 @@
 \title{getRangeAccuracy}
 \usage{
 getRangedAccuracy(dataBySpecies, ranges = Log2IntensityRanges,
-  spcNames = cfg$AllSpeciesNames)
+  spcNames = LFQbench.Config$AllSpeciesNames)
 }
 \arguments{
 \item{dataBySpecies}{}

@@ -4,10 +4,11 @@
 \alias{plotSampleComposition}
 \title{plotSampleComposition}
 \usage{
-plotSampleComposition(sampleAmounts = data.frame(cfg$SampleComposition,
+
+  plotSampleComposition(sampleAmounts = data.frame(LFQbench.Config$SampleComposition,
   row.names = 1), bgColors = NULL, fgColors = NULL, labMainSize = 1.5,
-  pdfFile = paste(cfg$PlotFilesLocation, "/SampleComposition.pdf", sep = ""),
-  pdfWidth = 2, pdfHeight = 3, pdfFontSize = 9,
+  pdfFile = paste(LFQbench.Config$PlotFilesLocation, "/SampleComposition.pdf",
+  sep = ""), pdfWidth = 2, pdfHeight = 3, pdfFontSize = 9,
   pdfFontFamily = "Helvetica", pdfMar = c(2.3, 2.8, 0.5, 4.6))
 }
 \arguments{

@@ -19,7 +19,7 @@ plotResultSet = function(resSet,
     
     if(!is.null(pdfFile)){
       cat(paste("creating ", pdfFile, " ...", sep = ""))
-      pdf(file = pdfFile, onefile = T, width = cfg$PlotWidth, height = cfg$PlotHeight, family = "Helvetica", pointsize = 9)      
+      pdf(file = pdfFile, onefile = T, width = LFQbench.Config$PlotWidth, height = LFQbench.Config$PlotHeight, family = "Helvetica", pointsize = 9)      
     }
     
     # accuracy and precision
@@ -39,7 +39,7 @@ plotResultSet = function(resSet,
 #' @param resultSets
 #' @param File 
 #' @export
-saveMetrics = function(resultSets = ResultSets, File = paste(cfg$LogFilesLocation, "/metrics.txt", sep = "")){
+saveMetrics = function(resultSets = ResultSets, File = paste(LFQbench.Config$LogFilesLocation, "/metrics.txt", sep = "")){
   metrics = lapply( resultSets, getMetrics )
   sink(file=File, split=T)
   explainMetrics()
@@ -131,7 +131,7 @@ showMetrics = function(m){
 #' @param resultSets the result sets
 #' @param csvFile the delimiter separated output file
 #' @export
-logIdStatistics = function( resultSets, csvFile=paste(cfg$LogFilesLocation,"/identification_statistics.csv",sep="") ){
+logIdStatistics = function( resultSets, csvFile=paste(LFQbench.Config$LogFilesLocation,"/identification_statistics.csv",sep="") ){
   cat("storing identification statistics ... ")
   idstats = t( sapply( resultSets, function(rs) rs$idstat ) )
   sums = rowSums(idstats)
@@ -139,7 +139,7 @@ logIdStatistics = function( resultSets, csvFile=paste(cfg$LogFilesLocation,"/ide
   write.table(
       data.frame( "name"=labs, idstats, "sum"=sums ),
       file=csvFile, 
-      sep=cfg$CsvColumnSeparator, 
+      sep=LFQbench.Config$CsvColumnSeparator, 
       row.names=F, col.names=T
       )
   cat("[done]\n")
@@ -161,7 +161,7 @@ saveLogRatios = function(rs){
         )
         
         write.table( 
-          pairRes$validLogRatios[pairRes$validLogRatios$logratio < cfg$LogRatioPlotRange[1] | pairRes$validLogRatios$logratio > cfg$LogRatioPlotRange[2],],
+          pairRes$validLogRatios[pairRes$validLogRatios$logratio < LFQbench.Config$LogRatioPlotRange[1] | pairRes$validLogRatios$logratio > LFQbench.Config$LogRatioPlotRange[2],],
           paste(rs$docSet$logPath,"/", rs$docSet$fileBase ," LR (", pairRes$name1 , "-" , pairRes$name2, ") out of range.csv", sep=""),
           sep = ",",dec = ".",row.names = F, col.names = T
         )    
@@ -194,7 +194,7 @@ saveSampleMeans = function( resultSet )
       id=d$id,
       species=d$species,
       d$mean
-    ), file=resultSet$docSet$avgFile, sep=cfg$CsvColumnSeparator, dec=cfg$CsvDecimalPointChar, col.names=T, row.names=F
+    ), file=resultSet$docSet$avgFile, sep=LFQbench.Config$CsvColumnSeparator, dec=LFQbench.Config$CsvDecimalPointChar, col.names=T, row.names=F
     )
     cat("[done]\n")
 }
@@ -216,7 +216,7 @@ saveSampleCVs = function( resultSet)
       species=d$species,
       d$cv,
       row.names = NULL
-    ), file=resultSet$docSet$rsdFile, sep=cfg$CsvColumnSeparator, dec=cfg$CsvDecimalPointChar, col.names=T, row.names=F
+    ), file=resultSet$docSet$rsdFile, sep=LFQbench.Config$CsvColumnSeparator, dec=LFQbench.Config$CsvDecimalPointChar, col.names=T, row.names=F
   )
   cat("[done]\n")
 }
@@ -230,7 +230,7 @@ saveIDs = function( resultSet ){
   cat("storing identified protein names ... ")
   write.table( 
     resultSet$data$id
-    , file = resultSet$docSet$idsFile, sep=cfg$CsvColumnSeparator, dec = cfg$CsvDecimalPointChar, col.names = F, row.names = F
+    , file = resultSet$docSet$idsFile, sep=LFQbench.Config$CsvColumnSeparator, dec = LFQbench.Config$CsvDecimalPointChar, col.names = F, row.names = F
   )
   cat("[done]\n")
 }
@@ -244,11 +244,11 @@ saveSpeciesSeparation = function( resultSet ){
   cat("storing species separation scores ... ")
   # species, a:b, a:c, ...
   d = data.frame(
-    species=cfg$AllSpeciesPairsLabels,
+    species=LFQbench.Config$AllSpeciesPairsLabels,
     sapply( resultSet$result, function(d) d$separation)
   )
-  names(d) = c("species", cfg$SamplePairsLabels)
-  write.table( d, file = resultSet$docSet$rocFile, sep = cfg$CsvColumnSeparator, dec = cfg$CsvDecimalPointChar, col.names = T, row.names = F  )
+  names(d) = c("species", LFQbench.Config$SamplePairsLabels)
+  write.table( d, file = resultSet$docSet$rocFile, sep = LFQbench.Config$CsvColumnSeparator, dec = LFQbench.Config$CsvDecimalPointChar, col.names = T, row.names = F  )
   cat("[done]\n")
 }
 
@@ -260,14 +260,14 @@ saveSpeciesSeparation = function( resultSet ){
 getMetrics = function(resultSet){
   # identification rate
   # number of identified proteins (only benchmark species)
-  # PROBLEM? identification = sum( sapply(cfg$AllSpeciesNames, function(s) sum( resultSet$data$species == s, na.rm=T) ))
-  identification = sum( sapply(cfg$AllSpeciesNames, function(s) length( which(resultSet$data$species == s) ) ) )
+  # PROBLEM? identification = sum( sapply(LFQbench.Config$AllSpeciesNames, function(s) sum( resultSet$data$species == s, na.rm=T) ))
+  identification = sum( sapply(LFQbench.Config$AllSpeciesNames, function(s) length( which(resultSet$data$species == s) ) ) )
   # in case we want all IDs just count all
   # identificationRateMetric = length(resultSet$data$id)
   
   # replication variance
   # median CV for background-species
-  replication = median( na.exclude( resultSet$data$cv[ resultSet$data$species == cfg$BackgroundSpeciesName ] ) )
+  replication = median( na.exclude( resultSet$data$cv[ resultSet$data$species == LFQbench.Config$BackgroundSpeciesName ] ) )
     
   # area under ROC curve in predefined quantiles of intensity
   globalSeparation = lapply(resultSet$result, function(d) d$separation )
@@ -291,7 +291,7 @@ getMetrics = function(resultSet){
     missing = ifelse(invalid == 0, 0, length(which(is.na(iLR))) )
     
     valid = length(vLR)
-    plotted = length( which( vLR >= min(cfg$LogRatioPlotRange) & vLR <= max(cfg$LogRatioPlotRange) ) )
+    plotted = length( which( vLR >= min(LFQbench.Config$LogRatioPlotRange) & vLR <= max(LFQbench.Config$LogRatioPlotRange) ) )
     return( c(
         "invalid ratios" = invalid, 
         "invalid, out of validity range" = (invalid - missing),
@@ -302,7 +302,7 @@ getMetrics = function(resultSet){
     ) )
   }
   
-  logRatioStats = lapply(resultSet$result, function(sp) sapply( cfg$AllSpeciesNames, lrs4spc, sp  ))
+  logRatioStats = lapply(resultSet$result, function(sp) sapply( LFQbench.Config$AllSpeciesNames, lrs4spc, sp  ))
     
   return(
     list(
@@ -358,8 +358,8 @@ getCombinedProteinRSDs = function(ResultSets){
 #' construct a document set for a file by paths from user configuration
 #' @param inFile
 #' @export
-makeDocSet = function( inFile, inputPath=cfg$InputFilesLocation, plotPath=cfg$PlotFilesLocation, logPath=cfg$LogFilesLocation ){
-  fileBase = sub(cfg$InputExtensionPattern, "", basename(inFile) )
+makeDocSet = function( inFile, inputPath=LFQbench.Config$InputFilesLocation, plotPath=LFQbench.Config$PlotFilesLocation, logPath=LFQbench.Config$LogFilesLocation ){
+  fileBase = sub(LFQbench.Config$InputExtensionPattern, "", basename(inFile) )
   return( 
     list(
       inputPath = inputPath, 

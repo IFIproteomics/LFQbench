@@ -13,10 +13,10 @@
 #' 
 #' @param rootFolder the root folder for batch processing
 #' @export
-processRootFolder = function( rootFolder=cfg$DataRootFolder, ... )
+processRootFolder = function( rootFolder=LFQbench.Config$DataRootFolder, ... )
 {
-  if(rootFolder != cfg$DataRootFolder) setRootFolder( rootFolder )
-  inputFiles = list.files( path=cfg$InputFilesLocation, pattern=cfg$InputExtensionPattern, full.names = T )
+  if(rootFolder != LFQbench.Config$DataRootFolder) setRootFolder( rootFolder )
+  inputFiles = list.files( path=LFQbench.Config$InputFilesLocation, pattern=LFQbench.Config$InputExtensionPattern, full.names = T )
   return( processBatch( inputFiles, ... ) )
 }
 
@@ -63,19 +63,19 @@ processBatch = function( inputFiles,
     if( length(inputFiles) < 1 ) 
     {
         cat( paste("working directory: ", getwd(),"\n", sep="") )
-        cat( paste("input directory:   ", cfg$InputFilesLocation, "\n", sep = "") )
-        cat( paste("file extension:    ", cfg$InputExtensionPattern, "\n", sep="") )
+        cat( paste("input directory:   ", LFQbench.Config$InputFilesLocation, "\n", sep = "") )
+        cat( paste("file extension:    ", LFQbench.Config$InputExtensionPattern, "\n", sep="") )
         stop( "no input files found!" )
     }
     else
     {
-        setRootFolder( cfg$DataRootFolder )
+        setRootFolder( LFQbench.Config$DataRootFolder )
         
         DocSets = lapply( inputFiles, makeDocSet )
         names(DocSets) = sapply( DocSets, function(d) d$fileBase )
         ResultSets = lapply( DocSets, processDocSet )
         
-        if(storeResultSetsImage) save(DocSets, ResultSets, file = paste(cfg$LogFilesLocation, "/ResultSets.rda", sep = "") )
+        if(storeResultSetsImage) save(DocSets, ResultSets, file = paste(LFQbench.Config$LogFilesLocation, "/ResultSets.rda", sep = "") )
         if(storeSampleMeans) nix=sapply( ResultSets, saveSampleMeans )
         if(storeSpeciesSeparation) nix=sapply( ResultSets, saveSpeciesSeparation )
         if(storeIDs) nix=sapply( ResultSets, saveIDs )

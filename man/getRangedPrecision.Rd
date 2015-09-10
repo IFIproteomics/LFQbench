@@ -4,8 +4,9 @@
 \alias{getRangedPrecision}
 \title{getRangePrecision}
 \usage{
-getRangedPrecision(dataBySpecies, ranges = cfg$Log2IntensityRanges,
-  spcNames = cfg$AllSpeciesNames)
+getRangedPrecision(dataBySpecies,
+  ranges = LFQbench.Config$Log2IntensityRanges,
+  spcNames = LFQbench.Config$AllSpeciesNames)
 }
 \arguments{
 \item{dataBySpecies}{}

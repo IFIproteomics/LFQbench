@@ -4,8 +4,9 @@
 \alias{makeDocSet}
 \title{makeDocSet}
 \usage{
-makeDocSet(inFile, inputPath = cfg$InputFilesLocation,
-  plotPath = cfg$PlotFilesLocation, logPath = cfg$LogFilesLocation)
+makeDocSet(inFile, inputPath = LFQbench.Config$InputFilesLocation,
+  plotPath = LFQbench.Config$PlotFilesLocation,
+  logPath = LFQbench.Config$LogFilesLocation)
 }
 \arguments{
 \item{inFile}{}

@@ -4,7 +4,8 @@
 \alias{getRangedSepRate}
 \title{getRangedSepRate}
 \usage{
-getRangedSepRate(dataBySpecies, spcNames, ranges = cfg$Log2IntensityRanges)
+getRangedSepRate(dataBySpecies, spcNames,
+  ranges = LFQbench.Config$Log2IntensityRanges)
 }
 \arguments{
 \item{dataBySpecies}{}

@@ -4,8 +4,9 @@
 \alias{setRootFolder}
 \title{setRootFolder}
 \usage{
-setRootFolder(rootFolder = ifelse(file.exists(cfg$DataRootFolder),
-  cfg$DataRootFolder, getwd()), createSubfolders = T)
+
+  setRootFolder(rootFolder = ifelse(file.exists(LFQbench.Config$DataRootFolder),
+  LFQbench.Config$DataRootFolder, getwd()), createSubfolders = T)
 }
 \arguments{
 \item{rootFolder}{the path to the root folder}

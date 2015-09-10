@@ -20,7 +20,7 @@ processFile = function( file ) {
   
   ################################################################################
   # read run based data
-  csvDat = read.table(file, sep=cfg$CsvColumnSeparator, dec=cfg$CsvDecimalPointChar, header=T)
+  csvDat = read.table(file, sep=LFQbench.Config$CsvColumnSeparator, dec=LFQbench.Config$CsvDecimalPointChar, header=T)
   
   # csv parsing problems lead to everything being in a single column
   if( ncol(csvDat) < 2 )
@@ -36,7 +36,7 @@ processFile = function( file ) {
   speciesColumnIdx = grep("speci", names(csvDat), ignore.case = T)
   
   # some checks for data fitness
-  if( length( which( numericColumnIdx ) ) < cfg$NumberOfSamples )
+  if( length( which( numericColumnIdx ) ) < LFQbench.Config$NumberOfSamples )
     stop("number of amount columns is smaller than the number of samples")
   
   if( length( speciesColumnIdx ) < 1 ) 
@@ -50,7 +50,7 @@ processFile = function( file ) {
   
   ################################################################################
   # disable low amounts
-  csvAmounts[csvAmounts < cfg$MinProteinAmount] = NA
+  csvAmounts[csvAmounts < LFQbench.Config$MinProteinAmount] = NA
   ################################################################################
   
   ################################################################################
@@ -60,14 +60,14 @@ processFile = function( file ) {
     return(sp_hist$counts)
   }
   csvNumNAs = apply(csvAmounts,1, function(row) sum(is.na(row)))
-  numNAs_histograms = as.data.frame(sapply(cfg$AllSpeciesNames, calHistNAsWithSpecies)) 
+  numNAs_histograms = as.data.frame(sapply(LFQbench.Config$AllSpeciesNames, calHistNAsWithSpecies)) 
   numNAs_histograms = cbind( seq(0, ncol(csvAmounts) ), numNAs_histograms)
   names(numNAs_histograms)[1] = c("numNAs")
   ################################################################################
   
   ################################################################################
   # check OTHER species
-  benchedSpeciesIndices = unlist(sapply( cfg$AllSpeciesNames, function(spc) which(csvSpecies==spc) ), use.names = F)
+  benchedSpeciesIndices = unlist(sapply( LFQbench.Config$AllSpeciesNames, function(spc) which(csvSpecies==spc) ), use.names = F)
   otherSpeciesIndices = (1:length(csvIDs))[ -benchedSpeciesIndices ]
   otherSpeciesIDs = csvIDs[ otherSpeciesIndices ]
   NumberOfProteinsForOtherSpecies = length(otherSpeciesIndices)
@@ -77,12 +77,12 @@ processFile = function( file ) {
   csvSpecies = csvSpecies[ benchedSpeciesIndices ]
   ################################################################################
   # normalize protein amounts to ppm
-  if(cfg$NormalizeAmountsToPPM) csvAmounts = apply( csvAmounts, 2, function(x) x / sum(x, na.rm=T) * 1000000 )
+  if(LFQbench.Config$NormalizeAmountsToPPM) csvAmounts = apply( csvAmounts, 2, function(x) x / sum(x, na.rm=T) * 1000000 )
   ################################################################################
   
   ################################################################################
   # extract data for a single sample
-  getSampleAverage = function(sampleIndex, nRuns=floor( ncol(csvAmounts) / cfg$NumberOfSamples ))
+  getSampleAverage = function(sampleIndex, nRuns=floor( ncol(csvAmounts) / LFQbench.Config$NumberOfSamples ))
   {
     amount = as.matrix( csvAmounts[, ((sampleIndex-1)*nRuns + 1):(nRuns * sampleIndex)] )
     avg = rowMeans( amount, na.rm=T )
@@ -92,27 +92,27 @@ processFile = function( file ) {
   }
   ################################################################################
   # generate sample average data
-  SampleAverageData = lapply( 1:cfg$NumberOfSamples, getSampleAverage )
-  SampleAverageAmounts = sapply( 1:cfg$NumberOfSamples, function(si) SampleAverageData[[si]]$mean )
-  SampleAverageCVs = sapply( 1:cfg$NumberOfSamples, function(si) SampleAverageData[[si]]$cv )
+  SampleAverageData = lapply( 1:LFQbench.Config$NumberOfSamples, getSampleAverage )
+  SampleAverageAmounts = sapply( 1:LFQbench.Config$NumberOfSamples, function(si) SampleAverageData[[si]]$mean )
+  SampleAverageCVs = sapply( 1:LFQbench.Config$NumberOfSamples, function(si) SampleAverageData[[si]]$cv )
   SampleAverageSpecies = csvSpecies
   SampleAverageProteinIDs = csvIDs
   rownames(SampleAverageAmounts) = SampleAverageProteinIDs
   rownames(SampleAverageCVs) = SampleAverageProteinIDs
-  colnames(SampleAverageAmounts) = cfg$AllSampleNames
-  colnames(SampleAverageCVs) = cfg$AllSampleNames
+  colnames(SampleAverageAmounts) = LFQbench.Config$AllSampleNames
+  colnames(SampleAverageCVs) = LFQbench.Config$AllSampleNames
   ################################################################################
   
   ################################################################################
   # create protein identification statistics
-  NumberOfProteinsBySpecies = sapply( cfg$AllSpeciesNames, function(x) length( which(SampleAverageSpecies == x) ) )
+  NumberOfProteinsBySpecies = sapply( LFQbench.Config$AllSpeciesNames, function(x) length( which(SampleAverageSpecies == x) ) )
   NumberOfProteinsBySpecies["OTHER"] = NumberOfProteinsForOtherSpecies
   ################################################################################
   
   ################################################################################
   # handle missing and low amount values
-  # SampleAverageAmounts[ is.na(SampleAverageAmounts) ] = cfg$MinProteinAmount
-  # SampleAverageAmounts[ SampleAverageAmounts < cfg$MinProteinAmount ] = cfg$MinProteinAmount
+  # SampleAverageAmounts[ is.na(SampleAverageAmounts) ] = LFQbench.Config$MinProteinAmount
+  # SampleAverageAmounts[ SampleAverageAmounts < LFQbench.Config$MinProteinAmount ] = LFQbench.Config$MinProteinAmount
   ################################################################################
   
   ################################################################################
@@ -121,16 +121,16 @@ processFile = function( file ) {
   {
     ################################################################################
     # extract sample pair data
-    SamplePairColor = cfg$SamplePairsColors[SamplePairIndex]
-    Sample1Index = cfg$SamplePairsIndices[SamplePairIndex,1]
-    Sample2Index = cfg$SamplePairsIndices[SamplePairIndex,2]
-    Sample1Name = cfg$AllSampleNames[Sample1Index]
-    Sample2Name = cfg$AllSampleNames[Sample2Index]
+    SamplePairColor = LFQbench.Config$SamplePairsColors[SamplePairIndex]
+    Sample1Index = LFQbench.Config$SamplePairsIndices[SamplePairIndex,1]
+    Sample2Index = LFQbench.Config$SamplePairsIndices[SamplePairIndex,2]
+    Sample1Name = LFQbench.Config$AllSampleNames[Sample1Index]
+    Sample2Name = LFQbench.Config$AllSampleNames[Sample2Index]
     Sample1ProteinAmounts = SampleAverageAmounts[,Sample1Index]
     Sample2ProteinAmounts = SampleAverageAmounts[,Sample2Index]
     SpeciesNames = SampleAverageSpecies
     ProteinIDs = SampleAverageProteinIDs
-    LogRatioExpectations = log2( cfg$AllExpectedAmounts[,Sample1Index] / cfg$AllExpectedAmounts[,Sample2Index] )
+    LogRatioExpectations = log2( LFQbench.Config$AllExpectedAmounts[,Sample1Index] / LFQbench.Config$AllExpectedAmounts[,Sample2Index] )
     ################################################################################
     
     ################################################################################
@@ -149,11 +149,11 @@ processFile = function( file ) {
     
     ################################################################################
     # drop invalid log ratios
-    if(cfg$DropInvalidLogRatio)
+    if(LFQbench.Config$DropInvalidLogRatio)
     {
       emptyLRs = which(is.na(LogRatio))
-      smallLRs = which(LogRatio < min(cfg$LogRatioValidityRange))
-      bigLRs = which(LogRatio > max(cfg$LogRatioValidityRange))      
+      smallLRs = which(LogRatio < min(LFQbench.Config$LogRatioValidityRange))
+      bigLRs = which(LogRatio > max(LFQbench.Config$LogRatioValidityRange))      
       badLRs = unique(c(emptyLRs, smallLRs, bigLRs))
       if(length(badLRs)>0)
       {
@@ -177,17 +177,17 @@ processFile = function( file ) {
     
     ################################################################################
     # calculate log-ratio means and medians
-    LogRatioMedians = sapply(cfg$AllSpeciesNames, function(x) median( LogRatio[SpeciesNames==x], na.rm=T ))
-    LogRatioMeans = sapply(cfg$AllSpeciesNames, function(x) mean( LogRatio[SpeciesNames==x], na.rm=T ))
-    BackgroundSpeciesMedian = LogRatioMedians[cfg$AllSpeciesNames==cfg$BackgroundSpeciesName]
-    BackgroundSpeciesMean = LogRatioMeans[cfg$AllSpeciesNames==cfg$BackgroundSpeciesName]
+    LogRatioMedians = sapply(LFQbench.Config$AllSpeciesNames, function(x) median( LogRatio[SpeciesNames==x], na.rm=T ))
+    LogRatioMeans = sapply(LFQbench.Config$AllSpeciesNames, function(x) mean( LogRatio[SpeciesNames==x], na.rm=T ))
+    BackgroundSpeciesMedian = LogRatioMedians[LFQbench.Config$AllSpeciesNames==LFQbench.Config$BackgroundSpeciesName]
+    BackgroundSpeciesMean = LogRatioMeans[LFQbench.Config$AllSpeciesNames==LFQbench.Config$BackgroundSpeciesName]
     ################################################################################
     
     ################################################################################
     # center by mean, median, or not at all
-    if( cfg$CenterLogRatioByBackground || regexpr("median", cfg$CenterLogRatioByBackground, ignore.case=T) )
+    if( LFQbench.Config$CenterLogRatioByBackground || regexpr("median", LFQbench.Config$CenterLogRatioByBackground, ignore.case=T) )
       LogRatioAdjustmentValue = BackgroundSpeciesMedian 
-    else if(regexpr("mean", cfg$CenterLogRatioByBackground, ignore.case=T))
+    else if(regexpr("mean", LFQbench.Config$CenterLogRatioByBackground, ignore.case=T))
       LogRatioAdjustmentValue = BackgroundSpeciesMean
     else
       LogRatioAdjustmentValue = 0
@@ -216,8 +216,8 @@ processFile = function( file ) {
     ScatterPlotXAxisData = log2( Sample2ProteinAmounts )
     # xLim = range(ScatterPlotXAxisData[ScatterPlotXAxisData>0])
     xLim = quantile( ScatterPlotXAxisData[ScatterPlotXAxisData>0], probs=c(0.01,0.99), na.rm = T )
-    if(!is.null(cfg[["LogIntensityPlotRange"]])) xLim = cfg$LogIntensityPlotRange
-    yLim = cfg$LogRatioPlotRange
+    if(!is.null(LFQbench.Config[["LogIntensityPlotRange"]])) xLim = LFQbench.Config$LogIntensityPlotRange
+    yLim = LFQbench.Config$LogRatioPlotRange
     # DISABLED: force log-ratio values into x-axis boundaries
     # ScatterPlotXAxisData[ ScatterPlotXAxisData < xLim[1] ] = xLim[1]
     # ScatterPlotXAxisData[ ScatterPlotXAxisData > xLim[2] ] = xLim[2]
@@ -228,21 +228,21 @@ processFile = function( file ) {
     packageSpecies = function( TheSpecies )
     {
       ValueIndices = which(SpeciesNames == TheSpecies)
-      SpeciesIndex = cfg$AllSpeciesNames == TheSpecies
+      SpeciesIndex = LFQbench.Config$AllSpeciesNames == TheSpecies
       
       if(DEBUG) cat( paste(TheSpecies, " has ", length( ValueIndices ), " IDs ... \n", sep = ""))
       
       qcFunc = as.function(
-        getQCFunction( LogRatio[ValueIndices] - LogRatioMedians[SpeciesIndex], ensureValueRange=c(0, cfg$MaxLogRatioForAUQC) )
+        getQCFunction( LogRatio[ValueIndices] - LogRatioMedians[SpeciesIndex], ensureValueRange=c(0, LFQbench.Config$MaxLogRatioForAUQC) )
       )
-      auqc = round( integrate( qcFunc, 0, cfg$MaxLogRatioForAUQC, stop.on.error=F )$value / cfg$MaxLogRatioForAUQC, 3)  
+      auqc = round( integrate( qcFunc, 0, LFQbench.Config$MaxLogRatioForAUQC, stop.on.error=F )$value / LFQbench.Config$MaxLogRatioForAUQC, 3)  
       return( 
         list(
           species = TheSpecies,
           x = ScatterPlotXAxisData[ ValueIndices ],
           y = LogRatio[ ValueIndices ],
           density = density(LogRatio[ ValueIndices ]),
-          col = cfg$SpeciesColors[ SpeciesIndex ],
+          col = LFQbench.Config$SpeciesColors[ SpeciesIndex ],
           median = LogRatioMedians[ SpeciesIndex ],
           expectation = LogRatioExpectations[ SpeciesIndex ],
           shift = LogRatioMedians[ SpeciesIndex ] - LogRatioExpectations[ SpeciesIndex ],
@@ -253,33 +253,33 @@ processFile = function( file ) {
     }
     
     # package data for all species
-    dataBySpecies = lapply( cfg$AllSpeciesNames, packageSpecies )
-    names( dataBySpecies ) = cfg$AllSpeciesNames
+    dataBySpecies = lapply( LFQbench.Config$AllSpeciesNames, packageSpecies )
+    names( dataBySpecies ) = LFQbench.Config$AllSpeciesNames
     ################################################################################
     
     ################################################################################
     # ROC-AUC for all species pairs
-    globalSeparation = apply(cfg$AllSpeciesPairs, 1, function(sp) getSepRate( dataBySpecies, cfg$AllSpeciesNames[sp] ) )
-    names(globalSeparation) = cfg$AllSpeciesPairsLabels
+    globalSeparation = apply(LFQbench.Config$AllSpeciesPairs, 1, function(sp) getSepRate( dataBySpecies, LFQbench.Config$AllSpeciesNames[sp] ) )
+    names(globalSeparation) = LFQbench.Config$AllSpeciesPairsLabels
     ################################################################################
     
     ################################################################################
     localSeparation = apply(
-        cfg$AllSpeciesPairs, 1, 
+        LFQbench.Config$AllSpeciesPairs, 1, 
         function(sp) {
             getQuantileSeparation( 
                 dataBySpecies, 
-                cfg$AllSpeciesNames[sp],
-                cfg$NumberOfIntensityQuantiles )
+                LFQbench.Config$AllSpeciesNames[sp],
+                LFQbench.Config$NumberOfIntensityQuantiles )
         } 
         )
-    colnames(localSeparation) = cfg$AllSpeciesPairsLabels
+    colnames(localSeparation) = LFQbench.Config$AllSpeciesPairsLabels
     ################################################################################
     
     globalAccuracy = sapply( dataBySpecies, function(d) median(d$y, na.rm=T) - d$expectation  )
     globalPrecision = sapply( dataBySpecies, function(d) sd(d$y, na.rm = T) ) 
-    localAccuracy = getQuantileAccuracy( dataBySpecies, cfg$AllSpeciesNames, cfg$NumberOfIntensityQuantiles )
-    localPrecision = getQuantilePrecision( dataBySpecies, cfg$AllSpeciesNames, cfg$NumberOfIntensityQuantiles )
+    localAccuracy = getQuantileAccuracy( dataBySpecies, LFQbench.Config$AllSpeciesNames, LFQbench.Config$NumberOfIntensityQuantiles )
+    localPrecision = getQuantilePrecision( dataBySpecies, LFQbench.Config$AllSpeciesNames, LFQbench.Config$NumberOfIntensityQuantiles )
     
     ################################################################################
     # package sample pair data
@@ -299,9 +299,9 @@ processFile = function( file ) {
       quantileSeparation = localSeparation,
       quantileAccuracy = localAccuracy,
       quantilePrecision = localPrecision,
-      log2IntensityRanges = cfg$Log2IntensityRanges,
+      log2IntensityRanges = LFQbench.Config$Log2IntensityRanges,
       adjustment = LogRatioAdjustmentValue,
-      qcrange = cfg$AUQCRatioRange,
+      qcrange = LFQbench.Config$AUQCRatioRange,
       allLogRatios = allLogRatios,
       validLogRatios = validLogRatios,
       invalidLogRatios = invalidLogRatios,
@@ -317,7 +317,7 @@ processFile = function( file ) {
   
   ################################################################################
   # process all sample pairs
-  SamplePairsData = lapply(1:cfg$NumberOfSamplePairs, getSamplePairData)
+  SamplePairsData = lapply(1:LFQbench.Config$NumberOfSamplePairs, getSamplePairData)
   names(SamplePairsData) = sapply( SamplePairsData, function(d) paste(d$name1, ":", d$name2,sep = "" ))
   ################################################################################
   
@@ -361,7 +361,7 @@ getQCFunction = function( ratios, ensureValueRange=c(0, 1) )
 ################################################################################
 
 ################################################################################
-# removed from cfg
+# removed from LFQbench.Config
 Log2IntensityRanges = rbind(
     "<2"=c(0,2),
     "<4"=c(2,4),
@@ -377,7 +377,7 @@ Log2IntensityRanges = rbind(
 #' @param dataBySpecies
 #' @param ranges 
 #' @param spcNames
-getRangedAccuracy = function(dataBySpecies, ranges=Log2IntensityRanges, spcNames = cfg$AllSpeciesNames){
+getRangedAccuracy = function(dataBySpecies, ranges=Log2IntensityRanges, spcNames = LFQbench.Config$AllSpeciesNames){
   el2r = sapply(spcNames, function(sn) dataBySpecies[[sn]]$expectation, USE.NAMES = F )  
   l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
   l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
@@ -400,7 +400,7 @@ getRangedAccuracy = function(dataBySpecies, ranges=Log2IntensityRanges, spcNames
 #'@param dataBySpecies
 #'@param ranges
 #'@param spcNames
-getRangedPrecision = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spcNames = cfg$AllSpeciesNames ){
+getRangedPrecision = function(dataBySpecies, ranges=LFQbench.Config$Log2IntensityRanges, spcNames = LFQbench.Config$AllSpeciesNames ){
   l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
   l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
   spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
@@ -422,7 +422,7 @@ getRangedPrecision = function(dataBySpecies, ranges=cfg$Log2IntensityRanges, spc
 #'  @param dataBySpecies
 #'  @param spcNames 
 #'  @param ranges
-getRangedSepRate = function(dataBySpecies, spcNames, ranges=cfg$Log2IntensityRanges){
+getRangedSepRate = function(dataBySpecies, spcNames, ranges=LFQbench.Config$Log2IntensityRanges){
   l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
   l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
   spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
@@ -451,7 +451,7 @@ getRangedSepRate = function(dataBySpecies, spcNames, ranges=cfg$Log2IntensityRan
 #'  @param dataBySpecies data structure as stored in ResultSet$result[[SamplePairIndex]]$data
 #'  @param spcNames a vector of two species names
 #'  @param numberOfQuantiles the number of quantiles
-getQuantileSeparation = function( dataBySpecies, spcNames, numberOfQuantiles=cfg$NumberOfIntensityQuantiles ){
+getQuantileSeparation = function( dataBySpecies, spcNames, numberOfQuantiles=LFQbench.Config$NumberOfIntensityQuantiles ){
     # get log-ratios
     l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
     # get intensities of first sample
@@ -480,7 +480,7 @@ getQuantileSeparation = function( dataBySpecies, spcNames, numberOfQuantiles=cfg
 #' @param dataBySpecies
 #' @param spcNames
 #' @param numberOfQuantiles
-getQuantileAccuracy = function(dataBySpecies, spcNames = cfg$AllSpeciesNames, numberOfQuantiles=cfg$NumberOfIntensityQuantiles){
+getQuantileAccuracy = function(dataBySpecies, spcNames = LFQbench.Config$AllSpeciesNames, numberOfQuantiles=LFQbench.Config$NumberOfIntensityQuantiles){
     expectation = sapply(spcNames, function(sn) dataBySpecies[[sn]]$expectation, USE.NAMES = F )  
     l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
     l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
@@ -507,7 +507,7 @@ getQuantileAccuracy = function(dataBySpecies, spcNames = cfg$AllSpeciesNames, nu
 #'@param dataBySpecies
 #'@param spcNames
 #' @param numberOfQuantiles
-getQuantilePrecision = function(dataBySpecies, spcNames = cfg$AllSpeciesNames, numberOfQuantiles=cfg$NumberOfIntensityQuantiles ){
+getQuantilePrecision = function(dataBySpecies, spcNames = LFQbench.Config$AllSpeciesNames, numberOfQuantiles=LFQbench.Config$NumberOfIntensityQuantiles ){
     l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
     l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
     spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )

@@ -1,10 +1,17 @@
 ################################################################################
+#' plotToFile
+#' 
+#'  Plot user content to file by using LFQbench canvas configuration.
+#'  
+#'  @param file the pdfFile
+#'  @param plotFunc the plot function
+#'  @export
 plotToFile = function( file, plotFunc, ... )
 {
-  pdf(file=file, onefile=T, width=cfg$PlotWidth, height=cfg$PlotHeight, family="Helvetica", pointsize=9)
-  par(cfg$par)
+  pdf(file=file, onefile=T, width=LFQbench.Config$PlotWidth, height=LFQbench.Config$PlotHeight, family="Helvetica", pointsize=9)
+  par(LFQbench.Config$par)
   if(is.function(plotFunc)) res = plotFunc(...)
-  par(cfg$parBackup)
+  par(LFQbench.Config$parBackup)
   dev.off()
   if(exists("res")) return(res)
 }
@@ -49,14 +56,14 @@ addAxes = function(lwd=1, showXlab=T, showYlab=T, showXAxis=T, showYAxis=T, cex.
 
 ################################################################################
 # add an x-axis label shifted by marginShift from par()$mgp[1]
-addXLab = function(xlab="", marginShift=-0.2, cex.lab = cfg$AxisLabelSize, ...)
+addXLab = function(xlab="", marginShift=-0.2, cex.lab = LFQbench.Config$AxisLabelSize, ...)
 {
   m = par()$mgp
   m[1] = m[1]+marginShift
   title(xlab=xlab, mgp=m, cex.lab=cex.lab, ...)
 }
 # add an y-axis label shifted by marginShift from par()$mgp[1]
-addYLab = function(ylab="", marginShift=0.3, cex.lab = cfg$AxisLabelSize, ...)
+addYLab = function(ylab="", marginShift=0.3, cex.lab = LFQbench.Config$AxisLabelSize, ...)
 {
   m = par()$mgp
   m[1] = m[1]+marginShift
@@ -97,7 +104,7 @@ scaleColor=function(col, scale=1.5, alpha=1)
 #'  @param pos the legend position on plot area
 plotSpeciesLegend = function( pos="top", ... )
 {
-  legend(x=pos, legend=cfg$AllSpeciesNames, col=cfg$SpeciesColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white", ...)	
+  legend(x=pos, legend=LFQbench.Config$AllSpeciesNames, col=LFQbench.Config$SpeciesColors, lwd=LFQbench.Config$PlotLegendLineWidth, inset=.02, bg="white", ...)	
 }
 ################################################################################
 
@@ -108,17 +115,17 @@ plotSpeciesLegend = function( pos="top", ... )
 #'  @export
 plotSpeciesLegends = function()
 {
-  pdf(file = paste(cfg$PlotFilesLocation,"/species_legend_vertical.pdf", sep = ""), width = 1.05, height = 0.66, family = "Helvetica", pointsize = 9)
+  pdf(file = paste(LFQbench.Config$PlotFilesLocation,"/species_legend_vertical.pdf", sep = ""), width = 1.05, height = 0.66, family = "Helvetica", pointsize = 9)
   par(mar=c(0,0,0.1,0))
   emptyPlot( 0:1, 0:1, lwd=0, grid=F, showXlab=F, showYlab=F, axes=F )
   plotSpeciesLegend(pos="top", horiz=F )
   dev.off()
-  pdf(file = paste(cfg$PlotFilesLocation,"/species_legend_horizontal.pdf",sep = ""), width = 2.9, height = 0.35, family = "Helvetica", pointsize = 9)
+  pdf(file = paste(LFQbench.Config$PlotFilesLocation,"/species_legend_horizontal.pdf",sep = ""), width = 2.9, height = 0.35, family = "Helvetica", pointsize = 9)
   par(mar=c(0,0,0.1,0))
   emptyPlot( 0:1, 0:1, lwd=0, grid=F, showXlab=F, showYlab=F, axes=F )
   plotSpeciesLegend(pos="top", horiz=T )
   dev.off()
-  par(cfg$parBackup)
+  par(LFQbench.Config$parBackup)
 }
 ################################################################################
 
@@ -126,7 +133,7 @@ plotSpeciesLegends = function()
 addScatterPointsForSpecies = function(species, samplePairResult, minAlpha=.2, showExpectationLine=T, showRegressionLine=T, useCfgColor=T, rampColors=T, ...)
 {
   ds = samplePairResult$data[[species]]
-  theCol = ifelse(useCfgColor, cfg$SpeciesColors[which(cfg$AllSpeciesNames==ds$species)], ds$col)
+  theCol = ifelse(useCfgColor, LFQbench.Config$SpeciesColors[which(LFQbench.Config$AllSpeciesNames==ds$species)], ds$col)
   cols=theCol
   if(rampColors)
   {
@@ -146,13 +153,13 @@ addScatterPointsForSpecies = function(species, samplePairResult, minAlpha=.2, sh
   # draw expectation line
   if(showExpectationLine) 
   {
-    abline(h = ds$expectation, col=scaleColor(theCol, .8), lty="dashed", lwd=cfg$PlotCurveLineWidth)
+    abline(h = ds$expectation, col=scaleColor(theCol, .8), lty="dashed", lwd=LFQbench.Config$PlotCurveLineWidth)
   }
   # draw lowess regression line
   if(showRegressionLine)
   {
     regLine = lowess( ds$x, ds$y )
-    lines( regLine, col=scaleColor(theCol,.5), lty=5, lwd=cfg$PlotCurveLineWidth )
+    lines( regLine, col=scaleColor(theCol,.5), lty=5, lwd=LFQbench.Config$PlotCurveLineWidth )
   }
   return(ds$y)
 }
@@ -172,7 +179,7 @@ scaleTo01 = function(v)
 addScatterPointsForSpecies2 = function(species, samplePairResult, minAlpha=.2, showExpectationLine=T, showRegressionLine=T, useCfgColor=T, rampColors=T, ...)
 {
   ds = samplePairResult$data[[species]]
-  theCol = ifelse(useCfgColor, cfg$SpeciesColors[which(cfg$AllSpeciesNames==ds$species)], ds$col)
+  theCol = ifelse(useCfgColor, LFQbench.Config$SpeciesColors[which(LFQbench.Config$AllSpeciesNames==ds$species)], ds$col)
   cols=theCol
   if(rampColors)
   {
@@ -201,13 +208,13 @@ addScatterPointsForSpecies2 = function(species, samplePairResult, minAlpha=.2, s
   # draw expectation line
   if(showExpectationLine) 
   {
-    abline(h = ds$expectation, col=scaleColor(theCol, .8), lty="dashed", lwd=cfg$PlotCurveLineWidth)
+    abline(h = ds$expectation, col=scaleColor(theCol, .8), lty="dashed", lwd=LFQbench.Config$PlotCurveLineWidth)
   }
   # draw lowess regression line
   if(showRegressionLine)
   {
     regLine = lowess( ds$x, ds$y )
-    lines( regLine, col=scaleColor(theCol,.5), lty=5, lwd=cfg$PlotCurveLineWidth )
+    lines( regLine, col=scaleColor(theCol,.5), lty=5, lwd=LFQbench.Config$PlotCurveLineWidth )
   }
   return(ds$y)
 }
@@ -224,13 +231,13 @@ addScatterPointsForSpecies2 = function(species, samplePairResult, minAlpha=.2, s
 #' @param useCfgColor ignore result set colors and use colors from current configuration settings
 makeScatter = function( samplePair, showLegend=F, showRegLines=F, showExpLines=T, useCfgColor=T )
 {
-  emptyPlot(samplePair$xlim, samplePair$ylim, grid=F, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize)
+  emptyPlot(samplePair$xlim, samplePair$ylim, grid=F, lwd = LFQbench.Config$AxisLineThickness, cex.axis = LFQbench.Config$AxisAnnotationSize)
   addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ) )
   addYLab( as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ) )
-  logRatios = sapply(cfg$AllSpeciesNames, 
+  logRatios = sapply(LFQbench.Config$AllSpeciesNames, 
                      addScatterPointsForSpecies2, samplePair, 
-                      minAlpha=cfg$PlotPointMinAlpha, showExpectationLine=showExpLines, showRegressionLine=showRegLines, 
-                      useCfgColor=T, rampColors=ifelse(cfg$PlotPointMinAlpha==1, F, T), cex=cfg$PlotPointSize
+                      minAlpha=LFQbench.Config$PlotPointMinAlpha, showExpectationLine=showExpLines, showRegressionLine=showRegLines, 
+                      useCfgColor=T, rampColors=ifelse(LFQbench.Config$PlotPointMinAlpha==1, F, T), cex=LFQbench.Config$PlotPointSize
   )
   if(showLegend) plotSpeciesLegend( horiz=T )
   return(logRatios)
@@ -247,9 +254,9 @@ makeScatter = function( samplePair, showLegend=F, showRegLines=F, showExpLines=T
 #' @export
 showScatterPlot = function( samplePair, showLegend=F, showRegLines=F )
 {
-  par(cfg$par)
+  par(LFQbench.Config$par)
   logRatios = makeScatter(samplePair, showLegend, showRegLines )
-  par(cfg$parBackup)
+  par(LFQbench.Config$parBackup)
 }
 ################################################################################
 
@@ -261,18 +268,18 @@ showScatterPlot = function( samplePair, showLegend=F, showRegLines=F )
 #' @export
 showLogRatioBoxPlot = function( samplePair )
 {
-  par(cfg$par)
+  par(LFQbench.Config$par)
   logRatios = sapply( samplePair$data, function(d) { return(d$y) } )
   qboxplot( logRatios, pch=20, ylab="",
-            whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F, lims=cfg$LogRatioPlotRange,
-      cex.lab = cfg$AxisLabelSize
+            whiskerQuantile=LFQbench.Config$BoxPlotWhiskerQuantile, axes=F, lims=LFQbench.Config$LogRatioPlotRange,
+      cex.lab = LFQbench.Config$AxisLabelSize
     )
-  addAxes(showXlab=F, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize)
-  axis(1, labels=cfg$AllSpeciesNames, at=(1:cfg$NumberOfSpecies), 
-       lwd.ticks=cfg$AxisLineThickness, lwd=0, cex.axis = cfg$AxisAnnotationSize )
+  addAxes(showXlab=F, lwd = LFQbench.Config$AxisLineThickness, cex.axis = LFQbench.Config$AxisAnnotationSize)
+  axis(1, labels=LFQbench.Config$AllSpeciesNames, at=(1:LFQbench.Config$NumberOfSpecies), 
+       lwd.ticks=LFQbench.Config$AxisLineThickness, lwd=0, cex.axis = LFQbench.Config$AxisAnnotationSize )
   addYLab( as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ))
   grid()
-  par(cfg$parBackup)
+  par(LFQbench.Config$parBackup)
 }
 ################################################################################
 
@@ -284,7 +291,7 @@ showLogRatioBoxPlot = function( samplePair )
 #' @export
 showQuantBarPlot = function( samplePair )
 {
-  par(cfg$par)
+  par(LFQbench.Config$par)
   values = unlist(sapply( samplePair$data, function(d) { return(d$y) } ))
   colors = unlist(sapply( samplePair$data, function(d) { return(rep(d$col,length(d$y)) ) } ))
   cat(paste("",length(values)," values ...\n", sep=""))
@@ -294,14 +301,14 @@ showQuantBarPlot = function( samplePair )
   barplot(values, col=colors, border=NA,
         ylim=samplePair$ylim,
         main="", names.arg=NA, xlab="", ylab="",
-        cex.lab = cfg$AxisLabelSize, cex.axis = cfg$AxisAnnotationSize
+        cex.lab = LFQbench.Config$AxisLabelSize, cex.axis = LFQbench.Config$AxisAnnotationSize
   )
   addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ) )
   addYLab( as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ) )
   legendLabels = sapply( samplePair$data, function(d) d$species )
   legendColors = sapply( samplePair$data, function(d) d$col )
-  legend(x="topright", legend=legendLabels, col=legendColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white")
-  par(cfg$parBackup)
+  legend(x="topright", legend=legendLabels, col=legendColors, lwd=LFQbench.Config$PlotLegendLineWidth, inset=.02, bg="white")
+  par(LFQbench.Config$parBackup)
 }
 ################################################################################
 
@@ -316,7 +323,7 @@ showQuantBarPlot = function( samplePair )
 #' @export
 showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8)
 {
-	par(cfg$par)
+	par(LFQbench.Config$par)
 	par(fig=c(0,scatterPlotWidth,0,1), new=F)
 	logRatios = makeScatter(samplePair, showLegend, showRegLines)
 	# density plot
@@ -330,12 +337,12 @@ showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, s
   mkLines = function(d)
   {
     idx = d$density$x > min(d$y) & d$density$x < max(d$y)
-    theCol = cfg$SpeciesColors[which(cfg$AllSpeciesNames==d$species)]
-    lines(d$density$y[idx], d$density$x[idx] , type="l", col=theCol, lwd=cfg$PlotCurveLineWidth ) 
-    hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=scaleColor(theCol,.8) )
+    theCol = LFQbench.Config$SpeciesColors[which(LFQbench.Config$AllSpeciesNames==d$species)]
+    lines(d$density$y[idx], d$density$x[idx] , type="l", col=theCol, lwd=LFQbench.Config$PlotCurveLineWidth ) 
+    hLine(y=d$expectation, lty=2, lwd=LFQbench.Config$PlotCurveLineWidth, col=scaleColor(theCol,.8) )
   }
 	nix = sapply( samplePair$data, mkLines )
-	par(cfg$parBackup)
+	par(LFQbench.Config$parBackup)
 	par(fig=c(0,1,0,1), new=F)
 }
 ################################################################################
@@ -351,7 +358,7 @@ showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, s
 #' @export
 showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8)
 {
-  par(cfg$par)
+  par(LFQbench.Config$par)
   par(fig=c(0,scatterPlotWidth,0,1), new=F)
   logRatios = makeScatter(samplePair, showLegend, showRegLines)
   # box plot
@@ -361,17 +368,17 @@ showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F, scatt
   par(mar=pm)
   qboxplot( logRatios, pch=20,
             ylab=as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ),
-            whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F, lims=samplePair$ylim, border=cfg$SpeciesColors
+            whiskerQuantile=LFQbench.Config$BoxPlotWhiskerQuantile, axes=F, lims=samplePair$ylim, border=LFQbench.Config$SpeciesColors
   )
   # add horizontal lines
   makeExpLines = function(d) 
   {
-    theCol = cfg$SpeciesColors[which(cfg$AllSpeciesNames==d$species)]
-    hLine(y=d$expectation, lty=2, lwd=cfg$PlotCurveLineWidth, col=scaleColor(theCol,.8) )
+    theCol = LFQbench.Config$SpeciesColors[which(LFQbench.Config$AllSpeciesNames==d$species)]
+    hLine(y=d$expectation, lty=2, lwd=LFQbench.Config$PlotCurveLineWidth, col=scaleColor(theCol,.8) )
     return(d$expectation) 
   }  
   expRatios = sapply( samplePair$data, makeExpLines )
-  par(cfg$parBackup)
+  par(LFQbench.Config$parBackup)
   par(fig=c(0,1,0,1), new=F)
 }
 ################################################################################
@@ -387,13 +394,13 @@ showDistributionDensityPlot = function(samplePair, showLegend=F)
 {
   xLim=samplePair$ylim
   yLim=range( lapply(samplePair$data, function(d) range(d$density$y) ) )
-  par(cfg$par)
-  emptyPlot(xLim, yLim, lwd = cfg$AxisLineThickness, cex.axis = cfg$AxisAnnotationSize )
+  par(LFQbench.Config$par)
+  emptyPlot(xLim, yLim, lwd = LFQbench.Config$AxisLineThickness, cex.axis = LFQbench.Config$AxisAnnotationSize )
   addXLab( as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ) )
   addYLab( "Density", .6 )
-  sapply(samplePair$data, function(d) lines(d$density, type="l", col=d$col, lwd=cfg$PlotCurveLineWidth ) )
+  sapply(samplePair$data, function(d) lines(d$density, type="l", col=d$col, lwd=LFQbench.Config$PlotCurveLineWidth ) )
   if(showLegend) plotSpeciesLegend( )
-  par(cfg$parBackup)
+  par(LFQbench.Config$parBackup)
 }
 ################################################################################
 
@@ -405,7 +412,7 @@ showDistributionDensityPlot = function(samplePair, showLegend=F)
 #' @export
 showAllSpeciesQC = function(samplePair)
 {
-  par(cfg$par)
+  par(LFQbench.Config$par)
   emptyPlot(xRange=samplePair$qcrange)
   x = (1:500)/500*samplePair$qcrange[2]
   title(
@@ -413,11 +420,11 @@ showAllSpeciesQC = function(samplePair)
     xlab=as.expression( bquote( "Absolute"~log[2]~"("~.(samplePair$name1)~":"~.(samplePair$name2)~")" ) ),
     ylab="Parts"
   )
-  sapply(samplePair$data, function(d) lines(x, d$qcfunction(x), type="l", col=d$col, lwd=cfg$PlotCurveLineWidth ) )
+  sapply(samplePair$data, function(d) lines(x, d$qcfunction(x), type="l", col=d$col, lwd=LFQbench.Config$PlotCurveLineWidth ) )
   legendLabels = sapply( samplePair$data, function(d) paste(d$species , ": " , d$auqc, sep="" ))
   legendColors = sapply( samplePair$data, function(d) d$col )
-  legend(x="bottomright", legend=legendLabels, col=legendColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white")
-  par(cfg$parBackup)
+  legend(x="bottomright", legend=legendLabels, col=legendColors, lwd=LFQbench.Config$PlotLegendLineWidth, inset=.02, bg="white")
+  par(LFQbench.Config$parBackup)
 }
 ################################################################################
 
@@ -430,23 +437,23 @@ showAllSpeciesQC = function(samplePair)
 #' @export
 showSingleSpeciesQC = function(resultSet, speciesName)
 {
-  speciesIndex = which( cfg$AllSpeciesNames == speciesName )
-  par( cfg$par )
-  emptyPlot( xRange=cfg$AUQCRatioRange )
+  speciesIndex = which( LFQbench.Config$AllSpeciesNames == speciesName )
+  par( LFQbench.Config$par )
+  emptyPlot( xRange=LFQbench.Config$AUQCRatioRange )
   title(
     main="",
     xlab=as.expression( bquote( Absolute~log[2]-ratio~"for"~.(speciesName) ) ),
     ylab="Parts"
   )
-  x = (1:500)/500*cfg$AUQCRatioRange[2]
+  x = (1:500)/500*LFQbench.Config$AUQCRatioRange[2]
   sapply(rs$result, 
          function(sp){ 
-             lines(x, sp$data[[speciesIndex]]$qcfunction(x), type="l", col=sp$col, lwd=cfg$PlotCurveLineWidth ) 
+             lines(x, sp$data[[speciesIndex]]$qcfunction(x), type="l", col=sp$col, lwd=LFQbench.Config$PlotCurveLineWidth ) 
         } )
   legendLabels = sapply( rs$result, function(sp) paste("AUQC(",sp$name1, ":", sp$name2, "): ", sp$data[[speciesIndex]]$auqc, sep = "" ))
   legendColors = sapply( rs$result, function(sp) sp$col )
-  legend(x="bottomright", legend=legendLabels, col=legendColors, lwd=cfg$PlotLegendLineWidth, inset=.02, bg="white")
-  par( cfg$parBackup )
+  legend(x="bottomright", legend=legendLabels, col=legendColors, lwd=LFQbench.Config$PlotLegendLineWidth, inset=.02, bg="white")
+  par( LFQbench.Config$parBackup )
 }
 ################################################################################
 
@@ -458,13 +465,13 @@ showSingleSpeciesQC = function(resultSet, speciesName)
 #' @export
 plotProteinDispersionBySpecies = function( d )
 {
-  d4s = sapply( cfg$AllSpeciesNames, function(sp) as.vector( na.exclude( d$cv[ d$species==sp ] ) ) )
-  par(cfg$par)
-  qboxplot(d4s, pch=20, ylab="Protein quantification dispersion (CV)", whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F )
+  d4s = sapply( LFQbench.Config$AllSpeciesNames, function(sp) as.vector( na.exclude( d$cv[ d$species==sp ] ) ) )
+  par(LFQbench.Config$par)
+  qboxplot(d4s, pch=20, ylab="Protein quantification dispersion (CV)", whiskerQuantile=LFQbench.Config$BoxPlotWhiskerQuantile, axes=F )
   addAxes(showXlab=F)
-  axis(1, labels=cfg$AllSpeciesNames, at=(1:cfg$NumberOfSpecies), lwd.ticks=1, lwd=0)
+  axis(1, labels=LFQbench.Config$AllSpeciesNames, at=(1:LFQbench.Config$NumberOfSpecies), lwd.ticks=1, lwd=0)
   grid()
-  par(cfg$parBackup)
+  par(LFQbench.Config$parBackup)
 }
 ################################################################################
 
@@ -476,13 +483,13 @@ plotProteinDispersionBySpecies = function( d )
 #' @export
 plotProteinDispersionBySample = function( d )
 {
-  d4s = sapply( 1:cfg$NumberOfSamples, function(si) as.vector( na.exclude( d$cv[,si] ) ) )
-  par(cfg$par)
-  qboxplot(d4s, pch=20, ylab="Protein quantification dispersion (CV)", whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F )
+  d4s = sapply( 1:LFQbench.Config$NumberOfSamples, function(si) as.vector( na.exclude( d$cv[,si] ) ) )
+  par(LFQbench.Config$par)
+  qboxplot(d4s, pch=20, ylab="Protein quantification dispersion (CV)", whiskerQuantile=LFQbench.Config$BoxPlotWhiskerQuantile, axes=F )
   addAxes(showXlab=F)
-  axis(1, labels=cfg$AllSampleNames, at=(1:cfg$NumberOfSamples), lwd.ticks=1, lwd=0)
+  axis(1, labels=LFQbench.Config$AllSampleNames, at=(1:LFQbench.Config$NumberOfSamples), lwd.ticks=1, lwd=0)
   grid()
-  par(cfg$parBackup)
+  par(LFQbench.Config$parBackup)
 }
 ################################################################################
 
@@ -490,22 +497,22 @@ plotProteinDispersionBySample = function( d )
 plotLogRatios = function( logRatios, File )
 {
   cat("creating log ratio box plot ...")
-  pdf(file=File, onefile=T, width=cfg$PlotWidth*1.5, height=cfg$PlotHeight*2, family="Helvetica", pointsize=9)
+  pdf(file=File, onefile=T, width=LFQbench.Config$PlotWidth*1.5, height=LFQbench.Config$PlotHeight*2, family="Helvetica", pointsize=9)
   
-  par(cfg$par)
+  par(LFQbench.Config$par)
   par( las=2 )
-  mars = cfg$par$mar
+  mars = LFQbench.Config$par$mar
   mars[1] = 14
   par( mar = mars )
   qboxplot( logRatios, pch=20,
             ylab=as.expression( bquote( Log[2]~"(A:B)" ) ),
-            whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F, lims=cfg$LogRatioPlotRange, lwd=1, cex=cfg$PlotPointSize
+            whiskerQuantile=LFQbench.Config$BoxPlotWhiskerQuantile, axes=F, lims=LFQbench.Config$LogRatioPlotRange, lwd=1, cex=LFQbench.Config$PlotPointSize
   )
   addAxes(showXlab=F)
   par()
   axis(1, labels=names(logRatios), at=(1:length(logRatios)), lwd.ticks=1, lwd=0)
   # grid()
-  par(cfg$parBackup)
+  par(LFQbench.Config$parBackup)
   
   dev.off()
   cat("[done]\n")
@@ -516,22 +523,22 @@ plotLogRatios = function( logRatios, File )
 plotCVs = function( CVs, File )
 {
   cat("creating CV boxplot ...")
-  pdf(file=File, onefile=T, width=cfg$PlotWidth*1.5, height=cfg$PlotHeight*1.5, family="Helvetica", pointsize=9)
+  pdf(file=File, onefile=T, width=LFQbench.Config$PlotWidth*1.5, height=LFQbench.Config$PlotHeight*1.5, family="Helvetica", pointsize=9)
   
-  par(cfg$par)
+  par(LFQbench.Config$par)
   par( las=2 )
-  mars = cfg$par$mar
+  mars = LFQbench.Config$par$mar
   mars[1] = 10
   par( mar = mars )
   qboxplot( CVs, pch=20,
             ylab="Protein quantification dispersion (CV)",
-            whiskerQuantile=cfg$BoxPlotWhiskerQuantile, axes=F, lims=range(CVs, na.rm = T), lwd=1, cex=cfg$PlotPointSize
+            whiskerQuantile=LFQbench.Config$BoxPlotWhiskerQuantile, axes=F, lims=range(CVs, na.rm = T), lwd=1, cex=LFQbench.Config$PlotPointSize
   )
   addAxes( showXlab=F )
   par()
   axis(1, labels=names(CVs), at=(1:length(CVs)), lwd.ticks=1, lwd=0)
   # grid()
-  par(cfg$parBackup)
+  par(LFQbench.Config$parBackup)
   
   dev.off()
   cat("[done]\n")
@@ -554,10 +561,10 @@ plotCVs = function( CVs, File )
 #' @param pdfMar
 #' @export
 plotSampleComposition = function(
-  sampleAmounts = data.frame( cfg$SampleComposition, row.names = 1  ),
+  sampleAmounts = data.frame( LFQbench.Config$SampleComposition, row.names = 1  ),
   bgColors=NULL, fgColors=NULL, 
   labMainSize=1.5,
-  pdfFile=paste(cfg$PlotFilesLocation, "/SampleComposition.pdf", sep = ""),
+  pdfFile=paste(LFQbench.Config$PlotFilesLocation, "/SampleComposition.pdf", sep = ""),
   pdfWidth=2, pdfHeight=3,
   pdfFontSize=9, pdfFontFamily="Helvetica",
   pdfMar=c(2.3,2.8,.5,4.6)

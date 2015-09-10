@@ -4,7 +4,7 @@
 \alias{processRootFolder}
 \title{processRootFolder}
 \usage{
-processRootFolder(rootFolder = cfg$DataRootFolder, ...)
+processRootFolder(rootFolder = LFQbench.Config$DataRootFolder, ...)
 }
 \arguments{
 \item{rootFolder}{the root folder for batch processing}

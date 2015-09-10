@@ -5,7 +5,7 @@
 \title{getQuantileSeparation}
 \usage{
 getQuantileSeparation(dataBySpecies, spcNames,
-  numberOfQuantiles = cfg$NumberOfIntensityQuantiles)
+  numberOfQuantiles = LFQbench.Config$NumberOfIntensityQuantiles)
 }
 \arguments{
 \item{dataBySpecies}{data structure as stored in ResultSet$result[[SamplePairIndex]]$data}

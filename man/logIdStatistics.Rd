@@ -4,7 +4,7 @@
 \alias{logIdStatistics}
 \title{logIdStatistics}
 \usage{
-logIdStatistics(resultSets, csvFile = paste(cfg$LogFilesLocation,
+logIdStatistics(resultSets, csvFile = paste(LFQbench.Config$LogFilesLocation,
   "/identification_statistics.csv", sep = ""))
 }
 \arguments{

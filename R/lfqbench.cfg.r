@@ -102,9 +102,9 @@ initConfiguration = function(
   # list argument names
   argNames = ls()
   # collect arguments and their values in a list
-  cfg <<- sapply( argNames, function(n) get(n) )
+  LFQbench.Config <<- sapply( argNames, function(n) get(n) )
   # process configuration
-  setRootFolder(cfg$DataRootFolder, createSubfolders=F)
+  setRootFolder(LFQbench.Config$DataRootFolder, createSubfolders=F)
   ################################################################################
   processConfig()
 }
@@ -114,35 +114,35 @@ processConfig = function()
 {
   ################################################################################
   # process composition of samples
-  cfg$AllSampleNames <<- as.vector( colnames(cfg$SampleComposition)[-1] )
-  cfg$AllSpeciesNames <<- as.vector( cfg$SampleComposition[,1] )
-  cfg$AllExpectedAmounts <<- as.matrix( cfg$SampleComposition[,-1] )
-  rownames(cfg$AllExpectedAmounts) <<- cfg$AllSpeciesNames
-  cfg$NumberOfSamples <<- length(cfg$AllSampleNames)
-  cfg$NumberOfSpecies <<- length(cfg$AllSpeciesNames)
-  cfg$SampleColors <<- brewer.pal(max(cfg$NumberOfSamples,3),"Dark2")[1:cfg$NumberOfSamples]
-  cfg$SpeciesColors <<- brewer.pal(max(cfg$NumberOfSpecies,3),"Dark2")[1:cfg$NumberOfSpecies]
+  LFQbench.Config$AllSampleNames <<- as.vector( colnames(LFQbench.Config$SampleComposition)[-1] )
+  LFQbench.Config$AllSpeciesNames <<- as.vector( LFQbench.Config$SampleComposition[,1] )
+  LFQbench.Config$AllExpectedAmounts <<- as.matrix( LFQbench.Config$SampleComposition[,-1] )
+  rownames(LFQbench.Config$AllExpectedAmounts) <<- LFQbench.Config$AllSpeciesNames
+  LFQbench.Config$NumberOfSamples <<- length(LFQbench.Config$AllSampleNames)
+  LFQbench.Config$NumberOfSpecies <<- length(LFQbench.Config$AllSpeciesNames)
+  LFQbench.Config$SampleColors <<- brewer.pal(max(LFQbench.Config$NumberOfSamples,3),"Dark2")[1:LFQbench.Config$NumberOfSamples]
+  LFQbench.Config$SpeciesColors <<- brewer.pal(max(LFQbench.Config$NumberOfSpecies,3),"Dark2")[1:LFQbench.Config$NumberOfSpecies]
   ################################################################################
   
   ################################################################################
-  cfg$AUQCRatioRange <<- c(0, cfg$MaxLogRatioForAUQC)
+  LFQbench.Config$AUQCRatioRange <<- c(0, LFQbench.Config$MaxLogRatioForAUQC)
   ################################################################################
   
   ################################################################################
   # create sample index pairs
-  cfg$SamplePairsIndices <<- createNumericPairs( 1, cfg$NumberOfSamples )
-  cfg$NumberOfSamplePairs <<- nrow( cfg$SamplePairsIndices )
-  cfg$SamplePairsLabels <<- apply(cfg$SamplePairsIndices, 1, function(sp){nms = cfg$AllSampleNames[sp]; return(paste(nms[1], ":" ,nms[2], sep = ""))} )
-  cfg$SamplePairsColors <<- brewer.pal( max(cfg$NumberOfSamplePairs,3), "Dark2" )[1:cfg$NumberOfSamplePairs]
+  LFQbench.Config$SamplePairsIndices <<- createNumericPairs( 1, LFQbench.Config$NumberOfSamples )
+  LFQbench.Config$NumberOfSamplePairs <<- nrow( LFQbench.Config$SamplePairsIndices )
+  LFQbench.Config$SamplePairsLabels <<- apply(LFQbench.Config$SamplePairsIndices, 1, function(sp){nms = LFQbench.Config$AllSampleNames[sp]; return(paste(nms[1], ":" ,nms[2], sep = ""))} )
+  LFQbench.Config$SamplePairsColors <<- brewer.pal( max(LFQbench.Config$NumberOfSamplePairs,3), "Dark2" )[1:LFQbench.Config$NumberOfSamplePairs]
   ################################################################################
   
   ################################################################################
-  cfg$AllSpeciesPairs <<- createNumericPairs(1, cfg$NumberOfSpecies)
-  cfg$AllSpeciesPairsLabels <<- apply(cfg$AllSpeciesPairs, 1, function(sp){nms = cfg$AllSpeciesNames[sp]; return(paste(nms[1], "-", nms[2], sep=""))} )
+  LFQbench.Config$AllSpeciesPairs <<- createNumericPairs(1, LFQbench.Config$NumberOfSpecies)
+  LFQbench.Config$AllSpeciesPairsLabels <<- apply(LFQbench.Config$AllSpeciesPairs, 1, function(sp){nms = LFQbench.Config$AllSpeciesNames[sp]; return(paste(nms[1], "-", nms[2], sep=""))} )
   ################################################################################
   
   # backup graphical parameters
-  cfg$parBackup <<- par()[ names(cfg$par) ]
+  LFQbench.Config$parBackup <<- par()[ names(LFQbench.Config$par) ]
 }
 
 #' setRootFolder
@@ -150,30 +150,30 @@ processConfig = function()
 #' change the location of root folder for batch processing
 #' @param rootFolder the path to the root folder
 #' @export
-setRootFolder = function( rootFolder=ifelse(file.exists(cfg$DataRootFolder), cfg$DataRootFolder, getwd()), createSubfolders=T )
+setRootFolder = function( rootFolder=ifelse(file.exists(LFQbench.Config$DataRootFolder), LFQbench.Config$DataRootFolder, getwd()), createSubfolders=T )
 {
-  cfg$DataRootFolder <<- rootFolder
+  LFQbench.Config$DataRootFolder <<- rootFolder
   ################################################################################
   # path to folder with protein quantification files
-  cfg$InputFilesLocation <<- file.path(cfg$DataRootFolder, "input")
+  LFQbench.Config$InputFilesLocation <<- file.path(LFQbench.Config$DataRootFolder, "input")
   # target location for plot files 
-  cfg$PlotFilesLocation <<- file.path(cfg$DataRootFolder, "plot")
+  LFQbench.Config$PlotFilesLocation <<- file.path(LFQbench.Config$DataRootFolder, "plot")
   # target location for log files
-  cfg$LogFilesLocation  <<- file.path(cfg$DataRootFolder,"log")
+  LFQbench.Config$LogFilesLocation  <<- file.path(LFQbench.Config$DataRootFolder,"log")
   ################################################################################
   
   ################################################################################
   # create input/output paths
-  if( file.exists(cfg$DataRootFolder) )
+  if( file.exists(LFQbench.Config$DataRootFolder) )
   {
     if(createSubfolders)
     {
-        nix = sapply( c(cfg$InputFilesLocation, cfg$PlotFilesLocation, cfg$LogFilesLocation), mkdir )   
+        nix = sapply( c(LFQbench.Config$InputFilesLocation, LFQbench.Config$PlotFilesLocation, LFQbench.Config$LogFilesLocation), mkdir )   
     }
   }
   else
   {
-    cat("Folder ''"+cfg$DataRootFolder+"'' does not exist.\n")
+    cat("Folder ''"+LFQbench.Config$DataRootFolder+"'' does not exist.\n")
     cat("No input/output folders were created!\n")
     cat("Please define a valid root folder.")
   }
@@ -214,39 +214,39 @@ setRootFolder = function( rootFolder=ifelse(file.exists(cfg$DataRootFolder), cfg
 #' @param  par the graphical parameters like mar, mgp, las, ... to set for the plot canvases.
 #' @export
 changeConfig = function( 
-  DataRootFolder= cfg$DataRootFolder
-  ,SampleComposition = cfg$SampleComposition
-  ,BackgroundSpeciesName  = cfg$BackgroundSpeciesName
-  ,InputExtensionPattern = cfg$InputExtensionPattern
-  ,CsvColumnSeparator = cfg$CsvColumnSeparator
-  ,CsvDecimalPointChar = cfg$CsvDecimalPointChar
-  ,BoxPlotWhiskerQuantile = cfg$BoxPlotWhiskerQuantile
-  ,MinProteinAmount    = cfg$MinProteinAmount
-  ,DropInvalidLogRatio = cfg$DropInvalidLogRatio
-  ,LogRatioValidityRange  = cfg$LogRatioValidityRange
-  ,LogRatioPlotRange   = cfg$LogRatioPlotRange
-  ,LogIntensityPlotRange = cfg$LogIntensityPlotRange
-  ,MaxLogRatioForAUQC  = cfg$MaxLogRatioForAUQC
-  ,NumberOfIntensityQuantiles = cfg$NumberOfIntensityQuantiles
-  ,CenterLogRatioByBackground = cfg$CenterLogRatioByBackground
-  ,NormalizeAmountsToPPM = cfg$NormalizeAmountsToPPM
-  ,PlotWidth = cfg$PlotWidth
-  ,PlotHeight = cfg$PlotHeight
-  ,PlotCurveLineWidth = cfg$PlotCurveLineWidth
-  ,PlotLegendLineWidth = cfg$PlotLegendLineWidth
-  ,PlotPointSize = cfg$PlotPointSize
-  ,ScatterPlotPointType = cfg$ScatterPlotPointType
-  ,PlotPointMinAlpha = cfg$PlotPointMinAlpha
-  ,AxisLabelSize = cfg$AxisLabelSize
-  ,AxisAnnotationSize = cfg$AxisAnnotationSize
-  ,AxisLineThickness = cfg$AxisLineThickness
-  ,par = cfg$par
+  DataRootFolder= LFQbench.Config$DataRootFolder
+  ,SampleComposition = LFQbench.Config$SampleComposition
+  ,BackgroundSpeciesName  = LFQbench.Config$BackgroundSpeciesName
+  ,InputExtensionPattern = LFQbench.Config$InputExtensionPattern
+  ,CsvColumnSeparator = LFQbench.Config$CsvColumnSeparator
+  ,CsvDecimalPointChar = LFQbench.Config$CsvDecimalPointChar
+  ,BoxPlotWhiskerQuantile = LFQbench.Config$BoxPlotWhiskerQuantile
+  ,MinProteinAmount    = LFQbench.Config$MinProteinAmount
+  ,DropInvalidLogRatio = LFQbench.Config$DropInvalidLogRatio
+  ,LogRatioValidityRange  = LFQbench.Config$LogRatioValidityRange
+  ,LogRatioPlotRange   = LFQbench.Config$LogRatioPlotRange
+  ,LogIntensityPlotRange = LFQbench.Config$LogIntensityPlotRange
+  ,MaxLogRatioForAUQC  = LFQbench.Config$MaxLogRatioForAUQC
+  ,NumberOfIntensityQuantiles = LFQbench.Config$NumberOfIntensityQuantiles
+  ,CenterLogRatioByBackground = LFQbench.Config$CenterLogRatioByBackground
+  ,NormalizeAmountsToPPM = LFQbench.Config$NormalizeAmountsToPPM
+  ,PlotWidth = LFQbench.Config$PlotWidth
+  ,PlotHeight = LFQbench.Config$PlotHeight
+  ,PlotCurveLineWidth = LFQbench.Config$PlotCurveLineWidth
+  ,PlotLegendLineWidth = LFQbench.Config$PlotLegendLineWidth
+  ,PlotPointSize = LFQbench.Config$PlotPointSize
+  ,ScatterPlotPointType = LFQbench.Config$ScatterPlotPointType
+  ,PlotPointMinAlpha = LFQbench.Config$PlotPointMinAlpha
+  ,AxisLabelSize = LFQbench.Config$AxisLabelSize
+  ,AxisAnnotationSize = LFQbench.Config$AxisAnnotationSize
+  ,AxisLineThickness = LFQbench.Config$AxisLineThickness
+  ,par = LFQbench.Config$par
 )
 {
   # list argument names
   argNames = ls()
   # collect arguments and their values in a list
-  cfg <<- sapply( argNames, function(n) get(n) )
+  LFQbench.Config <<- sapply( argNames, function(n) get(n) )
   # process configuration
   setRootFolder( DataRootFolder )
   processConfig()
