@@ -1,29 +1,4 @@
-### temp global vars
-#working_dir <- "../../ext/data/example_spectronaut"
-# working_dir = "/Volumes/RAID/SWATH30/software.tools.outputs/iteration1/TTOF5600_32w"
-
-# Options: see fswe.variables.R file
-## With the option "guess", input files must start with the software_source name. Then input files from different software sources can be analysed together.
-# software_source <- "guess"    
-# keep_original_names <- FALSE
-# outputFileNameSuffix <- "r1"
-# results_dir <- "input"
-# supplementary <- "supplementary"
-
-# Use peptidelist when you want to analyse a subset of peptides
-#peptidelist <- read.csv("/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/common_peptides/commonPeptides_Spectronaut_DIAumpire.csv", stringsAsFactors=F)$V1
-#peptidelist <- read.csv("/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/common_peptides/commonPeptides_allSoftwares_6600_64w.csv", stringsAsFactors=F)$V1
-# peptidelist <- NULL
-# proteinlist <- NULL
-#proteinlist="/Users/napedro/github_prj/LFQbench_package/LFQbench/inst/scripts/protein_overlap/list_common_proteins.txt"
-
-# plotHistogram = T 
-# plotHistNAs = T
-# reportSequences = T
-# singleHits = F
-
 #####################################
-
 
 #' FSWE.generateReports
 #' 
@@ -43,8 +18,9 @@ FSWE.generateReports <- function(
                             outputFileNameSuffix = ""
                             )
 {
-    dataSets = FSWE.dataSets
+    dataSets = as.list(FSWE.dataSets)
     speciesTags = FSWE.speciesTags
+    sample.names = names(FSWE.dataSets)
     # TODO: check if datasets are defined
     
     topN.sort_method = "sum"  # "sum", "mean", "idrate_mean"  ## TODO: NOT YET IMPLEMENTED 
@@ -56,7 +32,7 @@ FSWE.generateReports <- function(
     
     results_dir <- "input"
     supplementary <- "supplementary"
-    setRootFolder(working_dir, createSubfolders = F)
+    LFQbench.setDataRootFolder(working_dir, createSubfolders = F)
     mkdir( file.path( working_dir, results_dir ) )
     mkdir( file.path( working_dir, results_dir , supplementary ) )
     
@@ -198,14 +174,14 @@ FSWE.generateReports <- function(
   # (removing additions from software to the name, etc)
   common_names <- names(peptides_wide)[c(1:3)]
   inj_names <- names(peptides_wide)[-c(1:3)]
-  inj_names <- as.character(sapply(inj_names, guessInjection, dataSets[[experiment]]))
+  inj_names <- as.character( sapply(inj_names, guessInjection, dataSets[[experiment]]) )
   names(peptides_wide) <- c( common_names, inj_names )
   
   experiment.order <- match(dataSets[[experiment]], names(peptides_wide[-c(1:3)])) + 3
   peptides_wide <- peptides_wide[, c(c(1:3), experiment.order)]
   
   #Rename the samples 
-  names(peptides_wide) <- c("sequenceID", "proteinID", "specie", sample.names) 
+  names(peptides_wide) <- c("sequenceID", "proteinID", "specie", inj_names) 
   
   # add a sequence column (just to remove it after reporting naked sequences)
   peptides_wide$sequence <- gsub( "*\\[.*?\\]", "", peptides_wide$sequenceID )

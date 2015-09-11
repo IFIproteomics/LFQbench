@@ -165,7 +165,13 @@ guessExperiment <- function(exp, injections){
 }
 
 guessInjection <- function(varname, injections){
-    as.character(names(which(sapply(injections,  grepl, varname, ignore.case = T))))
+    as.character( 
+        injections[ 
+            which( 
+                sapply(injections,  grepl, varname, ignore.case = T)
+            ) 
+        ]
+    )
 }
 
 guessExperiment_wide <- function(exp, varnames){
