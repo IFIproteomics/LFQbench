@@ -1,4 +1,4 @@
-#' processRootFolder
+#' LFQbench.batchProcessRootFolder
 #' 
 #' Wrapper function for processing a batch of input files 
 #' automatically discovered from a predefined root folder.
@@ -13,14 +13,14 @@
 #' 
 #' @param rootFolder the root folder for batch processing
 #' @export
-processRootFolder = function( rootFolder=LFQbench.Config$DataRootFolder, ... )
+LFQbench.batchProcessRootFolder = function( rootFolder=LFQbench.Config$DataRootFolder, ... )
 {
   if(rootFolder != LFQbench.Config$DataRootFolder) setRootFolder( rootFolder )
   inputFiles = list.files( path=LFQbench.Config$InputFilesLocation, pattern=LFQbench.Config$InputExtensionPattern, full.names = T )
-  return( processBatch( inputFiles, ... ) )
+  return( LFQbench.batchProcessFiles( inputFiles, ... ) )
 }
 
-#' processBatch
+#' LFQbench.batchProcessFiles
 #' 
 #' Wrapper function for processing a batch of input files.
 #' Plots, metrics and log files will be automatically put into 
@@ -47,7 +47,7 @@ processRootFolder = function( rootFolder=LFQbench.Config$DataRootFolder, ... )
 #' @param storeMetrics=T,
 #' @param returnResultSets=F
 #' @export
-processBatch = function( inputFiles, 
+LFQbench.batchProcessFiles = function( inputFiles, 
                          storeResultSetsImage=T,
                          storeSampleMeans=F,
                          storeSpeciesSeparation=F,
@@ -81,9 +81,9 @@ processBatch = function( inputFiles,
         if(storeIDs) nix=sapply( ResultSets, saveIDs )
         if(storeLogRatios) nix=sapply( ResultSets, saveLogRatios )
         if(storePlots) {
-            nix=sapply( ResultSets, plotResultSet )
-            plotSpeciesLegends()
-            plotSampleComposition()
+            nix=sapply( ResultSets, LFQbench.plotResultSet )
+            LFQbench.plotSpeciesLegends()
+            LFQbench.plotSampleComposition()
         }
         if(storeSampleCVs) nix=sapply( ResultSets, saveSampleCVs )
         if(storeMetrics) saveMetrics( ResultSets )

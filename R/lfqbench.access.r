@@ -1,4 +1,4 @@
-#' plotResultSet
+#' LFQbench.plotResultSet
 #' 
 #' Function to generate the scatter plot
 #' @param resSet a result set
@@ -8,7 +8,7 @@
 #' @param showBoxPlot 
 #' @param showDensityPlot
 #' @export
-plotResultSet = function(resSet,
+LFQbench.plotResultSet = function(resSet,
                          showScatterPlot=T,
                          showScatterAndDensityPlot=T,
                          showScatterAndBoxPlot=T,
@@ -23,11 +23,11 @@ plotResultSet = function(resSet,
     }
     
     # accuracy and precision
-    if(showScatterPlot) sapply( resSet$result, showScatterPlot, showRegLines = T )
-    if(showScatterAndDensityPlot) sapply( resSet$result, showScatterAndDensityPlot, showRegLines = T )
-    if(showScatterAndBoxPlot) sapply( resSet$result, showScatterAndBoxPlot, showRegLines = T )
-    if(showBoxPlot) sapply( resSet$result, showLogRatioBoxPlot )
-    if(showDensityPlot) sapply( resSet$result, showDistributionDensityPlot )
+    if(showScatterPlot) sapply( resSet$result, LFQbench.showScatterPlot, showRegLines = T )
+    if(showScatterAndDensityPlot) sapply( resSet$result, LFQbench.showScatterAndDensityPlot, showRegLines = T )
+    if(showScatterAndBoxPlot) sapply( resSet$result, LFQbench.showScatterAndBoxPlot, showRegLines = T )
+    if(showBoxPlot) sapply( resSet$result, LFQbench.showLogRatioBoxPlot )
+    if(showDensityPlot) sapply( resSet$result, LFQbench.showDistributionDensityPlot )
     
     if(!is.null(pdfFile)) dev.off()
     cat("[done]\n")
@@ -38,19 +38,19 @@ plotResultSet = function(resSet,
 #' This function save all the metrics related with the experiment 
 #' @param resultSets
 #' @param File 
-#' @export
 saveMetrics = function(resultSets = ResultSets, File = paste(LFQbench.Config$LogFilesLocation, "/metrics.txt", sep = "")){
-  metrics = lapply( resultSets, getMetrics )
+  metrics = lapply( resultSets, LFQbench.getMetrics )
   sink(file=File, split=T)
-  explainMetrics()
-  x = lapply(metrics, showMetrics)
+  LFQbench.explainMetrics()
+  x = lapply(metrics, LFQbench.showMetrics)
   sink()
 }
 
-#' explainMetrics 
+#' LFQbench.explainMetrics 
 #' 
 #' This function verbose the metrics of the experiment 
-explainMetrics = function(){
+#' @export
+LFQbench.explainMetrics = function(){
   # identification = identification rate, number of identified proteins for benchmark species
   # replication = replication variance, median CV for the background species
   # accuracy = accuracy of relative quantification, AUQC for background species
@@ -100,10 +100,13 @@ explainMetrics = function(){
   cat("\t\tand log-ratios in and out of user defined ranges.\n")
 }
 
-#' showMetrics 
+#' LFQbench.showMetrics 
 #' 
-#' verbose the metrics of the experiment 
-showMetrics = function(m){
+#' verbose the metrics of the experiment
+#' 
+#' @param m the metrics object
+#' @export
+LFQbench.showMetrics = function(m){
   cat("--------------------------------------------\n")
   cat(paste("\n", m$name, "\n", sep=""))
   sm = function(mn){
@@ -130,7 +133,6 @@ showMetrics = function(m){
 #' 
 #' @param resultSets the result sets
 #' @param csvFile the delimiter separated output file
-#' @export
 logIdStatistics = function( resultSets, csvFile=paste(LFQbench.Config$LogFilesLocation,"/identification_statistics.csv",sep="") ){
   cat("storing identification statistics ... ")
   idstats = t( sapply( resultSets, function(rs) rs$idstat ) )
@@ -149,7 +151,6 @@ logIdStatistics = function( resultSets, csvFile=paste(LFQbench.Config$LogFilesLo
 #' 
 #' extract and store calculated log-ratios from a list of result sets
 #' @param rs the result set
-#' @export
 saveLogRatios = function(rs){
     listLR = function(pairName)
     { 
@@ -182,7 +183,6 @@ saveLogRatios = function(rs){
 #' 
 #' save sample means to file
 #' @param resultSet the result set
-#' @export
 #' 
 saveSampleMeans = function( resultSet )
 {
@@ -204,7 +204,6 @@ saveSampleMeans = function( resultSet )
 #' 
 #' save the in sample CVs to a file
 #' @param resultSet the result set
-#' @export 
 saveSampleCVs = function( resultSet)
 {
   cat("storing coeffiecients of in-sample variation ... ")
@@ -225,7 +224,6 @@ saveSampleCVs = function( resultSet)
 #' 
 #' save identified proteins/peptides to a file
 #' @param resultSet the result set
-#' @export
 saveIDs = function( resultSet ){
   cat("storing identified protein names ... ")
   write.table( 
@@ -239,7 +237,6 @@ saveIDs = function( resultSet ){
 #' 
 #' This function enable to save the species 
 #' @param resultSet
-#' @export
 saveSpeciesSeparation = function( resultSet ){
   cat("storing species separation scores ... ")
   # species, a:b, a:c, ...
@@ -252,12 +249,12 @@ saveSpeciesSeparation = function( resultSet ){
   cat("[done]\n")
 }
 
-#' getMetrics 
+#' LFQbench.getMetrics 
 #' 
 #' calculate metrics for a result set
 #' @param resultSet
 #' @export
-getMetrics = function(resultSet){
+LFQbench.getMetrics = function(resultSet){
   # identification rate
   # number of identified proteins (only benchmark species)
   # PROBLEM? identification = sum( sapply(LFQbench.Config$AllSpeciesNames, function(s) sum( resultSet$data$species == s, na.rm=T) ))
@@ -357,7 +354,6 @@ getCombinedProteinRSDs = function(ResultSets){
 #' 
 #' construct a document set for a file by paths from user configuration
 #' @param inFile
-#' @export
 makeDocSet = function( inFile, inputPath=LFQbench.Config$InputFilesLocation, plotPath=LFQbench.Config$PlotFilesLocation, logPath=LFQbench.Config$LogFilesLocation ){
   fileBase = sub(LFQbench.Config$InputExtensionPattern, "", basename(inFile) )
   return( 
@@ -381,8 +377,7 @@ makeDocSet = function( inFile, inputPath=LFQbench.Config$InputFilesLocation, plo
 #' makeEverythingInOneFolderDocSet
 #' 
 #' construct a doc set using the input file's path
-#' @param inFile 
-#' @export
+#' @param inFile
 makeEverythingInOneFolderDocSet = function( inFile ){
     tarDir = dirname(inFile)
     docSet = makeDocSet(inFile = inFile, inputPath=tarDir, plotPath=tarDir, logPath=tarDir)

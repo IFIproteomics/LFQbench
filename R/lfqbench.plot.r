@@ -1,12 +1,12 @@
 ################################################################################
-#' plotToFile
+#' LFQbench.plotToFile
 #' 
 #'  Plot user content to file by using LFQbench canvas configuration.
 #'  
 #'  @param file the pdfFile
 #'  @param plotFunc the plot function
 #'  @export
-plotToFile = function( file, plotFunc, ... )
+LFQbench.plotToFile = function( file, plotFunc, ... )
 {
   pdf(file=file, onefile=T, width=LFQbench.Config$PlotWidth, height=LFQbench.Config$PlotHeight, family="Helvetica", pointsize=9)
   par(LFQbench.Config$par)
@@ -109,11 +109,11 @@ plotSpeciesLegend = function( pos="top", ... )
 ################################################################################
 
 ################################################################################
-#' plotSpeciesLegends
+#' LFQbench.plotSpeciesLegends
 #' 
 #'  plot vertical and horizontal species legends
 #'  @export
-plotSpeciesLegends = function()
+LFQbench.plotSpeciesLegends = function()
 {
   pdf(file = paste(LFQbench.Config$PlotFilesLocation,"/species_legend_vertical.pdf", sep = ""), width = 1.05, height = 0.66, family = "Helvetica", pointsize = 9)
   par(mar=c(0,0,0.1,0))
@@ -245,14 +245,14 @@ makeScatter = function( samplePair, showLegend=F, showRegLines=F, showExpLines=T
 ################################################################################
 
 ################################################################################
-#' showScatterPlot
+#' LFQbench.showScatterPlot
 #'
 #' draw scatterplot
 #' @param samplePair the result set data of a hybrid proteome sample pair
 #' @param showLegend display the legend
 #' @param showRegLines display regression curves
 #' @export
-showScatterPlot = function( samplePair, showLegend=F, showRegLines=F )
+LFQbench.showScatterPlot = function( samplePair, showLegend=F, showRegLines=F )
 {
   par(LFQbench.Config$par)
   logRatios = makeScatter(samplePair, showLegend, showRegLines )
@@ -261,12 +261,12 @@ showScatterPlot = function( samplePair, showLegend=F, showRegLines=F )
 ################################################################################
 
 ################################################################################
-#' showLogRatioBoxPlot
+#' LFQbench.showLogRatioBoxPlot
 #'
 #' draw log ratio quiantile based boxplot
 #' @param samplePair the result set data of a hybrid proteome sample pair
 #' @export
-showLogRatioBoxPlot = function( samplePair )
+LFQbench.showLogRatioBoxPlot = function( samplePair )
 {
   par(LFQbench.Config$par)
   logRatios = sapply( samplePair$data, function(d) { return(d$y) } )
@@ -284,12 +284,11 @@ showLogRatioBoxPlot = function( samplePair )
 ################################################################################
 
 ################################################################################
-#' showQuantBarPlot
+#' LFQbench.showQuantBarPlot
 #'
 #' draw barplot showing quantification bars
 #' @param samplePair the result set data of a hybrid proteome sample pair
-#' @export
-showQuantBarPlot = function( samplePair )
+LFQbench.showQuantBarPlot = function( samplePair )
 {
   par(LFQbench.Config$par)
   values = unlist(sapply( samplePair$data, function(d) { return(d$y) } ))
@@ -313,7 +312,7 @@ showQuantBarPlot = function( samplePair )
 ################################################################################
 
 ################################################################################
-#' showScatterAndDensityPlot
+#' LFQbench.showScatterAndDensityPlot
 #'
 #' draw scatter plot with an attached density plot
 #' @param samplePair the result set data of a hybrid proteome sample pair
@@ -321,7 +320,7 @@ showQuantBarPlot = function( samplePair )
 #' @param showRegLines display regression curves
 #' @param scatterPlotWidth the window portion used for scatter plot
 #' @export
-showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8)
+LFQbench.showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8)
 {
 	par(LFQbench.Config$par)
 	par(fig=c(0,scatterPlotWidth,0,1), new=F)
@@ -348,7 +347,7 @@ showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, s
 ################################################################################
 
 ################################################################################
-#' showScatterAndBoxPlot
+#' LFQbench.showScatterAndBoxPlot
 #'
 #' draw scatter plot with an attached box plot
 #' @param samplePair the result set data of a hybrid proteome sample pair
@@ -356,7 +355,7 @@ showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, s
 #' @param showRegLines display regression curves
 #' @param scatterPlotWidth the window portion used for scatter plot
 #' @export
-showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8)
+LFQbench.showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8)
 {
   par(LFQbench.Config$par)
   par(fig=c(0,scatterPlotWidth,0,1), new=F)
@@ -384,13 +383,13 @@ showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F, scatt
 ################################################################################
 
 ################################################################################
-#' showDistributionDensityPlot
+#' LFQbench.showDistributionDensityPlot
 #'
 #' draw log-ratio distribution kernel density plot
 #' @param samplePair the result set data of a hybrid proteome sample pair
 #' @param showLegend display the legend
 #' @export
-showDistributionDensityPlot = function(samplePair, showLegend=F)
+LFQbench.showDistributionDensityPlot = function(samplePair, showLegend=F)
 {
   xLim=samplePair$ylim
   yLim=range( lapply(samplePair$data, function(d) range(d$density$y) ) )
@@ -405,12 +404,12 @@ showDistributionDensityPlot = function(samplePair, showLegend=F)
 ################################################################################
 
 ################################################################################
-#' showAllSpeciesQC
+#' LFQbench.showAllSpeciesQC
 #'
 #' draw quantification curves
 #' @param samplePair the result set data of a hybrid proteome sample pair
 #' @export
-showAllSpeciesQC = function(samplePair)
+LFQbench.showAllSpeciesQC = function(samplePair)
 {
   par(LFQbench.Config$par)
   emptyPlot(xRange=samplePair$qcrange)
@@ -429,13 +428,13 @@ showAllSpeciesQC = function(samplePair)
 ################################################################################
 
 ################################################################################
-#' showSingleSpeciesQC
+#' LFQbench.showSingleSpeciesQC
 #'
 #' draw quantification curves
 #' @param resultSet the result set data
 #' @param speciesName the name of a species
 #' @export
-showSingleSpeciesQC = function(resultSet, speciesName)
+LFQbench.showSingleSpeciesQC = function(resultSet, speciesName)
 {
   speciesIndex = which( LFQbench.Config$AllSpeciesNames == speciesName )
   par( LFQbench.Config$par )
@@ -458,12 +457,12 @@ showSingleSpeciesQC = function(resultSet, speciesName)
 ################################################################################
 
 ################################################################################
-#' plotProteinDispersionBySpecies
+#' LFQbench.plotProteinDispersionBySpecies
 #'
 #' draw protein dispersion as cv between replicates by species
 #' @param d the data of a result set (resultSet$data)
 #' @export
-plotProteinDispersionBySpecies = function( d )
+LFQbench.plotProteinDispersionBySpecies = function( d )
 {
   d4s = sapply( LFQbench.Config$AllSpeciesNames, function(sp) as.vector( na.exclude( d$cv[ d$species==sp ] ) ) )
   par(LFQbench.Config$par)
@@ -476,12 +475,12 @@ plotProteinDispersionBySpecies = function( d )
 ################################################################################
 
 ################################################################################
-#' plotProteinDispersionBySample
+#' LFQbench.plotProteinDispersionBySample
 #'
 #' draw protein dispersion as cv between replicates by sample
 #' @param d the data of a result set (resultSet$data)
 #' @export
-plotProteinDispersionBySample = function( d )
+LFQbench.plotProteinDispersionBySample = function( d )
 {
   d4s = sapply( 1:LFQbench.Config$NumberOfSamples, function(si) as.vector( na.exclude( d$cv[,si] ) ) )
   par(LFQbench.Config$par)
@@ -546,7 +545,7 @@ plotCVs = function( CVs, File )
 ################################################################################
 
 ################################################################################
-#' plotSampleComposition
+#' LFQbench.plotSampleComposition
 #' 
 #' draw the sample composition as a spine plot
 #' @param sampleAmounts
@@ -560,7 +559,7 @@ plotCVs = function( CVs, File )
 #' @param pdfFontFamily
 #' @param pdfMar
 #' @export
-plotSampleComposition = function(
+LFQbench.plotSampleComposition = function(
   sampleAmounts = data.frame( LFQbench.Config$SampleComposition, row.names = 1  ),
   bgColors=NULL, fgColors=NULL, 
   labMainSize=1.5,

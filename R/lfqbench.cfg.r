@@ -1,9 +1,9 @@
 
-#' initConfiguration
+#' LFQbench.initConfiguration
 #' 
 #' Initialization of LFQbench configuration settings.
 #' Executing the function without parameters will use default values.
-#' Use function changeConfig to change settings after initialization.
+#' Use function LFQbench.changeConfiguration to change settings after initialization.
 #' 
 #' @param  DataRootFolder the parent folder for batch processing
 #' @param  SampleComposition the quantitative composition of hybrid proteome samples
@@ -33,7 +33,7 @@
 #' @param  AxisLineThickness the line thickness of axes
 #' @param  par the graphical parameters like mar, mgp, las, ... to set for the plot canvases.
 #' @export
-initConfiguration = function( 
+LFQbench.initConfiguration = function( 
     # data folder for batch processing
     DataRootFolder=getwd()
     # sample composition
@@ -104,15 +104,13 @@ initConfiguration = function(
   # collect arguments and their values in a list
   LFQbench.Config <<- sapply( argNames, function(n) get(n) )
   # process configuration
-  setRootFolder(LFQbench.Config$DataRootFolder, createSubfolders=F)
+  LFQbench.setDataRootFolder(LFQbench.Config$DataRootFolder, createSubfolders=F)
   ################################################################################
-  processConfig()
-  
-  FSWE.init()
+  LFQbench.processConfig()
 }
 
 #' recalculate some parameters from user defined configuration
-processConfig = function()
+LFQbench.processConfig = function()
 {
   ################################################################################
   # process composition of samples
@@ -147,12 +145,12 @@ processConfig = function()
   LFQbench.Config$parBackup <<- par()[ names(LFQbench.Config$par) ]
 }
 
-#' setRootFolder
+#' LFQbench.setDataRootFolder
 #' 
 #' change the location of root folder for batch processing
 #' @param rootFolder the path to the root folder
 #' @export
-setRootFolder = function( rootFolder=ifelse(file.exists(LFQbench.Config$DataRootFolder), LFQbench.Config$DataRootFolder, getwd()), createSubfolders=T )
+LFQbench.setDataRootFolder = function( rootFolder=ifelse(file.exists(LFQbench.Config$DataRootFolder), LFQbench.Config$DataRootFolder, getwd()), createSubfolders=T )
 {
   LFQbench.Config$DataRootFolder <<- rootFolder
   ################################################################################
@@ -182,10 +180,10 @@ setRootFolder = function( rootFolder=ifelse(file.exists(LFQbench.Config$DataRoot
   ################################################################################
 }
 
-#' changeConfig
+#' LFQbench.changeConfiguration
 #' 
 #' change some of the initialized LFQbench configuration settings.
-#' changeConfig allows to change some configuration settings without loading default values.
+#' LFQbench.changeConfiguration allows to change some configuration settings without loading default values.
 #' 
 #' @param  DataRootFolder the parent folder for batch processing
 #' @param  SampleComposition the quantitative composition of hybrid proteome samples
@@ -215,7 +213,7 @@ setRootFolder = function( rootFolder=ifelse(file.exists(LFQbench.Config$DataRoot
 #' @param  AxisLineThickness the line thickness of axes
 #' @param  par the graphical parameters like mar, mgp, las, ... to set for the plot canvases.
 #' @export
-changeConfig = function( 
+LFQbench.changeConfiguration = function( 
   DataRootFolder= LFQbench.Config$DataRootFolder
   ,SampleComposition = LFQbench.Config$SampleComposition
   ,BackgroundSpeciesName  = LFQbench.Config$BackgroundSpeciesName
@@ -250,6 +248,6 @@ changeConfig = function(
   # collect arguments and their values in a list
   LFQbench.Config <<- sapply( argNames, function(n) get(n) )
   # process configuration
-  setRootFolder( DataRootFolder )
-  processConfig()
+  LFQbench.setDataRootFolder( DataRootFolder )
+  LFQbench.processConfig()
 }

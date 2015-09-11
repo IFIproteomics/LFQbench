@@ -3,7 +3,6 @@
 #' This function assigns a separator for separated values files readers
 #' depending on file extension
 #' @param filename 
-#' @export
 guessSep <- function(filename){
   filename <- gsub(".gz$", "", filename)
   extension <- file_ext(filename)
@@ -16,7 +15,6 @@ guessSep <- function(filename){
 #' guessSoftwareSource
 #' @param filename The file name should start by one of the software sources
 #' @param software_sources a list defined at the variables file.
-#' @export
 guessSoftwareSource <- function(filename, software_sources, allowNA = FALSE){
   softsource <- NA
   grepsw <- function(a, filen) { return(substring(filen, 1, nchar(a)) == a) }
@@ -30,7 +28,6 @@ guessSoftwareSource <- function(filename, software_sources, allowNA = FALSE){
 
 #' stopHere
 #' A stop with no error messages
-#' @export
 stopHere = function() {
   opt <- options(show.error.messages=FALSE) 
   on.exit(options(opt))
@@ -42,7 +39,6 @@ stopHere = function() {
 #' 
 #' this function takes the first entry of a swissprot database header
 #' @param entries char variable with the swissprot header
-#' @export 
 take1stentry <- function(entries){
   
   substrRight <- function(x, n) { substr(x, nchar(x)-n+1, nchar(x)) }
@@ -71,7 +67,6 @@ take1stentry <- function(entries){
 #' species[[2]] <- "_YEAS"
 #' species[[3]] <- "_ECOLI"
 #' 
-#' @export
 guessOrganism <- function(proteinid, species){
   sp <- names(which(sapply(species, grepl, proteinid)))
   if(length(sp) == 0) sp <- "NA"
@@ -92,7 +87,6 @@ guessOrganism <- function(proteinid, species){
 #' @param n number of top N values to be summed. 
 #' @param minimum minimum number of valid (not NA) values allowed in order to return a value.
 #' 
-#' @export
 sum_top_n <- function(values, n, minimum = 1){
   if(length(which(!is.na(values))) < minimum) {return (NA)}
   if (n > length(values)) n <- length(values)
@@ -112,7 +106,6 @@ sum_top_n <- function(values, n, minimum = 1){
 #' @param n number of top N values to be averaged. 
 #' @param minimum minimum number of valid (not NA) values allowed in order to return a value.
 #' 
-#' @export
 avg_top_n <- function(values, n, minimum = 1){
   # This top N approach is INDIVIDUAL, that is, there is no consensus among replicates to 
   # choose the top N peptides.
@@ -128,7 +121,6 @@ avg_top_n <- function(values, n, minimum = 1){
 #' This is useful for summary functions in dplyr, for example
 #' 
 #' @param values
-#' @export
 sumNA <- function(values){ 
   sumv <- sum(values, na.rm=T)
   if(sumv == 0) sumv <- NA
@@ -141,7 +133,6 @@ sumNA <- function(values){
 #' This is useful for summary functions in dplyr, for example
 #' 
 #' @param values
-#' @export
 avgNA <- function(values){ 
   avgv <- mean(values, na.rm=T)
   if(avgv == 0) avgv <- NA
@@ -154,7 +145,6 @@ avgNA <- function(values){
 #' This is useful for summary functions in dplyr, for example
 #' 
 #' @param values
-#' @export
 single_hits <- function(values){
   # choose single hit proteins.
   if(length(which(!is.na(values))) > 1) {return (NA)}

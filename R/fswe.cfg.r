@@ -1,11 +1,13 @@
-#' FSWE.init
+#' FSWE.initConfiguration
 #' 
 #' define software list and the list of initialization function for each software
 #' 
 #' @export
-FSWE.init = function()
+FSWE.initConfiguration = function( injectionNames, speciesTags )
 {
   FSWE.init.defaultSoftwares()
+  FSWE.setDatasetInjectionNames( injectionNames )
+  FSWE.setSpeciesTags( speciesTags )
 }
 
 
@@ -245,6 +247,31 @@ FSWE.postprocessSoftwareConfiguration = function()
   if(!is.na(FSWE.Config$decoy.var)){
     FSWE.Config$decoy.var <<- gsub(" ", ".", FSWE.Config$decoy.var)
   }
+}
+
+#' FSWE.setDatasetInjectionNames
+#' 
+#' set injections names used in the input data
+#'
+#' @param theData data.frame having 
+#' @export
+FSWE.setDatasetInjectionNames = function( theData )
+{
+    # TODO: check the format of theData
+    FSWE.dataSets <<- theData
+}
+
+#' FSWE.setSpeciesTags
+#' 
+#' set expressions for identifying species in protein names, e.g. _HUMAN, _YEAST, ...
+#'
+#' @param speciesTags named list of tags. Names of elements must contain all LFQbench.Config$AllSpeciesNames
+#' @export
+FSWE.setSpeciesTags = function( speciesTags )
+{
+    FSWE.speciesTags <<- speciesTags
+    if( !all(LFQbench.Config$AllSpeciesNames %in% names(speciesTags)) )
+       stop( paste("please define species tags for: ", paste0( LFQbench.Config$AllSpeciesNames, collapse = "," ) , "!") )
 }
 
 # expandList = function(theList)

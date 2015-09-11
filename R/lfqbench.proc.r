@@ -1,20 +1,19 @@
-#' processDocSet
+#' LFQbench.processDocSet
 #' 
 #' This function process the data before generate the charts
 #' @param DocSet is the aata to be processed 
-#' @export
-processDocSet = function( DocSet ) {
-    rs = processFile( file = DocSet$csvFile )
+LFQbench.processDocSet = function( DocSet ) {
+    rs = LFQbench.processFile( file = DocSet$csvFile )
     rs$docSet = DocSet
     return(rs)
 }
 
-#' processFile
+#' LFQbench.processFile
 #' 
 #' This function process the data and generates a result set
 #' @param file is the data to be processed
 #' @export
-processFile = function( file ) {
+LFQbench.processFile = function( file ) {
   if(!exists("DEBUG")) DEBUG <<- F
   cat(paste("processing ", basename(file) ," ... \n",sep = ""))
   

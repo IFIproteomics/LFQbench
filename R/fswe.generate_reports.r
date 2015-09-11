@@ -38,13 +38,15 @@ FSWE.generateReports <- function(
                             protein.list = NULL,
                             singleHits = F,
                             softwareSource="guess",
-                            dataSets = FSWE.dataSets,
-                            speciesTags = FSWE.speciesTags,
                             working_dir = LFQbench.Config$DataRootFolder,
                             keep_original_names = FALSE,
-                            outputFileNameSuffix = "r1"
+                            outputFileNameSuffix = ""
                             )
 {
+    dataSets = FSWE.dataSets
+    speciesTags = FSWE.speciesTags
+    # TODO: check if datasets are defined
+    
     topN.sort_method = "sum"  # "sum", "mean", "idrate_mean"  ## TODO: NOT YET IMPLEMENTED 
     topNindividual = T
     restrictNA = F

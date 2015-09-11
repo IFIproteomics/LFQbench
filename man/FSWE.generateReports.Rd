@@ -6,10 +6,9 @@
 \usage{
 FSWE.generateReports(experimentFile, plotHistogram = F, plotHistNAs = F,
   reportSequences = F, peptide.list = NULL, protein.list = NULL,
-  singleHits = F, softwareSource = "guess", dataSets = FSWE.dataSets,
-  speciesTags = FSWE.speciesTags,
+  singleHits = F, softwareSource = "guess",
   working_dir = LFQbench.Config$DataRootFolder, keep_original_names = FALSE,
-  outputFileNameSuffix = "r1")
+  outputFileNameSuffix = "")
 }
 \arguments{
 \item{experimentFile}{}

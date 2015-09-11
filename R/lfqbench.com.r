@@ -52,7 +52,6 @@ moveFiles = function(srcDir, tarDir, namePattern="\\..+", rmSrc=F)
 #' 
 #' @param from
 #' @param to
-#' @export
 createNumericPairs = function(from, to) {
   pairs = rbind(from:(from+1))
   for(num1 in from:(to-1)) {
@@ -71,7 +70,6 @@ createNumericPairs = function(from, to) {
 #' This root mean square
 #' @param x 
 #' @export
-#' 
 rms = function(x) sqrt( sum(x^2) / length(x) )
 
 #'qboxplot
