@@ -1,30 +1,9 @@
-# This script re-scales all peptides/proteins output files from formatSoftwareExports in order to have a common scale.
-
-# Assumption: since we lose  at this point the peak retention times, we will assume in this script that most of the peaks detected by different software
-#             tools match. 
-
-# library(LFQbench)
-
-# 0. Parameters
-working_dir = "./"
-subfolder = "input"
-software_scale_base = ""
-software_sources = c("PViewNoFilter")
-
-
-# software_scale_base = "PViewNoFilter"
-# software_sources = c("PViewNoFilter", "Spectronaut", "OpenSWATH", "DIAumpire", "Skyline")
-# working_dir = "/Users/napedro/Dropbox/PAPER_SWATHbenchmark_prv/output.from.softwares/draft.v2/iteration1/ttof5600_64w/input"
-
-evalCommandLineArguments()
-
-# working_dir = file.path(working_dir, "input")
-working_dir = file.path(working_dir, subfolder)
-
-
 #' FSWE.scaleIntensities
 #' 
 #' It scales FSWE-processed files to a common intensity scale defined by one software reference.
+#' 
+#' Assumption: since we lose  at this point the peak retention times, 
+#' we will assume in this script that most of the peaks detected by different software tools match. 
 #' 
 #' @param working_dir directory containing files processed by FSWE that you want to scale
 #' @param fileModelingPattern pattern for files you want to use for modeling
@@ -36,18 +15,25 @@ FSWE.scaleIntensities <- function(
                                     working_dir = file.path(LFQbench.Config$DataRootFolder, "input"),
                                     fileModelingPattern = "_peptides",
                                     filesToModelPattern = ".[\\.].",
-                                    softwareReference   = "PeakView"
-                                    
+                                    filesNotToModelPattern = "FILE_I_DONT_WANT_TO_HAVE",
+                                    softwareReference = "PeakView",
+                                    softToModelMap = list(),
+                                    softwareLabels = NULL
 ){
     # 1. Read all peptide files in folder (scaling will be based on these files).
     filesToModel = list.files( path=working_dir, pattern=filesToModelPattern, full.names= FALSE, include.dirs = F, recursive = F, all.files = F)
     
+    # exclude files which should not be modelled
+    filesToModel = filesToModel[!grepl(filesNotToModelPattern, filesToModel)]
+    
     modelingFiles = list.files( path=working_dir, pattern=fileModelingPattern, 
                                 full.names= FALSE, include.dirs = F, recursive = F, all.files = F)
     
+    # collect present software names
+    softwareNamesPresent <- sapply(filesToModel, guessModelSoftware, softToModelMap)
+    softwareNamesPresent <- unique( softwareNamesPresent[!is.na(softwareNamesPresent)] )
     
-    validFiles <- sapply(modelingFiles, guessSoftwareSource, software_sources, TRUE)
-    validFiles2 <- validFiles[nchar(validFiles) > 0]
+    if(!any(softwareNamesPresent==softwareReference)) stop("no files for reference software found!")
     
     # 2. Create a data frame with common peptides (no modifications) for each different peptide file (each software tool). 
     #    Identify each column with its corresponding software tool.
@@ -69,47 +55,95 @@ FSWE.scaleIntensities <- function(
     
     ## We use only common peptides to all software sources
     peptides.all <- peptides.all[complete.cases(peptides.all),]
+
+    # ensure supplementary folder is there
+    supDir = file.path(working_dir, "supplementary")
+    mkdir(supDir)
     
     # 4. Model each tool against the software_base.
     callm <- function(y, x, thedata, percentile = 0.98){
         if(!(x == y)){
             data_percentile = thedata[thedata[, y] < quantile(thedata[, y], percentile), ]
-            slope = lm(formula =  get(x) ~ get(y) - 1,data = data_percentile) 
-            pdf(file = file.path(working_dir, paste("CIS", x, y, ".pdf", sep="_")), width = 6, height = 6)
-            plot(thedata[,y], thedata[,x], xlab = y, ylab = x, pch=19)
-            abline(slope, col="red")
-            midx = (max(thedata[, y]) - min(thedata[, x])) / 2
-            lowy = (max(thedata[, y]) - min(thedata[, x])) / 5
-            sumlm = summary(slope)
-            rsquared = sumlm$adj.r.squared 
-            text(midx, lowy, adj=c(0,0), labels = paste("slope =" , round(slope$coefficients, 2), 
-                                                        "adj. R^2 =", round(rsquared,2),  sep=" ") )
-            dev.off()
+            slope = lm(formula =  get(x) ~ get(y) - 1, data = data_percentile)
+            
+            save( thedata, 
+                  LFQbench.Config, 
+                  softwareLabels, 
+                  y, x, slope, 
+                  file=file.path(supDir, paste0("CIS_", x, "_", y, ".rda") ) 
+            )
+            
+        pdf(
+            file=file.path(supDir, paste0("CIS_", x, "_", y, ".pdf") ),
+            width=LFQbench.Config$PlotWidth, height=LFQbench.Config$PlotHeight, family="Helvetica", pointsize=9)
+        par(
+            # plot area margins: c(bottom, left, top, right)
+            mar = c( 5, 9, 0.5, 3 ),
+            # axes layout: c(title, label, line)
+            mgp = c( 3.7, 1.5, 0 ),
+            # axis labels orientation: 0: parallel, 1: horizontal, 2: perpendicular, 3: vertical
+            las = 1
+        )
+        
+        #### plot model
+        yLab = x
+        xLab = y
+        if(!is.null(softwareLabels))
+        {
+        if(any(names(softwareLabels)==yLab)) yLab = softwareLabels[[yLab]]
+        if(any(names(softwareLabels)==xLab)) xLab = softwareLabels[[xLab]]
+        }
+        plot(thedata[,y], thedata[,x], xlab = "", ylab = "", pch=19,
+             lwd = LFQbench.Config$AxisLineThickness, 
+             cex.axis = LFQbench.Config$AxisAnnotationSize
+        )
+        title(xlab=xLab, mgp = c( 3.5, 1.5, 0 ), cex.lab=LFQbench.Config$AxisLabelSize)
+        title(ylab=yLab, mgp = c( 7, 1.5, 0 ), cex.lab=LFQbench.Config$AxisLabelSize)
+        abline(slope, col="red")
+        midx = (max(thedata[, y]) - min(thedata[, x])) / 2
+        lowy = (max(thedata[, y]) - min(thedata[, x])) / 5
+        sumlm = summary(slope)
+        rsquared = sumlm$adj.r.squared 
+        text(midx, lowy, adj=c(0,0), labels = paste("slope =" , round(slope$coefficients, 2), 
+                                                "adj. R^2 =", round(rsquared,2),  sep=" ") )
+        dev.off()
+        par(LFQbench.Config$parBackup)
             return(as.vector(slope$coefficients))
         }else{
             return(1.0)
         }
     }
     
-    software_sources_nobase <- software_sources[software_sources != software_scale_base]
-    models <- sapply(software_sources, callm, software_scale_base, peptides.all)
+    models <- sapply(softwareNamesPresent, callm, softwareReference, peptides.all)
     
     # 5. Re-scale all files (peptides and proteins).
     rescalefile <- function(filename, scaling){
         df <- read.table(file.path(working_dir, filename), header=T, sep="\t")
-        soft <- guessSoftwareSource(filename, software_sources, T)
+        soft <- guessModelSoftware(filename, softToModelMap)
         if(length(soft)==0) {
             return(NA)
         }
         quant.cols <- sapply(df, is.numeric)
-        df[, quant.cols] <- df[, quant.cols] * scaling[soft]
-        write.table(df, file.path(working_dir, filename), row.names=F, col.names = T, sep="\t")
+        # skip files of the reference software
+        if(scaling[soft]!=1.0) 
+        {
+            df[, quant.cols] <- df[, quant.cols] * scaling[soft]
+            write.table(df, file.path(working_dir, filename), row.names=F, col.names = T, sep="\t")   
+        }
     }
     
     nix <- sapply(filesToModel, rescalefile, models)
     
-    write(rbind(names(models),models), file.path(working_dir, "CIS.models.txt"), sep = "\t", ncolumns = 2)
+    write(rbind(names(models),models), file.path(supDir, "CIS.models.txt"), sep = "\t", ncolumns = 2)
     
 }
 
+# find model software for a file and replace softwares without a model by the right ones
+guessModelSoftware = function(filename, softToModelMap)
+{
+    src = guessSoftwareSource(filename, FSWE.softwareNames, T)
+    if(any(names(softToModelMap)==src))
+        src = softToModelMap[[src]]
+    return(src)
+}   
 

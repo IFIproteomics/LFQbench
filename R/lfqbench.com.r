@@ -30,6 +30,21 @@ mkdir = function(dirName){
   	}
 }
 
+#' moveFiles
+#' 
+#'  move all files (with any file extension) to a new directory
+#'  @param srcDir the origin folder
+#'  @param tarDir the target folder
+#'  @param namePattern the file name pattern for files to be moved
+#'  @param rmSrc if the origin folder should be removed, it can only be removed if it is empty
+#'  @export
+moveFiles = function(srcDir, tarDir, namePattern="\\..+", rmSrc=F)
+{
+    mkdir(tarDir)
+    files = list.files( srcDir, pattern=namePattern, include.dirs=F, full.names=F, recursive=F )
+    nix = sapply(files, function(f) file.rename( file.path(srcDir, f), file.path(tarDir, f) ) )
+    if(rmSrc) file.remove(srcDir)
+}
 
 #' createNumericPairs
 #' 

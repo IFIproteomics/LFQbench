@@ -54,7 +54,7 @@ FSWE.generateReports <- function(
     
     results_dir <- "input"
     supplementary <- "supplementary"
-    setRootFolder(working_dir)
+    setRootFolder(working_dir, createSubfolders = F)
     mkdir( file.path( working_dir, results_dir ) )
     mkdir( file.path( working_dir, results_dir , supplementary ) )
     
