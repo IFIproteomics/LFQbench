@@ -15,7 +15,7 @@
 #' @export
 LFQbench.batchProcessRootFolder = function( rootFolder=LFQbench.Config$DataRootFolder, ... )
 {
-  if(rootFolder != LFQbench.Config$DataRootFolder) setRootFolder( rootFolder )
+  if(rootFolder != LFQbench.Config$DataRootFolder) LFQbench.setDataRootFolder( rootFolder )
   inputFiles = list.files( path=LFQbench.Config$InputFilesLocation, pattern=LFQbench.Config$InputExtensionPattern, full.names = T )
   return( LFQbench.batchProcessFiles( inputFiles, ... ) )
 }
@@ -25,7 +25,7 @@ LFQbench.batchProcessRootFolder = function( rootFolder=LFQbench.Config$DataRootF
 #' Wrapper function for processing a batch of input files.
 #' Plots, metrics and log files will be automatically put into 
 #' subfolders of a root folder.
-#' PLEASE DEFINE THE ROOT FOLDER BEVORE RUNNING THIS FUNCTION!!!
+#' PLEASE DEFINE THE ROOT FOLDER BEFORE RUNNING THIS FUNCTION!!!
 #' Expected structure of root folder:
 #' 
 #'  - subfolder "input" contains automatically discovered input files
@@ -69,11 +69,11 @@ LFQbench.batchProcessFiles = function( inputFiles,
     }
     else
     {
-        setRootFolder( LFQbench.Config$DataRootFolder )
+        LFQbench.setDataRootFolder( LFQbench.Config$DataRootFolder )
         
         DocSets = lapply( inputFiles, makeDocSet )
         names(DocSets) = sapply( DocSets, function(d) d$fileBase )
-        ResultSets = lapply( DocSets, processDocSet )
+        ResultSets = lapply( DocSets, LFQbench.processDocSet )
         
         if(storeResultSetsImage) save(DocSets, ResultSets, file = paste(LFQbench.Config$LogFilesLocation, "/ResultSets.rda", sep = "") )
         if(storeSampleMeans) nix=sapply( ResultSets, saveSampleMeans )
