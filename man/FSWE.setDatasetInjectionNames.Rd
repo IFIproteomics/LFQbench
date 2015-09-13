@@ -8,7 +8,7 @@ FSWE.setDatasetInjectionNames(theData)
 }
 \arguments{
 \item{theData}{a data.frame having the injection names of each experiment considered. You may process several experiments together (each experiment
-                        is a row of the data frame. The row names of the data frame are used as column names in the FSWE output.).
+                        is a column of the data frame. The row names of the data frame are used as column names in the FSWE output.).
                         Example: dataSets = data.frame( "TTOF5600_32w"=c("lgillet_L150206_001", "lgillet_L150206_003", "lgillet_L150206_005",
                                                                          "lgillet_L150206_002", "lgillet_L150206_013", "lgillet_L150206_014"),
                                                        ,"TTOF5600_64w"=c("lgillet_L150206_007", "lgillet_L150206_009", "lgillet_L150206_011",
