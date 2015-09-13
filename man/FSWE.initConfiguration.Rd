@@ -6,6 +6,24 @@
 \usage{
 FSWE.initConfiguration(injectionNames, speciesTags)
 }
+\arguments{
+\item{injectionNames}{: a data frame the injection names of each experiment considered. You may process several experiments together (each experiment
+                        is a row of the data frame. The row names of the data frame are used as column names in the FSWE output.).
+                        Example: dataSets = data.frame( "TTOF5600_32w"=c("lgillet_L150206_001", "lgillet_L150206_003", "lgillet_L150206_005",
+                                                                         "lgillet_L150206_002", "lgillet_L150206_013", "lgillet_L150206_014"),
+                                                       ,"TTOF5600_64w"=c("lgillet_L150206_007", "lgillet_L150206_009", "lgillet_L150206_011",
+                                                                         "lgillet_L150206_008", "lgillet_L150206_010", "lgillet_L150206_012")
+                                                       ,"TTOF6600_32w"=c("lgillet_I150211_002", "lgillet_I150211_004", "lgillet_I150211_006",
+                                                                         "lgillet_I150211_003", "lgillet_I150211_005", "lgillet_I150211_007")
+                                                       ,"TTOF6600x64w"=c("lgillet_I150211_008", "lgillet_I150211_010", "lgillet_I150211_012",
+                                                                         "lgillet_I150211_009", "lgillet_I150211_011", "lgillet_I150211_013")
+                                                       ,row.names=c("A1", "A2", "A3", "B1", "B2", "B3"))}
+
+\item{speciesTags}{: Namesa named vector containing tags to locate the corresponding species at the protein name reported by the software.
+                     In SwissProt you may use something like _SPECIE.
+                     Names of elements must contain all LFQbench.Config$AllSpecies
+                     Example: speciesTags = list(HUMAN = "_HUMAN", YEAST = "_YEAS", ECOLI = "_ECOLI")}
+}
 \description{
 define software list and the list of initialization function for each software
 }

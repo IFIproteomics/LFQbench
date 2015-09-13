@@ -4,50 +4,64 @@
 \alias{FSWE.addSoftwareConfiguration}
 \title{FSWE.addSoftwareConfiguration}
 \usage{
-FSWE.addSoftwareConfiguration(softwareName, quantitative.var = NA,
-  quantitative.var.tag = NA, protein.var = NA, filename.var = NA,
-  sequence.mod.var = NA, charge.var = NA, q_filter_threshold = NA,
-  decoy.var = NA, sheet.fdr = NULL, protein_input = F,
-  input.extension = "*.csv$", nastrings = "NA", decoy.tags = c("DECOY_",
-  "reverse"), fdr.var.tag = NA, input_format = "wide", qvalue.var = NA,
-  sheet.data = NA)
+FSWE.addSoftwareConfiguration(softwareName, input_format = "wide",
+  input.extension = "*.csv$", nastrings = "NA", protein_input = F,
+  filename.var = NA, quantitative.var = NA, quantitative.var.tag = NA,
+  protein.var = NA, sequence.mod.var = NA, charge.var = NA,
+  decoy.var = NA, decoy.tags = c("DECOY_", "reverse"), fdr.var.tag = NA,
+  qvalue.var = NA, q_filter_threshold = NA, sheet.data = NA,
+  sheet.fdr = NULL)
 }
 \arguments{
-\item{softwareName}{}
+\item{softwareName}{:   a name for this configuration set.}
 
-\item{quantitative.var}{= NA}
+\item{input_format}{:   data format of the file. Options: "wide", "long"}
 
-\item{quantitative.var.tag}{= NA}
+\item{input.extension}{:   file extension.
+Warning: FSWE interprets file extensions to read the files.
+Ensure that files named i.e. ".tsv" are actually tab separated
+values files. Do not use the extension ".xls" in tab separated
+values files.}
 
-\item{protein.var}{= NA}
+\item{nastrings}{:   string used at the file to label not available / not a number data.
+Examples: "NA", "#N/A", "NaN".}
 
-\item{filename.var}{= NA}
+\item{protein_input}{:   Boolean. Set to TRUE if the files contain only protein information
+(no sequence/precursors reports).}
 
-\item{sequence.mod.var}{= NA}
+\item{filename.var}{:   when using "long" report formats, column head name of the injection
+file names.}
 
-\item{charge.var}{= NA}
+\item{quantitative.var}{:   column head name of the quantitative values.}
 
-\item{q_filter_threshold}{= NA}
+\item{quantitative.var.tag}{:   when using "wide" report formats, indicate a common tag for all
+quantitative columns.}
 
-\item{decoy.var}{= NA}
+\item{protein.var}{:   column head name of the protein names. It must contain a species tag.}
 
-\item{sheet.fdr}{= NULL}
+\item{sequence.mod.var}{:   column head name of the sequence (including modifications).}
 
-\item{protein_input}{= F}
+\item{charge.var}{:   column head name of the precursor charge state.}
 
-\item{input.extension}{= "*.csv$"}
+\item{decoy.var}{:   (optional) column head name of is_decoy (yes/no)}
 
-\item{nastrings}{= "NA"}
+\item{decoy.tags}{:   vector of tags for decoy proteins/peptides.
+Example: c("DECOY_", "reverse")}
 
-\item{decoy.tags}{= c("DECOY_""reverse")}
+\item{fdr.var.tag}{:   when using excel formats (SWATH 2.0), indicate a tag to locate
+the FDR columns.}
 
-\item{fdr.var.tag}{= NA}
+\item{qvalue.var}{:   (optional) If filtering by Q-value is required, column head name
+of the Q-Value.}
 
-\item{input_format}{= "wide"}
+\item{q_filter_threshold}{:   (optional) Q-value threshold, if you want to filter results by Q-value.
+Note that you must specify then the qvalue.var (see above).}
 
-\item{qvalue.var}{= NA}
+\item{sheet.data}{:   when using excel formats, name of the sheet containing the
+quantitative values.}
 
-\item{sheet.data}{= NA}
+\item{sheet.fdr}{:   when using excel formats, name of the sheet containing the
+                                 False Discovery Rate values.}
 }
 \description{
 add a new software and its parameters to the list of softwares

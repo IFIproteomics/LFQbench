@@ -2,6 +2,23 @@
 #' 
 #' define software list and the list of initialization function for each software
 #' 
+#' @param injectionNames : a data frame the injection names of each experiment considered. You may process several experiments together (each experiment
+#'                         is a row of the data frame. The row names of the data frame are used as column names in the FSWE output.).
+#'                         Example: dataSets = data.frame( "TTOF5600_32w"=c("lgillet_L150206_001", "lgillet_L150206_003", "lgillet_L150206_005",
+#'                                                                          "lgillet_L150206_002", "lgillet_L150206_013", "lgillet_L150206_014"), 
+#'                                                        ,"TTOF5600_64w"=c("lgillet_L150206_007", "lgillet_L150206_009", "lgillet_L150206_011", 
+#'                                                                          "lgillet_L150206_008", "lgillet_L150206_010", "lgillet_L150206_012") 
+#'                                                        ,"TTOF6600_32w"=c("lgillet_I150211_002", "lgillet_I150211_004", "lgillet_I150211_006",
+#'                                                                          "lgillet_I150211_003", "lgillet_I150211_005", "lgillet_I150211_007") 
+#'                                                        ,"TTOF6600x64w"=c("lgillet_I150211_008", "lgillet_I150211_010", "lgillet_I150211_012",
+#'                                                                          "lgillet_I150211_009", "lgillet_I150211_011", "lgillet_I150211_013")
+#'                                                        ,row.names=c("A1", "A2", "A3", "B1", "B2", "B3"))
+#'                                                         
+#' @param speciesTags : Namesa named vector containing tags to locate the corresponding species at the protein name reported by the software. 
+#'                      In SwissProt you may use something like _SPECIE. 
+#'                      Names of elements must contain all LFQbench.Config$AllSpecies
+#'                      Example: speciesTags = list(HUMAN = "_HUMAN", YEAST = "_YEAS", ECOLI = "_ECOLI") 
+#'           
 #' @export
 FSWE.initConfiguration = function( injectionNames, speciesTags )
 {
@@ -15,7 +32,7 @@ FSWE.initConfiguration = function( injectionNames, speciesTags )
 #' 
 #' change the FSWE configuration to values for a specific software
 #' 
-#' @param softwareName
+#' @param softwareName 
 #' @export
 FSWE.switchSoftwareConfiguration = function(softwareName)
 {
@@ -33,52 +50,68 @@ FSWE.switchSoftwareConfiguration = function(softwareName)
 #' 
 #' add a new software and its parameters to the list of softwares
 #' 
-#' @param softwareName
-#' @param quantitative.var = NA
-#' @param quantitative.var.tag = NA
-#' @param protein.var = NA
-#' @param filename.var = NA
-#' @param sequence.mod.var = NA
-#' @param charge.var = NA
-#' @param q_filter_threshold = NA
-#' @param decoy.var = NA
-#' @param sheet.fdr = NULL
-#' @param protein_input = F
-#' @param input.extension = "*.csv$"
-#' @param nastrings = "NA"
-#' @param decoy.tags = c("DECOY_""reverse")
-#' @param fdr.var.tag = NA
-#' @param input_format = "wide"
-#' @param qvalue.var = NA
-#' @param sheet.data = NA
+#' @param softwareName          :   a name for this configuration set.
+#' @param input_format          :   data format of the file. Options: "wide", "long"
+#' @param input.extension       :   file extension. 
+#'                                  Warning: FSWE interprets file extensions to read the files. 
+#'                                  Ensure that files named i.e. ".tsv" are actually tab separated 
+#'                                  values files. Do not use the extension ".xls" in tab separated 
+#'                                  values files.
+#' @param nastrings             :   string used at the file to label not available / not a number data. 
+#'                                  Examples: "NA", "#N/A", "NaN".  
+#' @param protein_input         :   Boolean. Set to TRUE if the files contain only protein information 
+#'                                  (no sequence/precursors reports).
+#' @param filename.var          :   when using "long" report formats, column head name of the injection 
+#'                                  file names. 
+#' @param quantitative.var      :   column head name of the quantitative values.
+#' @param quantitative.var.tag  :   when using "wide" report formats, indicate a common tag for all 
+#'                                  quantitative columns. 
+#' @param protein.var           :   column head name of the protein names. It must contain a species tag.
+#' @param sequence.mod.var      :   column head name of the sequence (including modifications).
+#' @param charge.var            :   column head name of the precursor charge state.
+#' @param decoy.var             :   (optional) column head name of is_decoy (yes/no) 
+#' @param decoy.tags            :   vector of tags for decoy proteins/peptides. 
+#'                                  Example: c("DECOY_", "reverse")
+#' @param fdr.var.tag           :   when using excel formats (SWATH 2.0), indicate a tag to locate 
+#'                                  the FDR columns. 
+#' @param qvalue.var            :   (optional) If filtering by Q-value is required, column head name 
+#'                                  of the Q-Value.
+#' @param q_filter_threshold    :   (optional) Q-value threshold, if you want to filter results by Q-value.
+#'                                  Note that you must specify then the qvalue.var (see above).
+#' @param sheet.data            :   when using excel formats, name of the sheet containing the 
+#'                                  quantitative values.
+#' @param sheet.fdr             :   when using excel formats, name of the sheet containing the 
+#'                                  False Discovery Rate values.
+#'                                  
 #' @export
 FSWE.addSoftwareConfiguration = function(
   softwareName
+  ,input_format = "wide"
+  ,input.extension = "*.csv$"
+  ,nastrings = "NA"
+  ,protein_input = F
+  ,filename.var = NA
   ,quantitative.var = NA
   ,quantitative.var.tag = NA
   ,protein.var = NA
-  ,filename.var = NA
   ,sequence.mod.var = NA
   ,charge.var = NA
-  ,q_filter_threshold = NA
   ,decoy.var = NA
-  ,sheet.fdr = NULL
-  ,protein_input = F
-  ,input.extension = "*.csv$"
-  ,nastrings = "NA"
   ,decoy.tags = c("DECOY_","reverse")
   ,fdr.var.tag = NA
-  ,input_format = "wide"
   ,qvalue.var = NA
+  ,q_filter_threshold = NA
   ,sheet.data = NA
-  )
+  ,sheet.fdr = NULL
+)
 {
   FSWE.softwareNames <<- c(FSWE.softwareNames, softwareName)
   FSWE.configFunctionForSoftware[[softwareName]] <<- function(){
     FSWE.setSoftwareConfiguration(
-      quantitative.var,quantitative.var.tag,protein.var,filename.var 
-      ,sequence.mod.var,charge.var,q_filter_threshold,decoy.var
-      ,sheet.fdr,protein_input,input.extension,nastrings,decoy.tags,fdr.var.tag,input_format,qvalue.var,sheet.data
+        input_format, input.extension, nastrings, protein_input, filename.var, 
+        quantitative.var, quantitative.var.tag, protein.var, sequence.mod.var, charge.var, 
+        decoy.var, decoy.tags, qvalue.var, q_filter_threshold, sheet.data,
+        sheet.fdr,fdr.var.tag
     )
   }    
 }
@@ -211,24 +244,25 @@ FSWE.init.defaultSoftwares = function()
   )  
 }
 
+
 FSWE.setSoftwareConfiguration = function(
-  quantitative.var = NA
-  ,quantitative.var.tag = NA
-  ,protein.var = NA
-  ,filename.var = NA
-  ,sequence.mod.var = NA
-  ,charge.var = NA
-  ,q_filter_threshold = NA
-  ,decoy.var = NA
-  ,sheet.fdr = NULL
-  ,protein_input = F
-  ,input.extension = "*.csv$"
-  ,nastrings = "NA"
-  ,decoy.tags = c("DECOY_","reverse")
-  ,fdr.var.tag = NA
-  ,input_format = "wide"
-  ,qvalue.var = NA
-  ,sheet.data = NA )
+    input_format = "wide"
+    ,input.extension = "*.csv$"
+    ,nastrings = "NA"
+    ,protein_input = F
+    ,filename.var = NA
+    ,quantitative.var = NA
+    ,quantitative.var.tag = NA
+    ,protein.var = NA
+    ,sequence.mod.var = NA
+    ,charge.var = NA
+    ,decoy.var = NA
+    ,decoy.tags = c("DECOY_","reverse")
+    ,qvalue.var = NA
+    ,q_filter_threshold = NA
+    ,sheet.data = NA
+    ,sheet.fdr = NULL
+    ,fdr.var.tag = NA)
 {
   # list argument names
   argNames = ls()
@@ -247,13 +281,28 @@ FSWE.postprocessSoftwareConfiguration = function()
   if(!is.na(FSWE.Config$decoy.var)){
     FSWE.Config$decoy.var <<- gsub(" ", ".", FSWE.Config$decoy.var)
   }
+  if(!is.na(FSWE.Config$qvalue.var)){
+      FSWE.Config$qvalue.var <<- gsub(" ", ".", FSWE.Config$qvalue.var)
+  }
+  
 }
 
 #' FSWE.setDatasetInjectionNames
 #' 
 #' set injections names used in the input data
 #'
-#' @param theData data.frame having 
+#' @param theData a data.frame having the injection names of each experiment considered. You may process several experiments together (each experiment
+#'                         is a row of the data frame. The row names of the data frame are used as column names in the FSWE output.).
+#'                         Example: dataSets = data.frame( "TTOF5600_32w"=c("lgillet_L150206_001", "lgillet_L150206_003", "lgillet_L150206_005",
+#'                                                                          "lgillet_L150206_002", "lgillet_L150206_013", "lgillet_L150206_014"), 
+#'                                                        ,"TTOF5600_64w"=c("lgillet_L150206_007", "lgillet_L150206_009", "lgillet_L150206_011", 
+#'                                                                          "lgillet_L150206_008", "lgillet_L150206_010", "lgillet_L150206_012") 
+#'                                                        ,"TTOF6600_32w"=c("lgillet_I150211_002", "lgillet_I150211_004", "lgillet_I150211_006",
+#'                                                                          "lgillet_I150211_003", "lgillet_I150211_005", "lgillet_I150211_007") 
+#'                                                        ,"TTOF6600x64w"=c("lgillet_I150211_008", "lgillet_I150211_010", "lgillet_I150211_012",
+#'                                                                          "lgillet_I150211_009", "lgillet_I150211_011", "lgillet_I150211_013")
+#'                                                        ,row.names=c("A1", "A2", "A3", "B1", "B2", "B3")) 
+#'                                                        
 #' @export
 FSWE.setDatasetInjectionNames = function( theData )
 {

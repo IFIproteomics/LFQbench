@@ -2,6 +2,9 @@
 
 #' FSWE.generateReports
 #' 
+#' It generates peptide and protein reports compatible with LFQbench, by following the data processing
+#' suggested in (#Ref_to_article). 
+#' 
 #' @param experimentFile
 #' @export
 FSWE.generateReports <- function(
