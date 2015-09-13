@@ -184,7 +184,7 @@ FSWE.generateReports <- function(
   peptides_wide <- peptides_wide[, c(c(1:3), experiment.order)]
   
   #Rename the samples 
-  names(peptides_wide) <- c("sequenceID", "proteinID", "specie", inj_names) 
+  names(peptides_wide) <- c("sequenceID", "proteinID", "specie", rownames(FSWE.dataSets)) 
   
   # add a sequence column (just to remove it after reporting naked sequences)
   peptides_wide$sequence <- gsub( "*\\[.*?\\]", "", peptides_wide$sequenceID )
