@@ -19,4 +19,3 @@ License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 URL: https://github.com/IFIproteomics/LFQbench
 BugReports: https://github.com/IFIproteomics/LFQbench/issues
 VignetteBuilder: knitr
-biocViews: Proteomics, Visualization, Label-free, GUI

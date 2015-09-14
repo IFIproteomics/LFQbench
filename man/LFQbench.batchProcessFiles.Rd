@@ -36,7 +36,7 @@ LFQbench.batchProcessFiles(inputFiles, storeResultSetsImage = T,
 Wrapper function for processing a batch of input files.
 Plots, metrics and log files will be automatically put into
 subfolders of a root folder.
-PLEASE DEFINE THE ROOT FOLDER BEVORE RUNNING THIS FUNCTION!!!
+PLEASE DEFINE THE ROOT FOLDER BEFORE RUNNING THIS FUNCTION!!!
 Expected structure of root folder:
 }
 \details{
