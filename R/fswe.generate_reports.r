@@ -140,9 +140,9 @@ FSWE.generateReports <- function(
     df <- tmp1
     rm(tmp1)
     
-    quantvar.range <- which(grepl(quantitative.var.tag, colnames(df), ignore.case=T))
-    
-    df <- df %>% gather_(filename.var, quantitative.var, quantvar.range) %>%  
+    quantvar.range <- which( grepl( quantitative.var.tag, colnames(df), ignore.case=T ) )
+    quantvar.colnames <- names(df)[quantvar.range]
+    df <- df %>% gather_(filename.var, quantitative.var, quantvar.colnames) %>%  
       arrange_(protein.var, sequence.mod.var)
     
   }else if(input_format == "long"){
@@ -184,7 +184,8 @@ FSWE.generateReports <- function(
   peptides_wide <- peptides_wide[, c(c(1:3), experiment.order)]
   
   #Rename the samples 
-  names(peptides_wide) <- c("sequenceID", "proteinID", "specie", rownames(FSWE.dataSets)) 
+  names(peptides_wide) <- c("sequenceID", "proteinID", "specie", rownames(FSWE.dataSets) )
+  # names(peptides_wide) <- c("sequenceID", "proteinID", "specie", inj_names )
   
   # add a sequence column (just to remove it after reporting naked sequences)
   peptides_wide$sequence <- gsub( "*\\[.*?\\]", "", peptides_wide$sequenceID )
