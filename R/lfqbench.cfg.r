@@ -44,14 +44,14 @@ LFQbench.initConfiguration = function(
     )
   # non regulated background species
   # has equal protein amounts in all samples
-  ,BackgroundSpeciesName  = "HUMAN"
+  ,BackgroundSpeciesName = "HUMAN"
   # protein quantification input data CSV format
   ,InputExtensionPattern = "\\..sv$"
   ,CsvColumnSeparator = "\t"
   ,CsvDecimalPointChar = "."
   # whiskers of boxplots will extend to given quantile
   # t.m. (1 - quantile*2) portion of data will be inside the whiskers
-  ,BoxPlotWhiskerQuantile = 0.02
+  ,BoxPlotWhiskerQuantile = 0.025
   # protein amounts below this threshold are considered as NA
   ,MinProteinAmount    = 0.000001
   # log-ratios outside validity range will be dropped

@@ -4,7 +4,10 @@
 \alias{LFQbench.plotSpeciesLegends}
 \title{LFQbench.plotSpeciesLegends}
 \usage{
-LFQbench.plotSpeciesLegends()
+LFQbench.plotSpeciesLegends(plotFolder = LFQbench.Config$PlotFilesLocation)
+}
+\arguments{
+\item{plotFolder}{the folder, where plots should go to}
 }
 \description{
 plot vertical and horizontal species legends

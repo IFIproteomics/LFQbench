@@ -6,7 +6,7 @@
 \usage{
 LFQbench.batchProcessFiles(inputFiles, storeResultSetsImage = T,
   storeSampleMeans = F, storeSpeciesSeparation = F, storeIDs = F,
-  storeIdStats = T, storeLogRatios = T, storePlots = T,
+  storeIdStats = T, storeLogRatios = F, storePlots = T,
   storeSampleCVs = F, storeMetrics = T)
 }
 \arguments{
@@ -14,23 +14,21 @@ LFQbench.batchProcessFiles(inputFiles, storeResultSetsImage = T,
 
 \item{storeResultSetsImage=T,}{}
 
-\item{storeSampleMeans=T,}{}
+\item{storeSampleMeans=F,}{}
 
-\item{storeSpeciesSeparation=T,}{}
+\item{storeSpeciesSeparation=F,}{}
 
-\item{storeIDs=T,}{}
+\item{storeIDs=F,}{}
 
 \item{storeIdStats=T,}{}
 
-\item{storeLogRatios=T,}{}
+\item{storeLogRatios=F,}{}
 
 \item{storePlots=T,}{}
 
-\item{storeSampleCVs=T,}{}
+\item{storeSampleCVs=F,}{}
 
-\item{storeMetrics=T,}{}
-
-\item{returnResultSets=F}{}
+\item{storeMetrics=T}{}
 }
 \description{
 Wrapper function for processing a batch of input files.

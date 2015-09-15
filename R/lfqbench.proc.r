@@ -276,6 +276,7 @@ LFQbench.processFile = function( file ) {
     ################################################################################
     
     globalAccuracy = sapply( dataBySpecies, function(d) median(d$y, na.rm=T) - d$expectation  )
+    names(globalAccuracy) = LFQbench.Config$AllSpeciesNames
     globalPrecision = sapply( dataBySpecies, function(d) sd(d$y, na.rm = T) ) 
     localAccuracy = getQuantileAccuracy( dataBySpecies, LFQbench.Config$AllSpeciesNames, LFQbench.Config$NumberOfIntensityQuantiles )
     localPrecision = getQuantilePrecision( dataBySpecies, LFQbench.Config$AllSpeciesNames, LFQbench.Config$NumberOfIntensityQuantiles )

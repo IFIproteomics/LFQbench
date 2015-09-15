@@ -8,7 +8,7 @@ LFQbench.initConfiguration(DataRootFolder = getwd(),
   SampleComposition = data.frame(species = c("HUMAN", "YEAST", "ECOLI"), A =
   c(65, 30, 5), B = c(65, 15, 20)), BackgroundSpeciesName = "HUMAN",
   InputExtensionPattern = "\\\\..sv$", CsvColumnSeparator = "\\t",
-  CsvDecimalPointChar = ".", BoxPlotWhiskerQuantile = 0.02,
+  CsvDecimalPointChar = ".", BoxPlotWhiskerQuantile = 0.025,
   MinProteinAmount = 1e-06, DropInvalidLogRatio = T,
   LogRatioValidityRange = c(-10, 10), LogRatioPlotRange = c(-4, 4),
   LogIntensityPlotRange = c(9, 26), MaxLogRatioForAUQC = 2,

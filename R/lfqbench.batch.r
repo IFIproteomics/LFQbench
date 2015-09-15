@@ -37,15 +37,14 @@ LFQbench.batchProcessRootFolder = function( rootFolder=LFQbench.Config$DataRootF
 #' 
 #' @param inputFiles a list of files to process
 #' @param storeResultSetsImage=T,
-#' @param storeSampleMeans=T,
-#' @param storeSpeciesSeparation=T,
-#' @param storeIDs=T,
+#' @param storeSampleMeans=F,
+#' @param storeSpeciesSeparation=F,
+#' @param storeIDs=F,
 #' @param storeIdStats=T,
-#' @param storeLogRatios=T,
+#' @param storeLogRatios=F,
 #' @param storePlots=T,
-#' @param storeSampleCVs=T,
-#' @param storeMetrics=T,
-#' @param returnResultSets=F
+#' @param storeSampleCVs=F,
+#' @param storeMetrics=T
 #' @export
 LFQbench.batchProcessFiles = function( inputFiles, 
                          storeResultSetsImage=T,
@@ -53,7 +52,7 @@ LFQbench.batchProcessFiles = function( inputFiles,
                          storeSpeciesSeparation=F,
                          storeIDs=F,
                          storeIdStats=T,
-                         storeLogRatios=T,
+                         storeLogRatios=F,
                          storePlots=T,
                          storeSampleCVs=F,
                          storeMetrics=T
@@ -74,7 +73,7 @@ LFQbench.batchProcessFiles = function( inputFiles,
         DocSets = lapply( inputFiles, makeDocSet )
         names(DocSets) = sapply( DocSets, function(d) d$fileBase )
         ResultSets = lapply( DocSets, LFQbench.processDocSet )
-        
+
         if(storeResultSetsImage) save(DocSets, ResultSets, file = paste(LFQbench.Config$LogFilesLocation, "/ResultSets.rda", sep = "") )
         if(storeSampleMeans) nix=sapply( ResultSets, saveSampleMeans )
         if(storeSpeciesSeparation) nix=sapply( ResultSets, saveSpeciesSeparation )
@@ -89,5 +88,6 @@ LFQbench.batchProcessFiles = function( inputFiles,
         if(storeMetrics) saveMetrics( ResultSets )
         if(storeIdStats) logIdStatistics( ResultSets )
     }
+    
     return( ResultSets )
 }

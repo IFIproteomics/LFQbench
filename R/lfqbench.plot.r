@@ -31,9 +31,19 @@ getQCFunction = function( ratios, ensureValueRange=c(0, 1) )
 ################################################################################
 
 ################################################################################
-# show empty plot with coordinate system in given ranges
-# x/y-Axes are plotted on the bottom/left side with given line width
-# grid can be switched off
+#' emptyPlot
+#' show an empty plot with the plotting area in given ranges
+#' x/y-Axes are plotted on the bottom/left side with given line width
+#' grid can be switched off
+#' @param xRange=c(0,1)
+#' @param yRange=c(0,1)
+#' @param lwd=1
+#' @param grid=T
+#' @param showXlab=T
+#' @param showYlab=T
+#' @param axes=T
+#' @param cex.axis=1
+#' @export
 emptyPlot = function(xRange=c(0,1), yRange=c(0,1), lwd=1, grid=T, showXlab=T, showYlab=T, axes=T, cex.axis=1)
 {
 	plot( 0, 0, xlim=xRange, ylim=yRange, type="n", axes=F, xlab="", ylab="", main="" )
@@ -43,7 +53,17 @@ emptyPlot = function(xRange=c(0,1), yRange=c(0,1), lwd=1, grid=T, showXlab=T, sh
 ################################################################################
 
 ################################################################################
-# add normal axes having full lengths of plotting area
+#' addAxes
+#' 
+#' add normal axes having full lengths of plotting area
+#' 
+#' @param lwd=1
+#' @param showXlab=T
+#' @param showYlab=T
+#' @param showXAxis=T
+#' @param showYAxis=T
+#' @param cex.axis=1
+#' @export
 addAxes = function(lwd=1, showXlab=T, showYlab=T, showXAxis=T, showYAxis=T, cex.axis=1)
 {
   usr = par()$usr
@@ -55,14 +75,27 @@ addAxes = function(lwd=1, showXlab=T, showYlab=T, showXAxis=T, showYAxis=T, cex.
 ################################################################################
 
 ################################################################################
-# add an x-axis label shifted by marginShift from par()$mgp[1]
+#' addXLab
+#' add an x-axis label shifted by marginShift from par()$mgp[1]
+#' @param xlab=""
+#' @param marginShift=-0.2
+#' @param cex.lab=LFQbench.Config$AxisLabelSize
+#' @param ... other parameter passed to title(...)
+#' @export
 addXLab = function(xlab="", marginShift=-0.2, cex.lab = LFQbench.Config$AxisLabelSize, ...)
 {
   m = par()$mgp
   m[1] = m[1]+marginShift
   title(xlab=xlab, mgp=m, cex.lab=cex.lab, ...)
 }
-# add an y-axis label shifted by marginShift from par()$mgp[1]
+
+#' addYLab
+#' add an y-axis label shifted by marginShift from par()$mgp[1]
+#' @param ylab=""
+#' @param marginShift=-0.2
+#' @param cex.lab=LFQbench.Config$AxisLabelSize
+#' @param ... other parameter passed to title(...)
+#' @export
 addYLab = function(ylab="", marginShift=0.3, cex.lab = LFQbench.Config$AxisLabelSize, ...)
 {
   m = par()$mgp
@@ -112,15 +145,16 @@ plotSpeciesLegend = function( pos="top", ... )
 #' LFQbench.plotSpeciesLegends
 #' 
 #'  plot vertical and horizontal species legends
+#'  @param plotFolder the folder, where plots should go to
 #'  @export
-LFQbench.plotSpeciesLegends = function()
+LFQbench.plotSpeciesLegends = function(plotFolder = LFQbench.Config$PlotFilesLocation)
 {
-  pdf(file = paste(LFQbench.Config$PlotFilesLocation,"/species_legend_vertical.pdf", sep = ""), width = 1.05, height = 0.66, family = "Helvetica", pointsize = 9)
+  pdf(file = paste(plotFolder,"/species_legend_vertical.pdf", sep = ""), width = 1.05, height = 0.66, family = "Helvetica", pointsize = 9)
   par(mar=c(0,0,0.1,0))
   emptyPlot( 0:1, 0:1, lwd=0, grid=F, showXlab=F, showYlab=F, axes=F )
   plotSpeciesLegend(pos="top", horiz=F )
   dev.off()
-  pdf(file = paste(LFQbench.Config$PlotFilesLocation,"/species_legend_horizontal.pdf",sep = ""), width = 2.9, height = 0.35, family = "Helvetica", pointsize = 9)
+  pdf(file = paste(plotFolder,"/species_legend_horizontal.pdf",sep = ""), width = 2.9, height = 0.35, family = "Helvetica", pointsize = 9)
   par(mar=c(0,0,0.1,0))
   emptyPlot( 0:1, 0:1, lwd=0, grid=F, showXlab=F, showYlab=F, axes=F )
   plotSpeciesLegend(pos="top", horiz=T )
