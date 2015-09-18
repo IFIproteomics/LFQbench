@@ -460,8 +460,10 @@ getQuantileSeparation = function( dataBySpecies, spcNames, numberOfQuantiles=LFQ
     spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
     # flag first species as 0 and the second as 1
     spcFlags = as.numeric( factor(spcs) ) - 1
+    
     # flag quantiles of log-ratios
-    l2rFlags = as.numeric( cut( order( l2is ), numberOfQuantiles ) )
+    l2rFlags = as.numeric( cut( rank( l2is ), numberOfQuantiles ) )
+    
     auc4q = function( q )
     { 
         idx = l2rFlags == q; 
@@ -481,18 +483,12 @@ getQuantileSeparation = function( dataBySpecies, spcNames, numberOfQuantiles=LFQ
 #' @param spcNames
 #' @param numberOfQuantiles
 getQuantileAccuracy = function(dataBySpecies, spcNames = LFQbench.Config$AllSpeciesNames, numberOfQuantiles=LFQbench.Config$NumberOfIntensityQuantiles){
-    expectation = sapply(spcNames, function(sn) dataBySpecies[[sn]]$expectation, USE.NAMES = F )  
-    l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
-    l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
-    spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
-    l2rFlags = as.numeric( cut( order( l2is ), numberOfQuantiles ) )
+    qnts = sapply( spcNames, function(sn) as.numeric( cut( rank( dataBySpecies[[sn]]$x ), numberOfQuantiles ) ) )
     acc4qs = function(q, s)
     { 
-        idx4q = l2rFlags == q
-        idx4s = spcs %in% s
-        vals = l2rs[ idx4q & idx4s ]
-        dev = median(vals, na.rm = T) - expectation[s]
-        return(dev)
+        l2rs = dataBySpecies[[s]]$y
+        vals = l2rs[ qnts[[s]] == q  ]
+        median(vals, na.rm = T) - dataBySpecies[[s]]$expectation
     }
     res = sapply( spcNames, function(s) sapply( 1:numberOfQuantiles, acc4qs, s) )
     rownames(res) = paste0("Q", 1:numberOfQuantiles)
@@ -507,23 +503,20 @@ getQuantileAccuracy = function(dataBySpecies, spcNames = LFQbench.Config$AllSpec
 #'@param dataBySpecies
 #'@param spcNames
 #' @param numberOfQuantiles
-getQuantilePrecision = function(dataBySpecies, spcNames = LFQbench.Config$AllSpeciesNames, numberOfQuantiles=LFQbench.Config$NumberOfIntensityQuantiles ){
-    l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
-    l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
-    spcs = unlist( lapply( spcNames, function( sn ) rep( sn, length( dataBySpecies[[sn]]$y ) ) ) )
-    l2rFlags = as.numeric( cut( order( l2is ), numberOfQuantiles ) )
+getQuantilePrecision = function(dataBySpecies, spcNames = LFQbench.Config$AllSpeciesNames, numberOfQuantiles=LFQbench.Config$NumberOfIntensityQuantiles )
+{
+    qnts = sapply( spcNames, function(sn) as.numeric( cut( rank( dataBySpecies[[sn]]$x ), numberOfQuantiles ) ) )
     var4qs = function(q, s)
     { 
-        idx4q = l2rFlags == q
-        idx4s = spcs %in% s
-        vals = l2rs[ idx4q & idx4s ]
-        std = sd(vals, na.rm = T)
-        return( std )
+        l2rs = dataBySpecies[[s]]$y
+        vals = l2rs[ qnts[[s]] == q  ]
+        sd(vals, na.rm = T)
     }
     res = sapply( spcNames, function(s) sapply( 1:numberOfQuantiles,  var4qs, s) )
     rownames(res) = paste0("Q", 1:numberOfQuantiles)
     return( res )
 }
+
 ################################################################################
 
 ################################################################################
