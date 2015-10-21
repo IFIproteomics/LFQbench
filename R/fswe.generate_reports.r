@@ -132,18 +132,29 @@ FSWE.generateReports <- function(
     
     # WARNING: the quantitative variables should be the only ones containing the injection names at this point.
     # We filter by the quantitative.var.tag in order to remove any other columns like score, ret time...
-    tmp1 <- df[, grepl(protein.var, colnames(df))]
-    tmp1 <- cbind( tmp1, df[, grepl(sequence.mod.var, colnames(df))] )
-    tmp1 <- cbind( tmp1, df[, grepl(charge.var, colnames(df))] )
-    tmp1 <- cbind( tmp1, df[, grepl("specie", colnames(df))])
-    tmp1 <- cbind( tmp1, df[, grepl(quantitative.var.tag, colnames(df), ignore.case=T)])
+    #tmp1 <- df[, grepl(protein.var, colnames(df))]
+    #tmp1 <- cbind( tmp1, df[, grepl(sequence.mod.var, colnames(df))] )
+    #tmp1 <- cbind( tmp1, df[, grepl(charge.var, colnames(df))] )
+    #tmp1 <- cbind( tmp1, df[, grepl("specie", colnames(df))])
+    tmp1 <- df[, protein.var]
+    tmp1 <- cbind( tmp1, df[, sequence.mod.var] )
+    tmp1 <- cbind( tmp1, df[, charge.var] )
+    tmp1 <- cbind( tmp1, df[, "specie"])
+    
+    # For the quantitative data, we filter by columns that have: the quantitative.var.tag AND any of the injection names
+    quant.columns <- grepl(quantitative.var.tag, colnames(df), ignore.case=T) 
+    injection.columns <- Reduce(`|`, lapply(dataSets[[experiment]], grepl, colnames(df)))
+    tmp1 <- cbind( tmp1, df[, quant.columns & injection.columns])
+    
     df <- tmp1
     rm(tmp1)
     
     quantvar.range <- which( grepl( quantitative.var.tag, colnames(df), ignore.case=T ) )
     quantvar.colnames <- names(df)[quantvar.range]
-    df <- df %>% gather_(filename.var, quantitative.var, quantvar.colnames) %>%  
-      arrange_(protein.var, sequence.mod.var)
+    if(is.na(filename.var))
+        filename.var <- "filename.var"
+    df <- df %>% gather_(filename.var, quantitative.var, quantvar.colnames) %>%
+                 arrange_(protein.var, sequence.mod.var)
     
   }else if(input_format == "long"){
     # If filename.var contains the complete path -> remove it
