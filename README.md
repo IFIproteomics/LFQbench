@@ -62,5 +62,4 @@ Then we just call
 
 ```
 
-### How to cite
-
+# References
