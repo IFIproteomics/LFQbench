@@ -1,30 +1,13 @@
 ---
-references:
-- id: fenner2012a
-  title: One-click science marketing
-  author:
-  - family: Fenner
-    given: Martin
-  container-title: Nature Materials
-  volume: 11
-  URL: 'http://dx.doi.org/10.1038/nmat3283'
-  DOI: 10.1038/nmat3283
-  issue: 4
-  publisher: Nature Publishing Group
-  page: 261-263
-  type: article-journal
-  issued:
-    year: 2012
-    month: 3
+bibliography: LFQbench_references.bib
 ---
-
 
 [<img src="https://raw.githubusercontent.com/IFIproteomics/LFQbench/master/logo.png">](https://github.com/IFIproteomics/LFQbench)
 
 [![Build Status](https://travis-ci.org/IFIproteomics/LFQbench.svg)](https://travis-ci.org/IFIproteomics/LFQbench) [![DOI](https://zenodo.org/badge/15862/IFIproteomics/LFQbench.svg)](https://zenodo.org/badge/latestdoi/15862/IFIproteomics/LFQbench)
 ======
 
-An [R package](https://github.com/IFIproteomics/LFQbench) to  standardize  and analyze the results of SWATH data and specially the output of all software tools such as: PeakView, Spectronaut, OpenSWATH, DIA-Umpire. LFQbench evaluates and represents graphically precision and accuracy of label free quantification experiments based on hybrid samples, providing software developers with an standardized set of reports that enable an in-depth evaluation of their software performance. This is just a test [@fenner2012a]
+An [R package](https://github.com/IFIproteomics/LFQbench) to  standardize  and analyze the results of SWATH data and specially the output of all software tools such as: PeakView, Spectronaut, OpenSWATH, DIA-Umpire. LFQbench evaluates and represents graphically precision and accuracy of label free quantification experiments based on hybrid samples, providing software developers with an standardized set of reports that enable an in-depth evaluation of their software performance. This is just a test [@PMIC:PMIC8028]
 
 At the moment most of the library can be use using a set of shell scripts that generate a final report with the information of the data. The final report contains the following sections:
 
