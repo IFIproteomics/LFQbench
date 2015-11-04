@@ -20,7 +20,7 @@ Then we just call
     install_github("IFIproteomics/LFQbench")
     library(LFQbench)
 
-##Examples
+## Examples
 =================
 
 ```{r, engine='bash', count_lines}
@@ -37,7 +37,10 @@ Then we just call
 # In the main folder of the dataset: ext/data/example_peakview
 > ../../ext/data/peakview
 
-#Different folder shows the plot and information: (i) The log folder contain the log information, (ii) the input the example information, (iii) the plot folder the resulted plot fomr the analysis
+# Different folder shows the plot and information: 
+# (i) the log folder contain the log information, 
+# (ii) the input the example information, 
+# (iii) the plot folder the resulted plot from the analysis
 
 ```
 
