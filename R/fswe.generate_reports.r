@@ -265,6 +265,7 @@ FSWE.generateReports <- function(
     peptides_wide <- peptides_wide[matches, ] 
   }
   
+  attr(peptides_wide, "vars") <- NULL
   peptides_wide <- peptides_wide %>% select(-sequence) 
   # Remove "empty" peptides (all values are NAs).
   common_names <- !sapply(peptides_wide, is.numeric)
