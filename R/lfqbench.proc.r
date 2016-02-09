@@ -483,7 +483,8 @@ getQuantileSeparation = function( dataBySpecies, spcNames, numberOfQuantiles=LFQ
 #' @param spcNames
 #' @param numberOfQuantiles
 getQuantileAccuracy = function(dataBySpecies, spcNames = LFQbench.Config$AllSpeciesNames, numberOfQuantiles=LFQbench.Config$NumberOfIntensityQuantiles){
-    qnts = sapply( spcNames, function(sn) as.numeric( cut( rank( dataBySpecies[[sn]]$x ), numberOfQuantiles ) ) )
+    qnts = lapply( spcNames, function(sn) as.numeric( cut( rank( dataBySpecies[[sn]]$x ), numberOfQuantiles ) ) )
+    names(qnts) = spcNames
     acc4qs = function(q, s)
     { 
         l2rs = dataBySpecies[[s]]$y
@@ -505,7 +506,8 @@ getQuantileAccuracy = function(dataBySpecies, spcNames = LFQbench.Config$AllSpec
 #' @param numberOfQuantiles
 getQuantilePrecision = function(dataBySpecies, spcNames = LFQbench.Config$AllSpeciesNames, numberOfQuantiles=LFQbench.Config$NumberOfIntensityQuantiles )
 {
-    qnts = sapply( spcNames, function(sn) as.numeric( cut( rank( dataBySpecies[[sn]]$x ), numberOfQuantiles ) ) )
+    qnts = lapply( spcNames, function(sn) as.numeric( cut( rank( dataBySpecies[[sn]]$x ), numberOfQuantiles ) ) )
+    names(qnts) = spcNames
     var4qs = function(q, s)
     { 
         l2rs = dataBySpecies[[s]]$y
