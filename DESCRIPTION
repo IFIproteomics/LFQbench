@@ -3,19 +3,32 @@ Title: Label Free Quantitation benchmark package
 Version: 1.0.0
 Author: Jorg Kuharev, Pedro Navarro, Yasset Perez-Riverol
 Maintainer: Jorg Kuharev <kuharev@uni-mainz.de>,
-            Pedro Navarro <pnavarro@uni-mainz.de>,
-            Yasset Perez-Riverol <yperez@ebi.ac.uk>
-Description: The package LFQbench comprises functions to compare different Label Free Quantitation pipelines and softwares in proteomics.
-Depends: R (>= 3.1.0),SDMTools,RColorBrewer,
-         dplyr,tidyr,ggplot2,readxl,classInt,
-         scales,pander,GGally,tools
-Imports: tools (>= 3.1.0), 
-         RColorBrewer (>= 1.1.0), 
-         SDMTools (>= 1.1.0),
-         readxl,
-         data.table, tidyr, ggplot2, readxl, reshape2
-Suggests: RUnit, bibtex, knitcitations (>= 1.0-1), knitr
-License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License
+    Pedro Navarro <pnavarro@uni-mainz.de>,
+    Yasset Perez-Riverol <yperez@ebi.ac.uk>
+Description: The package LFQbench comprises functions to compare different Label
+    Free Quantitation pipelines and softwares in proteomics.
+Depends:
+    R (>= 3.1.0),SDMTools,RColorBrewer,
+    dplyr,tidyr,ggplot2,readxl,classInt,
+    scales,pander,GGally,tools
+Imports:
+    tools (>= 3.1.0),
+    RColorBrewer (>= 1.1.0),
+    SDMTools (>= 1.1.0),
+    readxl,
+    data.table,
+    tidyr,
+    ggplot2,
+    readxl,
+    reshape2
+Suggests:
+    RUnit,
+    bibtex,
+    knitcitations (>= 1.0-1),
+    knitr
+License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+    License
 URL: https://github.com/IFIproteomics/LFQbench
 BugReports: https://github.com/IFIproteomics/LFQbench/issues
 VignetteBuilder: knitr
+RoxygenNote: 5.0.1
