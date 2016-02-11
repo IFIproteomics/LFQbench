@@ -3,22 +3,8 @@ library(readr)
 
 set.seed(1234)
 
-# General LFQbench settings =======================================================
-srcDir = "/Users/napedro/tmp_data/LFQbench/simulator"
-expFile = "test_PeptideSummary.tsv"
-
-dataSets = data.frame(
-    "Test"=c("A1", "A2", "A3",   # A
-                     "B1", "B2", "B3")   # B , 
-    ,row.names=c("A1", "A2", "A3", "B1", "B2", "B3")
-)
-
-# Define the species tags of the protein entries in your experiment
-speciesTags = list(HUMAN = "_HUMAN", YEAST = "_YEAS", ECOLI = "_ECOLI") 
-
-
 # For the simulator ===============================================================
-numReplicates = 3
+numReplicates = 9
 numProteinsSpecies = c(2000, 1500, 1000)
 peptidesPerProtein = c(3, 3, 3)
 species = c("HUMAN", "YEAST", "ECOLI")
@@ -26,9 +12,22 @@ speciesRatios = c(0.0, 1.0, -2.0)
 stdDevRatios = c(0.001, 0.001, 0.001)
 intDistribution = c(13.0, 1.5)
 stdDeviationFactorMS = 0.03
-BackgroundSignalLevel = 2^1 #2^14
+BackgroundSignalLevel = 2^14 #2^14
 MissingValuesFactor = 0.01
-SignalNoiseFactor = 0.0
+SignalNoiseFactor = 5.0
+# General LFQbench settings =======================================================
+srcDir = "/Users/napedro/tmp_data/LFQbench/simulator"
+expFile = "test_PeptideSummary.tsv"
+
+replicateNames = c(paste0("A", 1:numReplicates), paste0("B", 1:numReplicates))
+
+dataSets = data.frame(
+    "Test"= replicateNames 
+    ,row.names=replicateNames
+)
+
+# Define the species tags of the protein entries in your experiment
+speciesTags = list(HUMAN = "_HUMAN", YEAST = "_YEAS", ECOLI = "_ECOLI") 
 
 # =================================================================================
 
