@@ -368,7 +368,7 @@ FSWE.generateReports <- function(
   
   if(plotHistNAs){
     p <- ggplot(proteins_wide, aes(x = numNAs))
-    p <- p + geom_histogram()
+    p <- p + geom_bar() #geom_histogram()
     p <- p + aes() + ylab("# proteins")
     if(exists("histNAs.proteins.scale")){
       p <- p + scale_y_continuous(limits = histNAs.proteins.scale)
@@ -377,7 +377,7 @@ FSWE.generateReports <- function(
       scale_fill_discrete(drop=FALSE) + scale_x_discrete(drop=FALSE)
     
     p <- ggplot(peptides_wide, aes(x = numNAs))
-    p <- p + geom_histogram()
+    p <- p + geom_bar() # geom_histogram()
     p <- p + aes() + ylab("# peptides")
     if(exists("histNAs.peptides.scale")){
       p <- p + scale_y_continuous(limits = histNAs.peptides.scale)
