@@ -15,7 +15,7 @@
 #'                                                        ,row.names=c("A1", "A2", "A3", "B1", "B2", "B3"))
 #'                                                         
 #' @param speciesTags : Namesa named vector containing tags to locate the corresponding species at the protein name reported by the software. 
-#'                      In SwissProt you may use something like _SPECIE. 
+#'                      In SwissProt you may use something like _SPECIES. 
 #'                      Names of elements must contain all LFQbench.Config$AllSpecies
 #'                      Example: speciesTags = list(HUMAN = "_HUMAN", YEAST = "_YEAS", ECOLI = "_ECOLI") 
 #'           

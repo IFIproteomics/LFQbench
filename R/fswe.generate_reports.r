@@ -116,10 +116,10 @@ FSWE.generateReports <- function(
     df <- df[!grepl(dectag, df[[protein.var]], ignore.case = T),]
   }
   
-  # Attach specie and remove peptides belonging to multiple species, and not considered species ("NA"s)
+  # Attach species and remove peptides belonging to multiple species, and not considered species ("NA"s)
   df <- df %>% rowwise()
-  df <- eval( substitute(mutate(df, "specie" = guessOrganism(var, speciesTags)), list(var = as.name(protein.var)) ) ) 
-  df <- filter(df, specie != "NA", specie != "multiple")
+  df <- eval( substitute(mutate(df, "species" = guessOrganism(var, speciesTags)), list(var = as.name(protein.var)) ) ) 
+  df <- filter(df, species != "NA", species != "multiple")
   
   experiment <- NA
   if(input_format == "wide"){
@@ -135,11 +135,11 @@ FSWE.generateReports <- function(
     #tmp1 <- df[, grepl(protein.var, colnames(df))]
     #tmp1 <- cbind( tmp1, df[, grepl(sequence.mod.var, colnames(df))] )
     #tmp1 <- cbind( tmp1, df[, grepl(charge.var, colnames(df))] )
-    #tmp1 <- cbind( tmp1, df[, grepl("specie", colnames(df))])
+    #tmp1 <- cbind( tmp1, df[, grepl("species", colnames(df))])
     tmp1 <- df[, protein.var]
     tmp1 <- cbind( tmp1, df[, sequence.mod.var] )
     tmp1 <- cbind( tmp1, df[, charge.var] )
-    tmp1 <- cbind( tmp1, df[, "specie"])
+    tmp1 <- cbind( tmp1, df[, "species"])
     
     # For the quantitative data, we filter by columns that have: the quantitative.var.tag AND any of the injection names
     quant.columns <- grepl(quantitative.var.tag, colnames(df), ignore.case=T) 
@@ -179,8 +179,8 @@ FSWE.generateReports <- function(
   #data <- data %>% na.omit() 
   
   # For each peptide: Sum quantitative values of charge states
-  data <- data %>% group_by_(filename.var, sequence.mod.var, protein.var , "specie") %>% 
-    summarise_( quant_value = sumquant ) # proteinID = protein.var, specie = "specie" , 
+  data <- data %>% group_by_(filename.var, sequence.mod.var, protein.var , "species") %>% 
+    summarise_( quant_value = sumquant ) # proteinID = protein.var, species = "species" , 
   
   peptides_wide <- spread_(data, filename.var, "quant_value") 
   
@@ -195,8 +195,8 @@ FSWE.generateReports <- function(
   peptides_wide <- peptides_wide[, c(c(1:3), experiment.order)]
   
   #Rename the samples 
-  names(peptides_wide) <- c("sequenceID", "proteinID", "specie", rownames(FSWE.dataSets) )
-  # names(peptides_wide) <- c("sequenceID", "proteinID", "specie", inj_names )
+  names(peptides_wide) <- c("sequenceID", "proteinID", "species", rownames(FSWE.dataSets) )
+  # names(peptides_wide) <- c("sequenceID", "proteinID", "species", inj_names )
   
   # add a sequence column (just to remove it after reporting naked sequences)
   peptides_wide$sequence <- gsub( "*\\[.*?\\]", "", peptides_wide$sequenceID )
@@ -300,8 +300,8 @@ FSWE.generateReports <- function(
   if(singleHits){
     print("Summarising protein single hits...")
     proteins_wide <- peptides_wide %>% 
-      arrange(proteinID, specie) %>%
-      group_by(proteinID, specie) %>%
+      arrange(proteinID, species) %>%
+      group_by(proteinID, species) %>%
       filter(n_distinct(sequenceID) == 1) %>%
       select(-sequenceID) %>% 
       summarise_each(funs(single_hits(.))) 
@@ -311,8 +311,8 @@ FSWE.generateReports <- function(
       print("using TOP3 individual for each run")
       proteins_wide <- peptides_wide %>% 
         select(-sequenceID) %>% 
-        arrange(proteinID, specie) %>%
-        group_by(proteinID, specie) %>%  
+        arrange(proteinID, species) %>%
+        group_by(proteinID, species) %>%  
         summarise_each(funs(avg_top_n(., top.N, top.N.min))) 
     }else{
       print("using consensus TOP3")
@@ -323,7 +323,7 @@ FSWE.generateReports <- function(
         arrange(desc(totalIntensity)) %>%
         filter(row_number() <= top.N & n() >= top.N.min) %>%
         select(-sequenceID, -totalIntensity) %>%
-        group_by(proteinID, specie)
+        group_by(proteinID, species)
       
       if(restrictNA){
         proteins_wide <- proteins_wide %>%
@@ -350,7 +350,7 @@ FSWE.generateReports <- function(
   ## Histogram: Peptides per protein
   
   peptides_per_protein <- peptides_wide %>%
-    group_by(proteinID, specie) %>%
+    group_by(proteinID, species) %>%
     summarise(pep.protein = n_distinct(sequenceID))
   
   if(plotHistogram){
@@ -373,7 +373,7 @@ FSWE.generateReports <- function(
     if(exists("histNAs.proteins.scale")){
       p <- p + scale_y_continuous(limits = histNAs.proteins.scale)
     }
-    hNAprot <- p + facet_wrap( ~ specie, ncol = 3)  + theme_classic() +
+    hNAprot <- p + facet_wrap( ~ species, ncol = 3)  + theme_classic() +
       scale_fill_discrete(drop=FALSE) + scale_x_discrete(drop=FALSE)
     
     p <- ggplot(peptides_wide, aes(x = numNAs))
@@ -382,7 +382,7 @@ FSWE.generateReports <- function(
     if(exists("histNAs.peptides.scale")){
       p <- p + scale_y_continuous(limits = histNAs.peptides.scale)
     }
-    hNApep <- p + facet_wrap( ~ specie, ncol = 3)  + theme_classic() +
+    hNApep <- p + facet_wrap( ~ species, ncol = 3)  + theme_classic() +
       scale_fill_discrete(drop=FALSE) + scale_x_discrete(drop=FALSE)
     
     ggsave(filename = file.path(working_dir, results_dir, supplementary, histNAsProteinsreportname), plot = hNAprot , width=6, height=4)
