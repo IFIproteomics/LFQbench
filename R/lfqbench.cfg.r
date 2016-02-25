@@ -59,7 +59,7 @@ LFQbench.initConfiguration = function(
   ,LogRatioValidityRange  = c(-10, 10)
   # log-ratio range for plots
   ,LogRatioPlotRange   = c(-4, 4)
-  ,LogIntensityPlotRange = c(9, 26)
+  ,LogIntensityPlotRange = NULL # c(9, 26)
   # value used as maximum for AUQC quantification
   ,MaxLogRatioForAUQC  = 2
   # data will be split into this number of quantiles for calculating ranged metrics
