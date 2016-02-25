@@ -131,6 +131,7 @@ FSWE.init.defaultSoftwares = function()
     "Spectronaut" = function(){
       FSWE.setSoftwareConfiguration(
         qvalue.var = "EG.Qvalue"
+        ,decoy.var = "EG.IsDecoy"
         ,quantitative.var = "FG.NormalizedTotalPeakArea"
         ,protein.var = "EG.ProteinId"
         ,filename.var = "R.FileName"

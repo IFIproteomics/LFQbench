@@ -116,6 +116,11 @@ FSWE.generateReports <- function(
     df <- df[!grepl(dectag, df[[protein.var]], ignore.case = T),]
   }
   
+  # If there is a "decoy" column with boolean values, filter to no decoys
+  if(!is.na(decoy.var)){
+      df <- df[tolower(df[[decoy.var]]) == "false",]
+  }
+  
   # Attach species and remove peptides belonging to multiple species, and not considered species ("NA"s)
   df <- df %>% rowwise()
   df <- eval( substitute(mutate(df, "species" = guessOrganism(var, speciesTags)), list(var = as.name(protein.var)) ) ) 
