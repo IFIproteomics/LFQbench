@@ -93,8 +93,16 @@ FSWE.generateReports <- function(
       qvalue.filtered = TRUE
     }
   }else{
-    df <- read.table(experimentFile, na.strings= nastrings, header=T, 
-                     sep=guessSep(experimentFile), stringsAsFactors =F, fill = T)
+    #df <- read.table(experimentFile, na.strings= nastrings, header=T, 
+    #                 sep=guessSep(experimentFile), stringsAsFactors =F, fill = T)
+
+    if(guessSep(experimentFile) == ","){
+        df <- read_csv(experimentFile, na = nastrings)
+    }
+    if(guessSep(experimentFile) == "\t"){
+        df <- read_tsv(experimentFile, na = nastrings)
+    }
+        
   }
   
   if(protein_input){
