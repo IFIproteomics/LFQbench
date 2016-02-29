@@ -6,8 +6,10 @@
 \usage{
 plotSpeciesLegend(pos = "top", ...)
 }
+\arguments{
+\item{pos}{the legend position on plot area}
+}
 \description{
 This function add the species legend to a plot
- @param pos the legend position on plot area
 }
 

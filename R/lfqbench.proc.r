@@ -419,9 +419,9 @@ getRangedPrecision = function(dataBySpecies, ranges=LFQbench.Config$Log2Intensit
 #' getRangedSepRate
 #' 
 #'  This function calculate species separation ROC-AUC for a species pair
-#'  @param dataBySpecies
-#'  @param spcNames 
-#'  @param ranges
+#' @param dataBySpecies
+#' @param spcNames 
+#' @param ranges
 getRangedSepRate = function(dataBySpecies, spcNames, ranges=LFQbench.Config$Log2IntensityRanges){
   l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )
   l2is = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$x ) )
@@ -448,9 +448,9 @@ getRangedSepRate = function(dataBySpecies, spcNames, ranges=LFQbench.Config$Log2
 #'  This function calculates species separation ROC-AUC for a species pair
 #'  in equally sized quantiles of intensity in first sample.
 #'  
-#'  @param dataBySpecies data structure as stored in ResultSet$result[[SamplePairIndex]]$data
-#'  @param spcNames a vector of two species names
-#'  @param numberOfQuantiles the number of quantiles
+#' @param dataBySpecies data structure as stored in ResultSet$result[[SamplePairIndex]]$data
+#' @param spcNames a vector of two species names
+#' @param numberOfQuantiles the number of quantiles
 getQuantileSeparation = function( dataBySpecies, spcNames, numberOfQuantiles=LFQbench.Config$NumberOfIntensityQuantiles ){
     # get log-ratios
     l2rs = unlist( lapply( spcNames, function( sn ) dataBySpecies[[sn]]$y ) )

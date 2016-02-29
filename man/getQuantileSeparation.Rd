@@ -7,12 +7,15 @@
 getQuantileSeparation(dataBySpecies, spcNames,
   numberOfQuantiles = LFQbench.Config$NumberOfIntensityQuantiles)
 }
+\arguments{
+\item{dataBySpecies}{data structure as stored in ResultSet$result[[SamplePairIndex]]$data}
+
+\item{spcNames}{a vector of two species names}
+
+\item{numberOfQuantiles}{the number of quantiles}
+}
 \description{
 This function calculates species separation ROC-AUC for a species pair
  in equally sized quantiles of intensity in first sample.
- 
- @param dataBySpecies data structure as stored in ResultSet$result[[SamplePairIndex]]$data
- @param spcNames a vector of two species names
- @param numberOfQuantiles the number of quantiles
 }
 

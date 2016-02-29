@@ -4,17 +4,13 @@
 
 # Example code in package build process
 *-Ex.R
-
 # RStudio files
 .Rproj.user/
-
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
-
 .RData
-
 Rplots.pdf
-
 *.Rout
 .Rproj.user
+inst/doc

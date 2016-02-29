@@ -3,9 +3,9 @@
 #' 
 #'  Plot user content to file by using LFQbench canvas configuration.
 #'  
-#'  @param file the pdfFile
-#'  @param plotFunc the plot function
-#'  @export
+#' @param file the pdfFile
+#' @param plotFunc the plot function
+#' @export
 LFQbench.plotToFile = function( file, plotFunc, ... )
 {
   pdf(file=file, onefile=T, width=LFQbench.Config$PlotWidth, height=LFQbench.Config$PlotHeight, family="Helvetica", pointsize=9)
@@ -134,7 +134,7 @@ scaleColor=function(col, scale=1.5, alpha=1)
 #' plotSpeciesLegend
 #' 
 #'  This function add the species legend to a plot
-#'  @param pos the legend position on plot area
+#' @param pos the legend position on plot area
 plotSpeciesLegend = function( pos="top", ... )
 {
   legend(x=pos, legend=LFQbench.Config$AllSpeciesNames, col=LFQbench.Config$SpeciesColors, lwd=LFQbench.Config$PlotLegendLineWidth, inset=.02, bg="white", ...)	
@@ -145,8 +145,8 @@ plotSpeciesLegend = function( pos="top", ... )
 #' LFQbench.plotSpeciesLegends
 #' 
 #'  plot vertical and horizontal species legends
-#'  @param plotFolder the folder, where plots should go to
-#'  @export
+#' @param plotFolder the folder, where plots should go to
+#' @export
 LFQbench.plotSpeciesLegends = function(plotFolder = LFQbench.Config$PlotFilesLocation)
 {
   pdf(file = paste(plotFolder,"/species_legend_vertical.pdf", sep = ""), width = 1.05, height = 0.66, family = "Helvetica", pointsize = 9)
@@ -266,8 +266,12 @@ addScatterPointsForSpecies2 = function(species, samplePairResult, minAlpha=.2, s
 makeScatter = function( samplePair, showLegend=F, showRegLines=F, showExpLines=T, useCfgColor=T )
 {
   emptyPlot(samplePair$xlim, samplePair$ylim, grid=F, lwd = LFQbench.Config$AxisLineThickness, cex.axis = LFQbench.Config$AxisAnnotationSize)
-  addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ) )
-  addYLab( as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ) )
+  if( !any(names(LFQbench.Config)=="DisplayAxisLabels") ) LFQbench.Config[["DisplayAxisLabels"]] <<- TRUE
+  if(LFQbench.Config$DisplayAxisLabels)
+  {
+      addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ) )
+      addYLab( as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ) )
+  }
   logRatios = sapply(LFQbench.Config$AllSpeciesNames, 
                      addScatterPointsForSpecies2, samplePair, 
                       minAlpha=LFQbench.Config$PlotPointMinAlpha, showExpectationLine=showExpLines, showRegressionLine=showRegLines, 

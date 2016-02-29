@@ -5,7 +5,8 @@
 \title{FSWE.simExperiment}
 \usage{
 FSWE.simExperiment(numReplicates, species, speciesRatios, stdDevRatios,
-  numProteinsSpecies, peptidesPerProtein, intDistribution, stdDeviationFactorMS)
+  numProteinsSpecies, peptidesPerProtein, intDistribution, stdDeviationFactorMS,
+  BackgroundSignalLevel, MissingValuesFactor, SignalNoiseFactor)
 }
 \arguments{
 \item{numReplicates}{number of replicates of the experiment (same number for samples A and B)}
@@ -23,6 +24,8 @@ FSWE.simExperiment(numReplicates, species, speciesRatios, stdDevRatios,
 \item{intDistribution}{vector containing mean and sd values defining the protein distribution intensities desired. Example: intDistribution = c(10.0, 5.0)}
 
 \item{stdDeviationFactorMS}{standard deviation factor (0 to 1) due to MS. Example: stdDeviationFactorMS = 0.03}
+
+\item{MissingValuesFactor}{factor of missing values in the experiment. They are intensity-dependant.}
 }
 \description{
 This function simulates a complete experiment that can be read by FSWE.

@@ -6,12 +6,16 @@
 \usage{
 moveFiles(srcDir, tarDir, namePattern = "\\\\..+", rmSrc = F)
 }
+\arguments{
+\item{srcDir}{the origin folder}
+
+\item{tarDir}{the target folder}
+
+\item{namePattern}{the file name pattern for files to be moved}
+
+\item{rmSrc}{if the origin folder should be removed, it can only be removed if it is empty}
+}
 \description{
 move all files (with any file extension) to a new directory
- @param srcDir the origin folder
- @param tarDir the target folder
- @param namePattern the file name pattern for files to be moved
- @param rmSrc if the origin folder should be removed, it can only be removed if it is empty
- @export
 }
 

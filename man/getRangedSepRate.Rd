@@ -7,10 +7,10 @@
 getRangedSepRate(dataBySpecies, spcNames,
   ranges = LFQbench.Config$Log2IntensityRanges)
 }
+\arguments{
+\item{spcNames}{}
+}
 \description{
 This function calculate species separation ROC-AUC for a species pair
- @param dataBySpecies
- @param spcNames 
- @param ranges
 }
 

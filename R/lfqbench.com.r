@@ -11,16 +11,10 @@ loadLibrary <- function(x)
   } 
 }
 
-# Define + for String concatenation
-# "+"=function(...) UseMethod("+")
-# "+.default"=.Primitive("+")
-# "+.character"=function(...) paste(...,sep="")
-
 #' mkdir
-#' 
-#'  This recursively create a directory if it does not exist
-#'  @param dirName the directory to create the directory
-#'  @export
+#' This recursively create a directory if it does not exist
+#' @param dirName the directory to create the directory
+#' @export
 mkdir = function(dirName){
 	if(!file.exists(dirName))
 	{
@@ -32,12 +26,12 @@ mkdir = function(dirName){
 
 #' moveFiles
 #' 
-#'  move all files (with any file extension) to a new directory
-#'  @param srcDir the origin folder
-#'  @param tarDir the target folder
-#'  @param namePattern the file name pattern for files to be moved
-#'  @param rmSrc if the origin folder should be removed, it can only be removed if it is empty
-#'  @export
+#' move all files (with any file extension) to a new directory
+#' @param srcDir the origin folder
+#' @param tarDir the target folder
+#' @param namePattern the file name pattern for files to be moved
+#' @param rmSrc if the origin folder should be removed, it can only be removed if it is empty
+#' @export
 moveFiles = function(srcDir, tarDir, namePattern="\\..+", rmSrc=F)
 {
     mkdir(tarDir)
@@ -80,7 +74,6 @@ rms = function(x) sqrt( sum(x^2) / length(x) )
 #' @param lims overrides yLim parameter of boxplot
 #' @param whiskerQuantile whiskers range from (this value) to (1 - this value)
 #' @export 
-#' 
 qboxplot = function( vals, labs=NULL, lims=NULL, whiskerQuantile=0.05, horizontal=F, ... ){
   if( is.matrix(vals) ){
     cnames = colnames(vals)

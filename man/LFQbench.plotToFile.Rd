@@ -6,11 +6,12 @@
 \usage{
 LFQbench.plotToFile(file, plotFunc, ...)
 }
+\arguments{
+\item{file}{the pdfFile}
+
+\item{plotFunc}{the plot function}
+}
 \description{
 Plot user content to file by using LFQbench canvas configuration.
- 
- @param file the pdfFile
- @param plotFunc the plot function
- @export
 }
 

@@ -2,13 +2,16 @@
 % Please edit documentation in R/lfqbench.com.r
 \name{mkdir}
 \alias{mkdir}
-\title{mkdir}
+\title{mkdir
+This recursively create a directory if it does not exist}
 \usage{
 mkdir(dirName)
 }
+\arguments{
+\item{dirName}{the directory to create the directory}
+}
 \description{
+mkdir
 This recursively create a directory if it does not exist
- @param dirName the directory to create the directory
- @export
 }
 

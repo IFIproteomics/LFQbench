@@ -26,7 +26,8 @@ Suggests:
     RUnit,
     bibtex,
     knitcitations (>= 1.0-1),
-    knitr
+    knitr,
+    rmarkdown
 License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
     License
 URL: https://github.com/IFIproteomics/LFQbench
