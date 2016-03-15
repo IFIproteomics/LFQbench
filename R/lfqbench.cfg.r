@@ -14,7 +14,7 @@
 #' @param  BoxPlotWhiskerQuantile the quantile to that whiskers of boxplots will extend, t.m. (1 - quantile*2) portion of data will be inside the whiskers
 #' @param  MinProteinAmount the minimum valid protein amount in the input data, protein amounts below this threshold are considered as NA
 #' @param  DropInvalidLogRatio if TRUE log-ratios outside validity range will be dropped
-#' @param  LogRatioValidityRange the log-ratio validity range 
+#' @param  LogRatioValidityRangeSDFactor validity range is calculated as mean +/- SD * SDFactor (separately for each species)
 #' @param  LogRatioPlotRange the log-ratio range for plotting
 #' @param  LogIntensityPlotRange the log2-intensity range for plotting
 #' @param  MaxLogRatioForAUQC the maximum value for AUQC quantification
@@ -56,7 +56,8 @@ LFQbench.initConfiguration = function(
   ,MinProteinAmount    = 0.000001
   # log-ratios outside validity range will be dropped
   ,DropInvalidLogRatio = T
-  ,LogRatioValidityRange  = c(-10, 10)
+  # dynamic log ratio validity for each species separately by SD * Factor to both sides of the mean
+  ,LogRatioValidityRangeSDFactor = 5 # ValidityRange = mu +/- factor * sd
   # log-ratio range for plots
   ,LogRatioPlotRange   = c(-4, 4)
   ,LogIntensityPlotRange = NULL # c(9, 26)
@@ -194,7 +195,7 @@ LFQbench.setDataRootFolder = function( rootFolder=ifelse(file.exists(LFQbench.Co
 #' @param  BoxPlotWhiskerQuantile the quantile to that whiskers of boxplots will extend, t.m. (1 - quantile*2) portion of data will be inside the whiskers
 #' @param  MinProteinAmount the minimum valid protein amount in the input data, protein amounts below this threshold are considered as NA
 #' @param  DropInvalidLogRatio if TRUE log-ratios outside validity range will be dropped
-#' @param  LogRatioValidityRange the log-ratio validity range 
+#' @param  LogRatioValidityRangeSDFactor validity range is calculated as mean +/- SD * SDFactor (separately for each species)
 #' @param  LogRatioPlotRange the log-ratio range for plotting
 #' @param  LogIntensityPlotRange the log2-intensity range for plotting
 #' @param  MaxLogRatioForAUQC the maximum value for AUQC quantification
@@ -223,7 +224,7 @@ LFQbench.changeConfiguration = function(
   ,BoxPlotWhiskerQuantile = LFQbench.Config$BoxPlotWhiskerQuantile
   ,MinProteinAmount    = LFQbench.Config$MinProteinAmount
   ,DropInvalidLogRatio = LFQbench.Config$DropInvalidLogRatio
-  ,LogRatioValidityRange  = LFQbench.Config$LogRatioValidityRange
+  ,LogRatioValidityRangeSDFactor  = LFQbench.Config$LogRatioValidityRangeSDFactor
   ,LogRatioPlotRange   = LFQbench.Config$LogRatioPlotRange
   ,LogIntensityPlotRange = LFQbench.Config$LogIntensityPlotRange
   ,MaxLogRatioForAUQC  = LFQbench.Config$MaxLogRatioForAUQC

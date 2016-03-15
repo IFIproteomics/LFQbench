@@ -144,33 +144,34 @@ LFQbench.processFile = function( file ) {
       logratio = LogRatio,
       sample1means = Sample1ProteinAmounts,
       sample2means = Sample2ProteinAmounts
-    )   
+    )
     
     ################################################################################
     # drop invalid log ratios
     if(LFQbench.Config$DropInvalidLogRatio)
     {
-      emptyLRs = which(is.na(LogRatio))
-      smallLRs = which(LogRatio < min(LFQbench.Config$LogRatioValidityRange))
-      bigLRs = which(LogRatio > max(LFQbench.Config$LogRatioValidityRange))      
-      badLRs = unique(c(emptyLRs, smallLRs, bigLRs))
-      if(length(badLRs)>0)
-      {
-        invalidLogRatios = data.frame(
-  	      	entry = ProteinIDs[badLRs],
-  	      	species = SpeciesNames[badLRs],
-  	      	logratio = LogRatio[badLRs],
-  	      	sample1means = Sample1ProteinAmounts[badLRs],
-  	      	sample2means = Sample2ProteinAmounts[badLRs],
-  	      	row.names = NULL,
-            stringsAsFactors=F
-  	    )
-        LogRatio = LogRatio[-badLRs]
-        SpeciesNames = SpeciesNames[-badLRs]
-        ProteinIDs = ProteinIDs[-badLRs]
-        Sample1ProteinAmounts = Sample1ProteinAmounts[-badLRs]
-        Sample2ProteinAmounts = Sample2ProteinAmounts[-badLRs]
-      }
+        emptyLR.idx = which( is.na(LogRatio) )
+        outlierLR.idx = unlist( sapply( unique(SpeciesNames), getOutlierIdx, flags=SpeciesNames, vals=LogRatio, sdFac=LFQbench.Config$LogRatioValidityRangeSDFactor ) )
+        badLR.idx = unique( emptyLR.idx, outlierLR.idx )
+        if(length(badLR.idx)>0)
+        {
+            # store outliers
+            invalidLogRatios = data.frame(
+      	      	entry = ProteinIDs[badLR.idx],
+      	      	species = SpeciesNames[badLR.idx],
+      	      	logratio = LogRatio[badLR.idx],
+      	      	sample1means = Sample1ProteinAmounts[badLR.idx],
+      	      	sample2means = Sample2ProteinAmounts[badLR.idx],
+      	      	row.names = NULL,
+                stringsAsFactors=F
+      	    )
+            # remove outliers
+            LogRatio = LogRatio[-badLR.idx]
+            SpeciesNames = SpeciesNames[-badLR.idx]
+            ProteinIDs = ProteinIDs[-badLR.idx]
+            Sample1ProteinAmounts = Sample1ProteinAmounts[-badLR.idx]
+            Sample2ProteinAmounts = Sample2ProteinAmounts[-badLR.idx]
+        }
     }
     ################################################################################
     
@@ -344,6 +345,28 @@ LFQbench.processFile = function( file ) {
 }
 
 ################################################################################
+#' getOutlierIdx
+#' get outlier indices out of a range defined as mean +/- sdFac*SD
+#' @param flag identify values in @param flags by this value, e.g. a single species
+#' @param vals vector of values, e.g. log-ratios
+#' @param flags vector of flags, e.g. species
+#' @param sdFac SD multiplier to define thresholds around the mean value where the outliers start
+getOutlierIdx = function(flag, vals, flags, sdFac)
+{
+    flagged = flags==flag 
+    avgVal = mean( vals[flagged], na.rm = T)
+    stdVal = sd( vals[flagged], na.rm = T)
+    outVal = stdVal * sdFac
+    loVal = avgVal - outVal
+    hiVal = avgVal + outVal
+    loIdx = which( vals < loVal & flagged )
+    hiIdx = which( vals > hiVal & flagged )
+    outIdx = c(loIdx, hiIdx)
+    return( outIdx )
+}
+################################################################################
+
+################################################################################
 # calculate qc function
 getQCFunction = function( ratios, ensureValueRange=c(0, 1) )
 {
@@ -503,7 +526,7 @@ getQuantileAccuracy = function(dataBySpecies, spcNames = LFQbench.Config$AllSpec
 #'This function generate the standard deviation for log-ratios for each species in each range
 #'@param dataBySpecies
 #'@param spcNames
-#' @param numberOfQuantiles
+#'@param numberOfQuantiles
 getQuantilePrecision = function(dataBySpecies, spcNames = LFQbench.Config$AllSpeciesNames, numberOfQuantiles=LFQbench.Config$NumberOfIntensityQuantiles )
 {
     qnts = lapply( spcNames, function(sn) as.numeric( cut( rank( dataBySpecies[[sn]]$x ), numberOfQuantiles ) ) )
@@ -540,4 +563,3 @@ getSepRate = function(dataBySpecies, spcNames){
 }
 
 ################################################################################
-
