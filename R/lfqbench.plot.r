@@ -247,7 +247,7 @@ addScatterPointsForSpecies2 = function(species, samplePairResult, minAlpha=.2, s
   # draw lowess regression line
   if(showRegressionLine)
   {
-    regLine = lowess( ds$x, ds$y )
+    regLine = lowess( ds$x, ds$y, f=LFQbench.Config$ScatterPlotLowessBandWidth )
     lines( regLine, col=scaleColor(theCol,.5), lty=5, lwd=LFQbench.Config$PlotCurveLineWidth )
   }
   return(ds$y)
@@ -274,8 +274,8 @@ makeScatter = function( samplePair, showLegend=F, showRegLines=F, showExpLines=T
   }
   logRatios = sapply(LFQbench.Config$AllSpeciesNames, 
                      addScatterPointsForSpecies2, samplePair, 
-                      minAlpha=LFQbench.Config$PlotPointMinAlpha, showExpectationLine=showExpLines, showRegressionLine=showRegLines, 
-                      useCfgColor=T, rampColors=ifelse(LFQbench.Config$PlotPointMinAlpha==1, F, T), cex=LFQbench.Config$PlotPointSize
+                      minAlpha=LFQbench.Config$ScatterPlotPointMinAlpha, showExpectationLine=showExpLines, showRegressionLine=showRegLines, 
+                      useCfgColor=T, rampColors=ifelse(LFQbench.Config$ScatterPlotPointMinAlpha==1, F, T), cex=LFQbench.Config$PlotPointSize
   )
   if(showLegend) plotSpeciesLegend( horiz=T )
   return(logRatios)

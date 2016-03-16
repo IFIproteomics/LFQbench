@@ -27,7 +27,8 @@
 #' @param  PlotLegendLineWidth the line thickness in legends
 #' @param  PlotPointSize the point size
 #' @param  ScatterPlotPointType the point type
-#' @param  PlotPointMinAlpha the minimum alpha value used for coloring points in sparse regions
+#' @param  ScatterPlotPointMinAlpha the minimum alpha value used for coloring points in sparse regions
+#' @param  ScatterPlotLowessBandWidth the lowess locality parameter f, use values (local) 0 < f <= 1 (global)
 #' @param  AxisLabelSize the relative font size for axis labels
 #' @param  AxisAnnotationSize the relative font size for axis labels
 #' @param  AxisLineThickness the line thickness of axes
@@ -82,7 +83,9 @@ LFQbench.initConfiguration = function(
   # point type
   ,ScatterPlotPointType = 20
   # minimum alpha threshold for point transparency ramping
-  ,PlotPointMinAlpha = 0.1
+  ,ScatterPlotPointMinAlpha = 0.6
+  # lowess locality parameter f between 0 (local) and 1 (global)
+  ,ScatterPlotLowessBandWidth = 0.8
   # size magnification for axis labels (cex.lab)
   ,AxisLabelSize = 2
   # size magnification for axis annotations (cex.axis)
@@ -208,7 +211,8 @@ LFQbench.setDataRootFolder = function( rootFolder=ifelse(file.exists(LFQbench.Co
 #' @param  PlotLegendLineWidth the line thickness in legends
 #' @param  PlotPointSize the point size
 #' @param  ScatterPlotPointType the point type
-#' @param  PlotPointMinAlpha the minimum alpha value used for coloring points in sparse regions
+#' @param  ScatterPlotPointMinAlpha the minimum alpha value used for coloring points in sparse regions
+#' @param  ScatterPlotLowessBandWidth the lowess locality parameter f, use values (local) 0 < f <= 1 (global)
 #' @param  AxisLabelSize the relative font size for axis labels
 #' @param  AxisAnnotationSize the relative font size for axis labels
 #' @param  AxisLineThickness the line thickness of axes
@@ -237,7 +241,8 @@ LFQbench.changeConfiguration = function(
   ,PlotLegendLineWidth = LFQbench.Config$PlotLegendLineWidth
   ,PlotPointSize = LFQbench.Config$PlotPointSize
   ,ScatterPlotPointType = LFQbench.Config$ScatterPlotPointType
-  ,PlotPointMinAlpha = LFQbench.Config$PlotPointMinAlpha
+  ,ScatterPlotPointMinAlpha = LFQbench.Config$ScatterPlotPointMinAlpha
+  ,ScatterPlotLowessBandWidth = LFQbench.Config$ScatterPlotLowessBandWidth 
   ,AxisLabelSize = LFQbench.Config$AxisLabelSize
   ,AxisAnnotationSize = LFQbench.Config$AxisAnnotationSize
   ,AxisLineThickness = LFQbench.Config$AxisLineThickness
