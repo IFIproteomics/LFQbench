@@ -83,7 +83,7 @@ LFQbench.initConfiguration = function(
   # point type
   ,ScatterPlotPointType = 20
   # minimum alpha threshold for point transparency ramping
-  ,ScatterPlotPointMinAlpha = 0.6
+  ,ScatterPlotPointMinAlpha = 0.5
   # lowess locality parameter f between 0 (local) and 1 (global)
   ,ScatterPlotLowessBandWidth = 0.8
   # size magnification for axis labels (cex.lab)

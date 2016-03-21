@@ -10,12 +10,13 @@ LFQbench.initConfiguration(DataRootFolder = getwd(),
   InputExtensionPattern = "\\\\..sv$", CsvColumnSeparator = "\\t",
   CsvDecimalPointChar = ".", BoxPlotWhiskerQuantile = 0.025,
   MinProteinAmount = 1e-06, DropInvalidLogRatio = T,
-  LogRatioValidityRange = c(-10, 10), LogRatioPlotRange = c(-4, 4),
+  LogRatioValidityRangeSDFactor = 5, LogRatioPlotRange = c(-4, 4),
   LogIntensityPlotRange = NULL, MaxLogRatioForAUQC = 2,
   NumberOfIntensityQuantiles = 3, CenterLogRatioByBackground = T,
   NormalizeAmountsToPPM = F, PlotWidth = 6, PlotHeight = 5,
   PlotCurveLineWidth = 2, PlotLegendLineWidth = 4, PlotPointSize = 1.5,
-  ScatterPlotPointType = 20, PlotPointMinAlpha = 0.1, AxisLabelSize = 2,
+  ScatterPlotPointType = 20, ScatterPlotPointMinAlpha = 0.5,
+  ScatterPlotLowessBandWidth = 0.8, AxisLabelSize = 2,
   AxisAnnotationSize = 2, AxisLineThickness = 2, par = list(mar = c(4.5,
   6, 0.5, 0.5), mgp = c(3.7, 1.5, 0), las = 1))
 }
@@ -38,7 +39,7 @@ LFQbench.initConfiguration(DataRootFolder = getwd(),
 
 \item{DropInvalidLogRatio}{if TRUE log-ratios outside validity range will be dropped}
 
-\item{LogRatioValidityRange}{the log-ratio validity range}
+\item{LogRatioValidityRangeSDFactor}{validity range is calculated as mean +/- SD * SDFactor (separately for each species)}
 
 \item{LogRatioPlotRange}{the log-ratio range for plotting}
 
@@ -64,7 +65,9 @@ LFQbench.initConfiguration(DataRootFolder = getwd(),
 
 \item{ScatterPlotPointType}{the point type}
 
-\item{PlotPointMinAlpha}{the minimum alpha value used for coloring points in sparse regions}
+\item{ScatterPlotPointMinAlpha}{the minimum alpha value used for coloring points in sparse regions}
+
+\item{ScatterPlotLowessBandWidth}{the lowess locality parameter f, use values (local) 0 < f <= 1 (global)}
 
 \item{AxisLabelSize}{the relative font size for axis labels}
 

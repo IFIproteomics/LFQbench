@@ -13,7 +13,7 @@ LFQbench.changeConfiguration(DataRootFolder = LFQbench.Config$DataRootFolder,
   BoxPlotWhiskerQuantile = LFQbench.Config$BoxPlotWhiskerQuantile,
   MinProteinAmount = LFQbench.Config$MinProteinAmount,
   DropInvalidLogRatio = LFQbench.Config$DropInvalidLogRatio,
-  LogRatioValidityRange = LFQbench.Config$LogRatioValidityRange,
+  LogRatioValidityRangeSDFactor = LFQbench.Config$LogRatioValidityRangeSDFactor,
   LogRatioPlotRange = LFQbench.Config$LogRatioPlotRange,
   LogIntensityPlotRange = LFQbench.Config$LogIntensityPlotRange,
   MaxLogRatioForAUQC = LFQbench.Config$MaxLogRatioForAUQC,
@@ -26,7 +26,8 @@ LFQbench.changeConfiguration(DataRootFolder = LFQbench.Config$DataRootFolder,
   PlotLegendLineWidth = LFQbench.Config$PlotLegendLineWidth,
   PlotPointSize = LFQbench.Config$PlotPointSize,
   ScatterPlotPointType = LFQbench.Config$ScatterPlotPointType,
-  PlotPointMinAlpha = LFQbench.Config$PlotPointMinAlpha,
+  ScatterPlotPointMinAlpha = LFQbench.Config$ScatterPlotPointMinAlpha,
+  ScatterPlotLowessBandWidth = LFQbench.Config$ScatterPlotLowessBandWidth,
   AxisLabelSize = LFQbench.Config$AxisLabelSize,
   AxisAnnotationSize = LFQbench.Config$AxisAnnotationSize,
   AxisLineThickness = LFQbench.Config$AxisLineThickness,
@@ -51,7 +52,7 @@ LFQbench.changeConfiguration(DataRootFolder = LFQbench.Config$DataRootFolder,
 
 \item{DropInvalidLogRatio}{if TRUE log-ratios outside validity range will be dropped}
 
-\item{LogRatioValidityRange}{the log-ratio validity range}
+\item{LogRatioValidityRangeSDFactor}{validity range is calculated as mean +/- SD * SDFactor (separately for each species)}
 
 \item{LogRatioPlotRange}{the log-ratio range for plotting}
 
@@ -77,7 +78,9 @@ LFQbench.changeConfiguration(DataRootFolder = LFQbench.Config$DataRootFolder,
 
 \item{ScatterPlotPointType}{the point type}
 
-\item{PlotPointMinAlpha}{the minimum alpha value used for coloring points in sparse regions}
+\item{ScatterPlotPointMinAlpha}{the minimum alpha value used for coloring points in sparse regions}
+
+\item{ScatterPlotLowessBandWidth}{the lowess locality parameter f, use values (local) 0 < f <= 1 (global)}
 
 \item{AxisLabelSize}{the relative font size for axis labels}
 
