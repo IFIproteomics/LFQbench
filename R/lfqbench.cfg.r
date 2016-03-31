@@ -177,7 +177,7 @@ LFQbench.setDataRootFolder = function( rootFolder=ifelse(file.exists(LFQbench.Co
   }
   else
   {
-    cat("Folder ''"+LFQbench.Config$DataRootFolder+"'' does not exist.\n")
+    cat(paste0("Folder ''", LFQbench.Config$DataRootFolder, "'' does not exist.\n"))
     cat("No input/output folders were created!\n")
     cat("Please define a valid root folder.")
   }

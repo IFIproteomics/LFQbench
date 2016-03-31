@@ -17,11 +17,16 @@ guessSep <- function(filename){
 #' @param software_sources a list defined at the variables file.
 guessSoftwareSource <- function(filename, software_sources, allowNA = FALSE){
   softsource <- NA
-  grepsw <- function(a, filen) { return(substring(filen, 1, nchar(a)) == a) }
+  grepsw <- function(a, filen) { return(tolower(substring(filen, 1, nchar(a))) == tolower(a)) }
   softsource <- software_sources[unlist(lapply(software_sources, grepsw, filename))]
   
   if(length(softsource) == 0 & !allowNA) {
-    stop("Software source can not be guessed by filename! Review file names: they should start by the software source.")
+    stop(
+        paste0(
+            "Software source can not be guessed by filename!\n",
+            "Review file names: they should start by the software source!",
+            "File: ", filename)
+    )
   }
   return(softsource)    
 }
