@@ -109,6 +109,45 @@ FSWE.generateReports <- function(
   # we need to replace them by . for compatibility with read.table
   names(df) <- make.names(names(df))
   
+  # match column names if a column name parameter is a list
+  theEnvir = environment()
+  matchColumnNames <- function(paramName = "protein.var")
+  {
+      # find which element matches the real column name 
+      # set the var to this value
+      paramValues = get0(paramName)
+      
+      # don't do anything if the value is NULL OR NA
+      if( is.null(paramValues) || is.na(paramValues) ) return(F)
+      
+      # for any kind of vector/array/list/etc.
+      if( length(paramValues)>1 ) 
+      {
+          columnNames = names(df)
+          matchingValues = paramValues %in% columnNames
+          # the parameter must be there!!!
+          if(!any(matchingValues)) 
+          {
+              stop( paste0("software configuration does not match the input file!\n",
+                           "file: ", experimentFile, "\n",
+                           paramName, ": ", paste(paramValues, collapse=", "), "\n",
+                           "column names: ", paste(columnNames, collapse=", "), "\n")
+              )
+          }
+          assign(paramName, paramValues[matchingValues][1], envir = theEnvir)
+      }
+  }
+  
+  # list all variables
+  colVars = ls()
+  # extract variables' names identifiying data columns
+  colVars = colVars[grep("\\.var$", colVars)]
+  # check if every parameter is present in the header of input file
+  nix = sapply( colVars, matchColumnNames )
+  
+  # FOR DEBUGGING ONLY
+  # sapply( colVars, function(n) cat(paste0("\t", n, " = ", get0(n), "\n")) )
+  
   if(protein_input){
     # If the input is already a peptide report, we need to "fake" some columns as a temporary solution 
     # to process the files
@@ -141,7 +180,7 @@ FSWE.generateReports <- function(
   
   # Attach species and remove peptides belonging to multiple species, and not considered species ("NA"s)
   df <- df %>% rowwise()
-  df <- eval( substitute(mutate(df, "species" = guessOrganism(var, speciesTags)), list(var = as.name(protein.var)) ) ) 
+  df <- eval( substitute( mutate(df, "species" = guessOrganism(var, speciesTags)), list(var = as.name(protein.var) ) ) ) 
   df <- filter(df, species != "NA", species != "multiple")
   
   experiment <- NA
