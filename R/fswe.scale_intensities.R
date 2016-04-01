@@ -33,7 +33,17 @@ FSWE.scaleIntensities <- function(
     softwareNamesPresent <- sapply(filesToModel, guessModelSoftware, softToModelMap)
     softwareNamesPresent <- unique( softwareNamesPresent[!is.na(softwareNamesPresent)] )
     
-    if(!any(softwareNamesPresent==softwareReference)) stop("no files for reference software found!")
+    if(!any(softwareNamesPresent==softwareReference))
+    {
+        stop(
+            paste0(
+                "no files for reference software found!\n",
+                "software names present: ", paste(softwareNamesPresent), "\n",
+                "reference software: ", softwareReference, "\n"
+            )
+        )
+    }
+        
     
     # 2. Create a data frame with common peptides (no modifications) for each different peptide file (each software tool). 
     #    Identify each column with its corresponding software tool.

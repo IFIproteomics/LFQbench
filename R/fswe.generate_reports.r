@@ -105,6 +105,10 @@ FSWE.generateReports <- function(
         
   }
   
+  # read_csv/read_tsv will produce spaces in column names
+  # we need to replace them by . for compatibility with read.table
+  names(df) <- make.names(names(df))
+  
   if(protein_input){
     # If the input is already a peptide report, we need to "fake" some columns as a temporary solution 
     # to process the files

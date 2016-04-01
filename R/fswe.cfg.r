@@ -232,7 +232,7 @@ FSWE.init.defaultSoftwares = function()
       FSWE.setSoftwareConfiguration(
         quantitative.var.tag = "Top6Top6Freq"
         ,quantitative.var = "top6Area"
-        ,protein.var = "Protein.Key"
+        ,protein.var = make.names("Protein Key")
         ,filename.var = "ReplicateName"
         ,sequence.mod.var = "ModSeq"
         ,charge.var = "Charge" 
