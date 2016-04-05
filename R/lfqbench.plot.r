@@ -147,17 +147,17 @@ plotSpeciesLegend = function( pos="top", ... )
 #'  plot vertical and horizontal species legends
 #' @param plotFolder the folder, where plots should go to
 #' @export
-LFQbench.plotSpeciesLegends = function(plotFolder = LFQbench.Config$PlotFilesLocation)
+LFQbench.plotSpeciesLegends = function(plotFolder = LFQbench.Config$PlotFilesLocation, ...)
 {
   pdf(file = paste(plotFolder,"/species_legend_vertical.pdf", sep = ""), width = 1.05, height = 0.66, family = "Helvetica", pointsize = 9)
   par(mar=c(0,0,0.1,0))
   emptyPlot( 0:1, 0:1, lwd=0, grid=F, showXlab=F, showYlab=F, axes=F )
-  plotSpeciesLegend(pos="top", horiz=F )
+  plotSpeciesLegend(pos="top", horiz=F, ... )
   dev.off()
   pdf(file = paste(plotFolder,"/species_legend_horizontal.pdf",sep = ""), width = 2.9, height = 0.35, family = "Helvetica", pointsize = 9)
   par(mar=c(0,0,0.1,0))
   emptyPlot( 0:1, 0:1, lwd=0, grid=F, showXlab=F, showYlab=F, axes=F )
-  plotSpeciesLegend(pos="top", horiz=T )
+  plotSpeciesLegend(pos="top", horiz=T, ... )
   dev.off()
   par(LFQbench.Config$parBackup)
 }

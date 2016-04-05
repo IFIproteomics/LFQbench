@@ -51,53 +51,57 @@ saveMetrics = function(resultSets = ResultSets, File = paste(LFQbench.Config$Log
 #' This function verbose the metrics of the experiment 
 #' @export
 LFQbench.explainMetrics = function(){
-  # identification = identification rate, number of identified proteins for benchmark species
-  # replication = replication variance, median CV for the background species
-  # accuracy = accuracy of relative quantification, AUQC for background species
-  # precision = precision of quantification, root mean square of ( medianLR - expectation ) for regulated species
-  # separation = species separation ability, area under ROC curve between a species pair
-  cat("--------------------------------------------\n")
-  cat("# Metrics description: \n")
-  
-  cat("\tidentification:\n")
-  cat("\t\tidentification rate,\n")
-  cat("\t\tthe number of identifications for benchmark species.\n")
-  
-  cat("\treplication:\n")
-  cat("\t\treplication variance,\n")
-  cat("\t\tthe median CV for the background species.\n")
-  
-  cat("\taccuracy:\n")
-  cat("\t\taccuracy of relative quantification,\n")
-  cat("\t\tthe median deviation of log-ratios to the expected value.\n")
-  
-  cat("\tprecision:\n")
-  cat("\t\tprecision of quantification,\n")
-  cat("\t\tthe standard deviation of log-ratios.\n")
-
-  cat("\tseparation:\n")
-  cat("\t\tspecies separation ability,\n")
-  cat("\t\tthe area under ROC curve between a species pair.\n")
-  
-  cat("\tlocal accuracy:\n")
-  cat("\t\tlocal accuracy of relative quantification,\n")
-  cat("\t\tthe median deviation of log-ratios to the expected value\n")
-  cat("\t\tfor partial data split in quantiles by intensity in first sample.\n")
-  
-  cat("\tlocal precision:\n")
-  cat("\t\tprecision of quantification,\n")
-  cat("\t\tthe standard deviation of log-ratios\n")
-  cat("\t\tfor partial data split in quantiles by intensity in first sample.\n")
+    cat("--------------------------------------------------------------------------------\n")
+    cat("# Metrics description: \n\n")
     
-  cat("\tlocal separation:\n")
-  cat("\t\tspecies separation ability,\n")
-  cat("\t\tthe area under ROC curve between a species pair\n")
-  cat("\t\tfor partial data split in quantiles by intensity in first sample.\n")
+    cat("Identification statistics:\n")
+    cat("  the number of identifications for benchmark species\n\n")
     
-  cat("\tquantification:\n")
-  cat("\t\tlog-ratio statistics,\n")
-  cat("\t\tthe numbers of valid quantifications, missing values,\n")
-  cat("\t\tand log-ratios in and out of user defined ranges.\n")
+    cat("Quantification statistics:\n")
+    cat("   valid ratios - total number of valid log-ratios that meet following conditions:\n")
+    cat("    a) peptide/protein could be quantified in both samples.\n")
+    cat("    b) calulcated log-ratio falls within the expectation range\n")
+    cat("       defined by the sample composition and the spread of spread of the log-ratios observed for each species.\n")
+    cat(paste0(
+        "    The expectation range is defined as a miximum difference of ",
+        LFQbench.Config$LogRatioValidityRangeSDFactor," standard deviations from the average ratio.\n"))
+    
+    cat("   in plot range - numbers of valid log-ratios inside of the user defined plot range\n")
+    cat("   out of plot range - numbers of valid log-ratios outside of the user defined plot range\n")
+    cat("   invalid ratios - total numbers of invalid log-ratios\n")
+    cat("   invalid ratios, out of validity range - proteins/peptides outside of validity range (see condition b)\n")
+    cat("   invalid ratios, missing value - proteins/peptides exclusively quantified in one of the samples (see condition a)\n\n")
+    
+    cat("Technical variance:\n")
+    cat("  the median CV for the background species among replicate runs\n\n")
+    
+    cat("Global accuracy:\n")
+    cat("  accuracy of relative quantification,\n")
+    cat("  the median deviation of log-ratios to the expected value\n\n")
+    
+    cat("Global precision:\n")
+    cat("  precision of quantification,\n")
+    cat("  the standard deviation of log-ratios\n\n")
+    
+    cat("Global species overlap:\n")
+    cat(" species separation ability,\n")
+    cat(" the area under ROC curve between a species pair.\n\n")
+    
+    cat("Local accuracy:\n")
+    cat(" local accuracy of relative quantification,\n")
+    cat(" the median deviation of log-ratios to the expected value\n")
+    cat(" for partial data split in quantiles by intensity in first sample\n\n")
+    
+    cat("Local precision:\n")
+    cat(" precision of quantification,\n")
+    cat(" the standard deviation of log-ratios\n")
+    cat(" for partial data split in quantiles by intensity in first sample\n\n")
+    
+    cat("Local species overlap:\n")
+    cat(" species separation ability,\n")
+    cat(" the area under ROC curve between a species pair\n")
+    cat(" for partial data split in quantiles by intensity in first sample\n")
+    cat("--------------------------------------------------------------------------------\n")
 }
 
 #' LFQbench.showMetrics 
@@ -303,16 +307,16 @@ LFQbench.getMetrics = function(resultSet){
     
   return(
     list(
-      name = resultSet$docSet$fileBase,
-      identification = identification,
-      replication = replication,
-      accuracy = globalAccuracy,
-      precision = globalPrecision,
-      separation = globalSeparation,
-      "local accuracy" = localAccuracy,
-      "local precision" = localPrecision,
-      "local separation" = localSeparation,
-      quantification = logRatioStats
+      "name" = resultSet$docSet$fileBase,
+      "Identification statistics" = identification,
+      "Quantification statistics" = logRatioStats,
+      "Technical variance" = replication,
+      "Global accuracy" = globalAccuracy,
+      "Global precision" = globalPrecision,
+      "Global species overlap" = globalSeparation,
+      "Local accuracy" = localAccuracy,
+      "Local precision" = localPrecision,
+      "Local species overlap" = localSeparation
     )
   )
 }
