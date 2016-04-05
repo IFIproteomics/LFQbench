@@ -18,7 +18,7 @@ FSWE.generateReports <- function(
                             softwareSource="guess",
                             working_dir = LFQbench.Config$DataRootFolder,
                             keep_original_names = FALSE,
-                            outputFileNameSuffix = ""
+                            outputFileNameSuffix = NULL
                             )
 {
     dataSets = as.list(FSWE.dataSets)
@@ -290,21 +290,32 @@ FSWE.generateReports <- function(
   # nums <- sapply(peptides_wide, is.numeric)
     
   #expfile_noext <- file_path_sans_ext(basename(experimentFile))
-  expfile_noext <- paste(softwareSource, names(experiment)[1], outputFileNameSuffix, sep="_")
+  expfile_noext <- paste(softwareSource, names(experiment)[1], sep="_")
+  if(!is.null(outputFileNameSuffix)) 
+  {
+    expfile_noext <- paste(expfile_noext, outputFileNameSuffix, sep="_")
+  }
   peptidereportname <- paste0(expfile_noext, "_peptides.tsv")
   proteinreportname <- paste0(expfile_noext, "_proteins.tsv")
   sequencereportname <- paste0(expfile_noext, "_sequencelist.csv")
   histPepProteinreportname <- paste0(expfile_noext, "_HistogramPeptidesProtein.pdf")
   histNAsProteinsreportname <- paste0(expfile_noext, "_proteins_HistogramNAs.pdf")
   histNAsPeptidesreportname <- paste0(expfile_noext, "_peptides_HistogramNAs.pdf")
-  if(keep_original_names) {
-    peptidereportname  <- paste(original.experimentFile, outputFileNameSuffix, "peptides.tsv", sep="_") 
-    proteinreportname  <- paste(original.experimentFile, outputFileNameSuffix, "proteins.tsv", sep="_") 
-    sequencereportname <- paste(original.experimentFile, outputFileNameSuffix, "sequencelist.csv", sep="_")
-    histPepProteinreportname <- paste(original.experimentFile, outputFileNameSuffix, "HistogramPeptidesProtein.pdf", sep="_")
-    histNAsProteinsreportname <- paste(original.experimentFile, outputFileNameSuffix, "_proteins_HistogramNAs.pdf", sep="_")
-    histNAsPeptidesreportname <- paste(original.experimentFile, outputFileNameSuffix, "_peptides_HistogramNAs.pdf", sep="_")
-  }
+    if(keep_original_names) 
+    {
+        file_base_name <- original.experimentFile
+        if(!is.null(outputFileNameSuffix)) 
+        {
+          file_base_name <- paste(file_base_name, outputFileNameSuffix, sep="_")
+        }
+          
+        peptidereportname  <- paste(file_base_name, "peptides.tsv", sep="_") 
+        proteinreportname  <- paste(file_base_name, "proteins.tsv", sep="_") 
+        sequencereportname <- paste(file_base_name, "sequencelist.csv", sep="_")
+        histPepProteinreportname <- paste(file_base_name, "HistogramPeptidesProtein.pdf", sep="_")
+        histNAsProteinsreportname <- paste(file_base_name, "_proteins_HistogramNAs.pdf", sep="_")
+        histNAsPeptidesreportname <- paste(file_base_name, "_peptides_HistogramNAs.pdf", sep="_")
+    }
   
   if(reportSequences){
     sequence_list <- as.data.frame(unique(peptides_wide$sequence))
