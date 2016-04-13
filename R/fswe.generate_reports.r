@@ -33,11 +33,11 @@ FSWE.generateReports <- function(
     top.N = 3 
     top.N.min = 2
     
-    results_dir <- "input"
-    supplementary <- "supplementary"
+    results_dir <- file.path( working_dir, "input" )
+    supplementary_dir <- file.path( working_dir, "supplementary" )
     LFQbench.setDataRootFolder(working_dir, createSubfolders = F)
-    mkdir( file.path( working_dir, results_dir ) )
-    mkdir( file.path( working_dir, results_dir , supplementary ) )
+    mkdir( results_dir )
+    mkdir( supplementary_dir )
     
   if(softwareSource == "guess") {
     softwareSource <- guessSoftwareSource(experimentFile, FSWE.softwareNames)
@@ -320,8 +320,7 @@ FSWE.generateReports <- function(
   if(reportSequences){
     sequence_list <- as.data.frame(unique(peptides_wide$sequence))
     write.table(sequence_list, 
-                file=file.path(working_dir, results_dir, supplementary, 
-                               sequencereportname),
+                file=file.path(supplementary_dir, sequencereportname),
                 sep=",", row.names=F, col.names=F)
   }
   
@@ -353,7 +352,7 @@ FSWE.generateReports <- function(
   if(protein_input){
     # If the input was already a protein report, we can finish here
     protein_report <- peptides_wide %>% select(-sequenceID)
-    write.table(protein_report, file=file.path(working_dir, results_dir , proteinreportname), 
+    write.table(protein_report, file=file.path(results_dir , proteinreportname), 
                 sep="\t", row.names=F, col.names=T)
     
     cat("Protein report as input -- No peptide report generated.\n")
@@ -363,7 +362,7 @@ FSWE.generateReports <- function(
   }
   
   
-  write.table(peptides_wide, file=file.path(working_dir, results_dir , peptidereportname), 
+  write.table(peptides_wide, file=file.path(results_dir , peptidereportname), 
               sep="\t", row.names=F, col.names=T)
   
   
@@ -417,7 +416,7 @@ FSWE.generateReports <- function(
     filter(totalIntensity > 0) %>%
     select(-totalIntensity)
   
-  write.table(proteins_wide, file=file.path(working_dir, results_dir , proteinreportname), 
+  write.table(proteins_wide, file=file.path(results_dir , proteinreportname), 
               sep="\t", row.names=F, col.names=T)
   
   ## Histogram: Peptides per protein
@@ -427,7 +426,7 @@ FSWE.generateReports <- function(
     summarise(pep.protein = n_distinct(sequenceID))
   
   if(plotHistogram){
-    pdf(file=file.path(working_dir, results_dir, supplementary, histPepProteinreportname), width=6, height=4)
+    pdf(file=file.path(supplementary_dir, histPepProteinreportname), width=6, height=4)
     h <- hist(x=peptides_per_protein$pep.protein, breaks=c(0:20,30,40,50,100,1000), main=NULL, xlab="Peptides per protein",
               xlim = c(0,20), plot=T,freq=T)
     dev.off()
@@ -458,7 +457,7 @@ FSWE.generateReports <- function(
     hNApep <- p + facet_wrap( ~ species, ncol = 3)  + theme_classic() +
       scale_fill_discrete(drop=FALSE) + scale_x_discrete(drop=FALSE)
     
-    ggsave(filename = file.path(working_dir, results_dir, supplementary, histNAsProteinsreportname), plot = hNAprot , width=6, height=4)
-    ggsave(filename = file.path(working_dir, results_dir, supplementary, histNAsPeptidesreportname), plot = hNApep,  width=6, height=4)
+    ggsave(filename = file.path(supplementary_dir, histNAsProteinsreportname), plot = hNAprot , width=6, height=4)
+    ggsave(filename = file.path(supplementary_dir, histNAsPeptidesreportname), plot = hNApep,  width=6, height=4)
   }
 }

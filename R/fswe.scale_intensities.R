@@ -5,28 +5,35 @@
 #' Assumption: since we lose  at this point the peak retention times, 
 #' we will assume in this script that most of the peaks detected by different software tools match. 
 #' 
-#' @param working_dir directory containing files processed by FSWE that you want to scale
+#' @param working_dir LFQbench-root directory with the subfolder input containing files processed by FSWE that you want to scale
 #' @param fileModelingPattern pattern for files you want to use for modeling
 #' @param filesToModelPattern pattern for files to apply the scaling models 
 #' @param softwareReference software name for scaling reference
 #' 
 #' @export
 FSWE.scaleIntensities <- function(
-                                    working_dir = file.path(LFQbench.Config$DataRootFolder, "input"),
+                                    working_dir = LFQbench.Config$DataRootFolder,
                                     fileModelingPattern = "_peptides",
                                     filesToModelPattern = ".[\\.].",
                                     filesNotToModelPattern = "FILE_I_DONT_WANT_TO_HAVE",
                                     softwareReference = "PeakView",
                                     softToModelMap = list(),
-                                    softwareLabels = NULL
-){
+                                    softwareLabels = NULL,
+                                    outputFileNameSuffix = NULL
+)
+{
+    results_dir = file.path(working_dir, "input")
+    supplementary_dir <- file.path( working_dir, "supplementary" )
+    mkdir( results_dir )
+    mkdir( supplementary_dir )
+    
     # 1. Read all peptide files in folder (scaling will be based on these files).
-    filesToModel = list.files( path=working_dir, pattern=filesToModelPattern, full.names= FALSE, include.dirs = F, recursive = F, all.files = F)
+    filesToModel = list.files( path=results_dir, pattern=filesToModelPattern, full.names= FALSE, include.dirs = F, recursive = F, all.files = F)
     
     # exclude files which should not be modelled
     filesToModel = filesToModel[!grepl(filesNotToModelPattern, filesToModel)]
     
-    modelingFiles = list.files( path=working_dir, pattern=fileModelingPattern, 
+    modelingFiles = list.files( path=results_dir, pattern=fileModelingPattern, 
                                 full.names= FALSE, include.dirs = F, recursive = F, all.files = F)
     
     # collect present software names
@@ -48,7 +55,7 @@ FSWE.scaleIntensities <- function(
     # 2. Create a data frame with common peptides (no modifications) for each different peptide file (each software tool). 
     #    Identify each column with its corresponding software tool.
     readAndsumQuantFile <- function(qfile){
-        df <- read.table(file =file.path(working_dir, qfile), header = T, sep = "\t")
+        df <- read.table(file =file.path(results_dir, qfile), header = T, sep = "\t")
         quant.cols <- sapply(df, is.numeric)
         quant.val <- rowSums(df[,quant.cols], na.rm = T)
         ids <- as.data.frame(df$sequenceID)
@@ -66,13 +73,15 @@ FSWE.scaleIntensities <- function(
     ## We use only common peptides to all software sources
     peptides.all <- peptides.all[complete.cases(peptides.all),]
 
-    # ensure supplementary folder is there
-    supDir = file.path(working_dir, "supplementary")
-    mkdir(supDir)
-    
     # 4. Model each tool against the software_base.
-    callm <- function(y, x, thedata, percentile = 0.98){
-        if(!(x == y)){
+    callm <- function(y, x, thedata, percentile = 0.98)
+    {
+        if(!(x == y))
+        {
+            outputFileBase = paste("CIS", x, y, sep="_")
+            if(!is.null(outputFileNameSuffix))
+                outputFileBase = paste("CIS", x, y, outputFileNameSuffix, sep="_")    
+                
             data_percentile = thedata[thedata[, y] < quantile(thedata[, y], percentile), ]
             slope = lm(formula =  get(x) ~ get(y) - 1, data = data_percentile)
             
@@ -80,11 +89,11 @@ FSWE.scaleIntensities <- function(
                   LFQbench.Config, 
                   softwareLabels, 
                   y, x, slope, 
-                  file=file.path(supDir, paste0("CIS_", x, "_", y, ".rda") ) 
+                  file=file.path(supplementary_dir, paste0(outputFileBase, ".rda") ) 
             )
             
         pdf(
-            file=file.path(supDir, paste0("CIS_", x, "_", y, ".pdf") ),
+            file=file.path(supplementary_dir, paste0( outputFileBase, ".pdf") ),
             width=LFQbench.Config$PlotWidth, height=LFQbench.Config$PlotHeight, family="Helvetica", pointsize=9)
         par(
             # plot area margins: c(bottom, left, top, right)
@@ -128,7 +137,7 @@ FSWE.scaleIntensities <- function(
     
     # 5. Re-scale all files (peptides and proteins).
     rescalefile <- function(filename, scaling){
-        df <- read.table(file.path(working_dir, filename), header=T, sep="\t")
+        df <- read.table(file.path(results_dir, filename), header=T, sep="\t")
         soft <- guessModelSoftware(filename, softToModelMap)
         if(length(soft)==0) {
             return(NA)
@@ -138,13 +147,15 @@ FSWE.scaleIntensities <- function(
         if(scaling[soft]!=1.0) 
         {
             df[, quant.cols] <- df[, quant.cols] * scaling[soft]
-            write.table(df, file.path(working_dir, filename), row.names=F, col.names = T, sep="\t")   
+            write.table(df, file.path(results_dir, filename), row.names=F, col.names = T, sep="\t")   
         }
     }
     
     nix <- sapply(filesToModel, rescalefile, models)
     
-    write(rbind(names(models),models), file.path(supDir, "CIS.models.txt"), sep = "\t", ncolumns = 2)
+    modelsFile = "CIS.models.txt"
+    if(!is.null(outputFileNameSuffix)) modelsFile = paste0("CIS.models.",outputFileNameSuffix,".txt")
+    write(rbind(names(models),models), file.path(supplementary_dir, modelsFile), sep = "\t", ncolumns = 2)
     
 }
 

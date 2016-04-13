@@ -4,7 +4,8 @@
 \alias{LFQbench.plotSpeciesLegends}
 \title{LFQbench.plotSpeciesLegends}
 \usage{
-LFQbench.plotSpeciesLegends(plotFolder = LFQbench.Config$PlotFilesLocation)
+LFQbench.plotSpeciesLegends(plotFolder = LFQbench.Config$PlotFilesLocation,
+  ...)
 }
 \arguments{
 \item{plotFolder}{the folder, where plots should go to}

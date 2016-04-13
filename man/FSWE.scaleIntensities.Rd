@@ -4,15 +4,14 @@
 \alias{FSWE.scaleIntensities}
 \title{FSWE.scaleIntensities}
 \usage{
-FSWE.scaleIntensities(working_dir = file.path(LFQbench.Config$DataRootFolder,
-  "input"), fileModelingPattern = "_peptides",
-  filesToModelPattern = ".[\\\\.].",
+FSWE.scaleIntensities(working_dir = LFQbench.Config$DataRootFolder,
+  fileModelingPattern = "_peptides", filesToModelPattern = ".[\\\\.].",
   filesNotToModelPattern = "FILE_I_DONT_WANT_TO_HAVE",
   softwareReference = "PeakView", softToModelMap = list(),
-  softwareLabels = NULL)
+  softwareLabels = NULL, outputFileNameSuffix = NULL)
 }
 \arguments{
-\item{working_dir}{directory containing files processed by FSWE that you want to scale}
+\item{working_dir}{LFQbench-root directory with the subfolder input containing files processed by FSWE that you want to scale}
 
 \item{fileModelingPattern}{pattern for files you want to use for modeling}
 
