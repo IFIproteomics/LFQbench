@@ -74,74 +74,61 @@ rms = function(x) sqrt( sum(x^2) / length(x) )
 #' @param lims overrides yLim parameter of boxplot
 #' @param whiskerQuantile whiskers range from (this value) to (1 - this value)
 #' @export 
-qboxplot = function( vals, labs=NULL, lims=NULL, whiskerQuantile=0.05, horizontal=F, ... ){
-  if( is.matrix(vals) ){
-    cnames = colnames(vals)
-    vals = lapply( 1:ncol(vals), function(i) vals[,i] )
-    names(vals) = cnames
-  }
-  
-  vals = lapply(vals, function(x) x[!is.na(x)] )
-  
-  d = as.list( vals )
-  nCols = length( d )
-  
-  bp = boxplot( d, plot=F, na.rm=T )
-  
-  # fill labels
-  if( is.null(labs) ) {
-    if( !is.null(colnames(vals)) )
+qboxplot = function( vals, labs=NULL, lims=NULL, whiskerQuantile=0.05, horizontal=F, ... )
+{
+    # convert matrix to list
+    if( is.matrix(vals) )
     {
-      labs = colnames(vals)
+        cnames = colnames(vals)
+        vals = sapply( 1:ncol(vals), function(i) vals[,i], simplify = F )
+        names(vals)=cnames
     }
-    else
-      if( !is.null(names(d)) )
-      {
-        labs = names(d)
-      }
-    else
-    {
-      labs = 1:nCols
-    }            
-  }
-  
-  # fill limits
-  if( is.null(lims) )
-  {
-    low = min(unlist(vals), na.rm=T)
-    hi = max(unlist(vals), na.rm=T)
-    rng = (hi-low)*0.1
-    lims = c(low-rng, hi+rng)
-  }
-  
-  for(i in 1:nCols)
-  {
-    y = unlist( d[i] )
     
-    qnt=quantile( y, probs=c( whiskerQuantile, 0.25, 0.50, 0.75, 1-whiskerQuantile ), na.rm=T )
-    o = y[ y<qnt[1] | y>qnt[5] ]
-    g = rep.int(i, length(o))
-    if(i==1)
+    # convert everything else to list
+    vals = as.list(vals)
+    nCols = length( vals )
+    
+    # remove NAs
+    vals = sapply(vals, function(x) x[!is.na(x)], simplify = F )
+    
+    # generate labels
+    if( is.null(labs) ) 
     {
-      bp$stats=qnt
-      bp$out=o
-      bp$group=g
+        if( !is.null(names(vals)) )
+            labs = names(vals)
+        else
+            labs = 1:nCols
     }
-    else
+    
+    # create boxplot object
+    bp = boxplot( vals, plot=F, na.rm=T )
+    bp$names = labs
+    bp$out=c()
+    bp$group=c()
+    
+    # calculate limits
+    if( is.null(lims) )
     {
-      bp$stats=cbind( bp$stats, qnt )
-      bp$out=c( bp$out, o )
-      bp$group=c( bp$group, g )
+        low = min(unlist(vals), na.rm=T)
+        hi = max(unlist(vals), na.rm=T)
+        rng = (hi-low)*0.1
+        lims = c(low-rng, hi+rng)
     }
-  }
-  
-  bxp(bp,
-      h = 0.15
-      , ylim=lims
-      , names=labs
-      , horizontal=horizontal
-      , ...
-  )
+    
+    # recalculate boxplot statistics
+    for(i in 1:nCols)
+    {
+        y = unlist( vals[i] )
+        qnt = quantile( y, probs=c( whiskerQuantile, 0.25, 0.50, 0.75, 1-whiskerQuantile ), na.rm=T )
+        o = y[ y<qnt[1] | y>qnt[5] ]
+        g = rep.int(i, length(o))
+        bp$stats[,i] = qnt
+        bp$out = as.vector(c( bp$out, o ))
+        bp$group = as.vector(c( bp$group, g ))
+    }
+    
+    # display boxplot
+    bxp(bp, h = 0.15, ylim=lims, horizontal=horizontal, ... )
 }
 
 
