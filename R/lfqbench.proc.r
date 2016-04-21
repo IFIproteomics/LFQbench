@@ -87,19 +87,19 @@ LFQbench.processFile = function( file ) {
     avg = rowMeans( amount, na.rm=T )
     std = apply( amount, 1, sd, na.rm=T )
     rsd = std / avg
-    return( list( mean=avg, cv=rsd ) )
+    mvs = apply(amount,1, function(row) sum(is.na(row)))
+    return( list( mean=avg, cv=rsd, mv=mvs ) )
   }
   ################################################################################
   # generate sample average data
   SampleAverageData = lapply( 1:LFQbench.Config$NumberOfSamples, getSampleAverage )
   SampleAverageAmounts = sapply( 1:LFQbench.Config$NumberOfSamples, function(si) SampleAverageData[[si]]$mean )
   SampleAverageCVs = sapply( 1:LFQbench.Config$NumberOfSamples, function(si) SampleAverageData[[si]]$cv )
+  SampleAverageMVs = sapply( 1:LFQbench.Config$NumberOfSamples, function(si) SampleAverageData[[si]]$mv )
   SampleAverageSpecies = csvSpecies
   SampleAverageProteinIDs = csvIDs
-  rownames(SampleAverageAmounts) = SampleAverageProteinIDs
-  rownames(SampleAverageCVs) = SampleAverageProteinIDs
-  colnames(SampleAverageAmounts) = LFQbench.Config$AllSampleNames
-  colnames(SampleAverageCVs) = LFQbench.Config$AllSampleNames
+  rownames(SampleAverageAmounts) = rownames(SampleAverageCVs) = rownames(SampleAverageMVs) = SampleAverageProteinIDs
+  colnames(SampleAverageAmounts) = colnames(SampleAverageCVs) = colnames(SampleAverageMVs) = LFQbench.Config$AllSampleNames
   ################################################################################
   
   ################################################################################
@@ -334,13 +334,12 @@ LFQbench.processFile = function( file ) {
         id=SampleAverageProteinIDs,
         mean=SampleAverageAmounts,
         cv=SampleAverageCVs,
-        missingvalues = numNAs_histograms
+        mv=SampleAverageMVs,
+        mvHist = numNAs_histograms
       )
   )
   ################################################################################
-  
   cat("[done]\n")
-  
   return( ResultSet )
 }
 

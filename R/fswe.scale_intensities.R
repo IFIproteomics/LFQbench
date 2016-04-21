@@ -95,11 +95,12 @@ FSWE.scaleIntensities <- function(
         pdf(
             file=file.path(supplementary_dir, paste0( outputFileBase, ".pdf") ),
             width=LFQbench.Config$PlotWidth, height=LFQbench.Config$PlotHeight, family="Helvetica", pointsize=9)
+        
         par(
             # plot area margins: c(bottom, left, top, right)
-            mar = c( 5, 9, 0.5, 3 ),
+            mar = c( 5, 10, 0.5, 3 ),
             # axes layout: c(title, label, line)
-            mgp = c( 3.7, 1.5, 0 ),
+            mgp = c( 3.7, 1.2, 0 ),
             # axis labels orientation: 0: parallel, 1: horizontal, 2: perpendicular, 3: vertical
             las = 1
         )
@@ -109,22 +110,34 @@ FSWE.scaleIntensities <- function(
         xLab = y
         if(!is.null(softwareLabels))
         {
-        if(any(names(softwareLabels)==yLab)) yLab = softwareLabels[[yLab]]
-        if(any(names(softwareLabels)==xLab)) xLab = softwareLabels[[xLab]]
+            if(any(names(softwareLabels)==yLab)) yLab = softwareLabels[[yLab]]
+            if(any(names(softwareLabels)==xLab)) xLab = softwareLabels[[xLab]]
         }
-        plot(thedata[,y], thedata[,x], xlab = "", ylab = "", pch=19,
-             lwd = LFQbench.Config$AxisLineThickness, 
-             cex.axis = LFQbench.Config$AxisAnnotationSize
-        )
-        title(xlab=xLab, mgp = c( 3.5, 1.5, 0 ), cex.lab=LFQbench.Config$AxisLabelSize)
-        title(ylab=yLab, mgp = c( 7, 1.5, 0 ), cex.lab=LFQbench.Config$AxisLabelSize)
+        
+        plot( thedata[,y], thedata[,x], xlab = "", ylab = "", pch=19, axes = F, lwd = LFQbench.Config$AxisLineThickness )
+        addAxes(showXlab = F, showYlab = F, lwd = LFQbench.Config$AxisLineThickness)
+        yLabs = sprintf("%1.1e", axTicks(2))
+        xLabs = sprintf("%1.1e", axTicks(1))
+        yLabs[1] = "0"
+        xLabs[1] = "0"
+        axis(1, at = axTicks(1), labels = xLabs, cex.axis = LFQbench.Config$AxisAnnotationSize, lwd = 0, lwd.ticks = LFQbench.Config$AxisLineThickness )
+        axis(2, at = axTicks(2), labels = yLabs, cex.axis = LFQbench.Config$AxisAnnotationSize, lwd = 0, lwd.ticks = LFQbench.Config$AxisLineThickness )
+        
+        title( xlab=xLab, mgp=c( 3.5, 1.5, 0 ), cex.lab=LFQbench.Config$AxisLabelSize )
+        title( ylab=yLab, mgp=c( 8.2, 1.5, 0 ), cex.lab=LFQbench.Config$AxisLabelSize )
+        
         abline(slope, col="red")
-        midx = (max(thedata[, y]) - min(thedata[, x])) / 2
-        lowy = (max(thedata[, y]) - min(thedata[, x])) / 5
         sumlm = summary(slope)
         rsquared = sumlm$adj.r.squared 
-        text(midx, lowy, adj=c(0,0), labels = paste("slope =" , round(slope$coefficients, 2), 
-                                                "adj. R^2 =", round(rsquared,2),  sep=" ") )
+        
+        # midx = (max(thedata[, y]) - min(thedata[, x])) / 2
+        # lowy = (max(thedata[, y]) - min(thedata[, x])) / 5
+        # text(midx, lowy, adj=c(0,0), labels = paste("slope =" , round(slope$coefficients, 2), "adj. R^2 =", round(rsquared,2),  sep=" ") )
+        
+        pa = par("usr") # plot area c( minx, maxx, miny, maxy )
+        text(pa[1], pa[4]*0.95, adj=c(0,0), cex=1.5, labels = paste0("   slope = ", round(slope$coefficients, 2) ), col="darkblue" )
+        text(pa[1], pa[4]*0.85, adj=c(0,0), cex=1.5, labels = bquote(" adj."~R^2~"="~.(round(rsquared,2))), col="darkblue")
+        
         dev.off()
         par(LFQbench.Config$parBackup)
             return(as.vector(slope$coefficients))
