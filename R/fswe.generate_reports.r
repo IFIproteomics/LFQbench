@@ -18,7 +18,8 @@ FSWE.generateReports <- function(
                             softwareSource="guess",
                             working_dir = LFQbench.Config$DataRootFolder,
                             keep_original_names = FALSE,
-                            outputFileNameSuffix = NULL
+                            outputFileNameSuffix = NULL,
+                            minimumHitsPerSample = 2
                             )
 {
     dataSets = as.list(FSWE.dataSets)
@@ -415,6 +416,21 @@ FSWE.generateReports <- function(
     mutate(totalIntensity = rowSums(.[nums], na.rm=T)) %>%
     filter(totalIntensity > 0) %>%
     select(-totalIntensity)
+  
+  
+  #Remove proteins, which have less than x hits per sample (among the two samples)
+  cols_sampleA <- grep("^A", names(proteins_wide))
+  cols_sampleB <- grep("^B", names(proteins_wide))
+  
+  proteins_wide$numHitsA <- apply(proteins_wide, 1, function(elt, cols) length(cols) - sum(is.na(elt[cols])), cols_sampleA)
+  proteins_wide$numHitsB <- apply(proteins_wide, 1, function(elt, cols) length(cols) - sum(is.na(elt[cols])), cols_sampleB)
+  proteins_wide <- proteins_wide %>% rowwise() %>% 
+                                mutate(maxHitsPerSample = max(numHitsA, numHitsB)) %>% 
+                                ungroup()
+  
+  proteins_wide <- proteins_wide %>% 
+                        filter(maxHitsPerSample >= minimumHitsPerSample) %>%
+                        select(-numHitsA, -numHitsB, -maxHitsPerSample)
   
   write.table(proteins_wide, file=file.path(results_dir , proteinreportname), 
               sep="\t", row.names=F, col.names=T)
