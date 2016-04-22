@@ -53,7 +53,7 @@ LFQbench.processFile = function( file ) {
   ################################################################################
   
   ################################################################################
-  # calculate missing value statistics
+  # calculate case completeness histogramm
   calHistNAsWithSpecies <- function(species){
     sp_hist = hist(csvNumNAs[csvSpecies == species],  breaks=seq(-1, ncol(csvAmounts)), include.lowest=T,  plot=F  )
     return(sp_hist$counts)
