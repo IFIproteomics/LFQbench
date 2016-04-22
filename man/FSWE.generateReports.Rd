@@ -8,7 +8,7 @@ FSWE.generateReports(experimentFile, plotHistogram = F, plotHistNAs = F,
   reportSequences = F, peptide.list = NULL, protein.list = NULL,
   singleHits = F, softwareSource = "guess",
   working_dir = LFQbench.Config$DataRootFolder, keep_original_names = FALSE,
-  outputFileNameSuffix = NULL)
+  outputFileNameSuffix = NULL, minimumHitsPerSample = 2)
 }
 \description{
 It generates peptide and protein reports compatible with LFQbench, by following the data processing
