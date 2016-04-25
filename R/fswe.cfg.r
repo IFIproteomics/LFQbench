@@ -380,6 +380,10 @@ FSWE.init.defaultModifications = function()
 #' @examples FSWE.addModification( "\\[Oxi\\]", "\\(UniMod:35\\)")
 FSWE.addModification <- function(modificationRegExps, UniModStrings){
     
+    if(!exists("FSWE.modificationsToUniMod")){
+        FSWE.modificationsToUniMod <- hash()
+    }
+    
     .set(FSWE.modificationsToUniMod, c(modificationRegExps), c(UniModStrings))
 
 }
@@ -390,6 +394,12 @@ FSWE.addModification <- function(modificationRegExps, UniModStrings){
 #' @export
 #'
 FSWE.listModifications <- function(){
+    
+    if(!exists("FSWE.modificationsToUniMod")){
+        warning( "FSWE modifications parser has not been initialized yet: please use FSWE.initConfiguration first!" )
+        return(NULL)
+    }
+    
     for(mod in ls(FSWE.modificationsToUniMod)){
         print(paste(mod, FSWE.modificationsToUniMod[[mod]] , sep = " : "))
     }
