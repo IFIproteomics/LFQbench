@@ -25,6 +25,8 @@ FSWE.generateReports <- function(
     dataSets = as.list(FSWE.dataSets)
     speciesTags = FSWE.speciesTags
     sample.names = names(FSWE.dataSets)
+    modificationsToUniMod = FSWE.modificationsToUniMod
+        
     # TODO: check if datasets are defined
     
     topN.sort_method = "sum"  # "sum", "mean", "idrate_mean"  ## TODO: NOT YET IMPLEMENTED 
@@ -266,30 +268,12 @@ FSWE.generateReports <- function(
   peptides_wide$sequence <- gsub( "*\\(.*?\\)", "", peptides_wide$sequence )
   
   
-  # TODO: Move these hard-coded modifications to a config file
   # Convert modifications to UniMod
-  peptides_wide$sequenceID <- gsub("\\[15\\.995\\(M\\)\\]M",      "M\\(UniMod:35\\)", peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[57\\.021\\(C\\)\\]C",      "C\\(UniMod:4\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[-17\\.027\\(Q\\)\\]Q",     "Q\\(UniMod:28\\)", peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[-18\\.011\\(E\\)\\]E",     "E\\(UniMod:27\\)", peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[39\\.995\\(C\\)\\]C",      "C\\(UniMod:26\\)", peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[42\\.011\\(N-term\\)\\]A", "A\\(UniMod:1\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[42\\.011\\(N-term\\)\\]M", "M\\(UniMod:1\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[42\\.011\\(N-term\\)\\]C", "C\\(UniMod:1\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[42\\.011\\(N-term\\)\\]D", "D\\(UniMod:1\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[42\\.011\\(N-term\\)\\]E", "E\\(UniMod:1\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[42\\.011\\(N-term\\)\\]G", "G\\(UniMod:1\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[42\\.011\\(N-term\\)\\]P", "P\\(UniMod:1\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[42\\.011\\(N-term\\)\\]S", "S\\(UniMod:1\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[42\\.011\\(N-term\\)\\]T", "T\\(UniMod:1\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[42\\.011\\(N-term\\)\\]V", "V\\(UniMod:1\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[\\+16\\]",                 "\\(UniMod:35\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[\\+57\\]",                 "\\(UniMod:4\\)",   peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[Oxi\\]",                   "\\(UniMod:35\\)",  peptides_wide$sequenceID)
-  peptides_wide$sequenceID <- gsub("\\[CAM\\]",                   "\\(UniMod:4\\)",   peptides_wide$sequenceID)
+  for(mod in ls(modificationsToUniMod)){
+      peptides_wide$sequenceID <- gsub(mod, modificationsToUniMod[[mod]], peptides_wide$sequenceID)
+  }
+
   
-  # nums <- sapply(peptides_wide, is.numeric)
-    
   #expfile_noext <- file_path_sans_ext(basename(experimentFile))
   expfile_noext <- paste(softwareSource, names(experiment)[1], sep="_")
   if(!is.null(outputFileNameSuffix)) 

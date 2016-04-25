@@ -23,6 +23,7 @@
 FSWE.initConfiguration = function( injectionNames, speciesTags )
 {
   FSWE.init.defaultSoftwares()
+  FSWE.init.defaultModifications()
   FSWE.setDatasetInjectionNames( injectionNames )
   FSWE.setSpeciesTags( speciesTags )
 }
@@ -330,3 +331,66 @@ FSWE.setSpeciesTags = function( speciesTags )
 #           function(pn) assign( pn,theList[[pn]], envir = parent.env(parent.env(environment()) ) )
 #   )
 # }
+
+
+
+FSWE.init.defaultModifications = function()
+{
+    modsToUniMod <- hash()
+    
+    # DIA-Umpire
+    .set(modsToUniMod, "\\[15\\.995\\(M\\)\\]M" = "M\\(UniMod:35\\)") 
+    .set(modsToUniMod, "\\[57\\.021\\(C\\)\\]C" = "C\\(UniMod:4\\)")
+    .set(modsToUniMod, "\\[-17\\.027\\(Q\\)\\]Q" = "Q\\(UniMod:28\\)")
+    .set(modsToUniMod, "\\[-18\\.011\\(E\\)\\]E" = "E\\(UniMod:27\\)")
+    .set(modsToUniMod, "\\[39\\.995\\(C\\)\\]C" = "C\\(UniMod:26\\)")
+    .set(modsToUniMod, "\\[42\\.011\\(N-term\\)\\]A" = "A\\(UniMod:1\\)")
+    .set(modsToUniMod, "\\[42\\.011\\(N-term\\)\\]M" = "M\\(UniMod:1\\)")
+    .set(modsToUniMod, "\\[42\\.011\\(N-term\\)\\]C" = "C\\(UniMod:1\\)")
+    .set(modsToUniMod, "\\[42\\.011\\(N-term\\)\\]D" = "D\\(UniMod:1\\)")
+    .set(modsToUniMod, "\\[42\\.011\\(N-term\\)\\]E" = "E\\(UniMod:1\\)")
+    .set(modsToUniMod, "\\[42\\.011\\(N-term\\)\\]G" = "G\\(UniMod:1\\)")
+    .set(modsToUniMod, "\\[42\\.011\\(N-term\\)\\]P" = "P\\(UniMod:1\\)")
+    .set(modsToUniMod, "\\[42\\.011\\(N-term\\)\\]S" = "S\\(UniMod:1\\)")
+    .set(modsToUniMod, "\\[42\\.011\\(N-term\\)\\]T" = "T\\(UniMod:1\\)")
+    .set(modsToUniMod, "\\[42\\.011\\(N-term\\)\\]V" = "V\\(UniMod:1\\)")
+    
+    # Skyline
+    .set(modsToUniMod, "\\[\\+16\\]" = "\\(UniMod:35\\)")
+    .set(modsToUniMod, "\\[\\+57\\]" = "\\(UniMod:4\\)")
+    
+    # SWATH2.0
+    .set(modsToUniMod, "\\[Oxi\\]" = "\\(UniMod:35\\)")
+    .set(modsToUniMod, "\\[CAM\\]" = "\\(UniMod:4\\)")
+    
+    # Spectronaut --> Modification format depends on the library used
+    # OpenSWATH --> Modifications are already reported in UniMod format
+    FSWE.modificationsToUniMod <<- copy(modsToUniMod)
+}
+
+#' FSWE.addModification
+#'
+#' Adds a new modification string to the modifications parser. 
+#'
+#' @param modificationRegExps    Modification regular expressions as it may be found at the software tool report (input of FSWE). Use here the whole string you would like to substitute by a UniMod string
+#' @param UniModStrings      UniMod string that will substitute modificationString at FSWE outputs.  
+#'
+#' @export
+#'
+#' @examples FSWE.addModification( "\\[Oxi\\]", "\\(UniMod:35\\)")
+FSWE.addModification <- function(modificationRegExps, UniModStrings){
+    
+    .set(FSWE.modificationsToUniMod, c(modificationRegExps), c(UniModStrings))
+
+}
+
+#' FSWE.listModifications
+#'
+#' @return list of modifications used by FSWE
+#' @export
+#'
+FSWE.listModifications <- function(){
+    for(mod in ls(FSWE.modificationsToUniMod)){
+        print(paste(mod, FSWE.modificationsToUniMod[[mod]] , sep = " : "))
+    }
+}
