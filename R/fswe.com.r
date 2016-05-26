@@ -118,6 +118,42 @@ avg_top_n <- function(values, n, minimum = 1){
   mean(sort(values, decreasing=T)[1:n], na.rm=T)
 }
 
+#' median_all
+#' 
+#' @param values the vector with the values. 
+#' @param minimum minimum number of valid (not NA) values allowed in order to return a value.
+#' 
+median_all <- function(values, minimum = 1){
+    # This approach is INDIVIDUAL, that is, there is no consensus among replicates to 
+    # choose the contributing peptides.
+    if(length(which(!is.na(values))) < minimum) {return (NA)}
+    # if (n > length(values)) n <- length(values)
+    median(values, na.rm = T)
+    #mean(sort(values, decreasing=T)[1:n], na.rm=T)
+}
+
+#' median_quench
+#' 
+#' @param values the vector with the values. 
+#' @param minimum minimum number of valid (not NA) values allowed in order to return a value.
+#' @param minPepsToRemove minimum number of peptides the protein must have in order to remove the top N peptides
+#' @param removeTop number of peptides to be removed when the protein has more than minPepsToRemove   
+#' 
+median_quench <- function(values, minimum = 1, minPepsToRemove = 10, removeTop = 3){
+    # This approach is INDIVIDUAL, that is, there is no consensus among replicates to 
+    # choose the contributing peptides.
+
+    if(length(which(!is.na(values))) < minimum) {return (NA)}
+
+    removeIndex = removeTop + 1
+    if(length(values) >= minPepsToRemove){
+        values <- sort(values, decreasing = T)[removeIndex:length(values)]
+    }
+    
+    median(values, na.rm = T)
+}
+
+
 
 #' sumNA
 #' 

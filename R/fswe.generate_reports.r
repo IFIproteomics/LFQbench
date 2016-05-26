@@ -19,9 +19,19 @@ FSWE.generateReports <- function(
                             working_dir = LFQbench.Config$DataRootFolder,
                             keep_original_names = FALSE,
                             outputFileNameSuffix = NULL,
-                            minimumHitsPerSample = 2
+                            minimumHitsPerSample = 2,
+                            top.N =3,
+                            top.N.min =2,
+                            integrationMethod = "topN_individual",
+                            quench.minPepsToRemove = 10, 
+                            quench.removeTop = 3
                             )
 {
+    
+
+    
+    integrationMethod.types = c("topN_individual", "topN_consensus", "median_individual")
+    
     dataSets = as.list(FSWE.dataSets)
     speciesTags = FSWE.speciesTags
     sample.names = names(FSWE.dataSets)
@@ -33,8 +43,8 @@ FSWE.generateReports <- function(
     topNindividual = T
     restrictNA = F
     #topN.allowNAs = T  ## Redundant
-    top.N = 3 
-    top.N.min = 2
+    #top.N = 3 
+    #top.N.min = 2
     
     results_dir <- file.path( working_dir, "input" )
     supplementary_dir <- file.path( working_dir, "supplementary" )
@@ -353,45 +363,78 @@ FSWE.generateReports <- function(
   
   ## PROTEIN REPORT
   cat(paste0("Generating protein report for ", experimentFile,"\n"))
-  
+
   if(singleHits){
     print("Summarising protein single hits...")
+    integrationMethod = NULL
     proteins_wide <- peptides_wide %>% 
       arrange(proteinID, species) %>%
       group_by(proteinID, species) %>%
       filter(n_distinct(sequenceID) == 1) %>%
       select(-sequenceID) %>% 
-      summarise_each(funs(single_hits(.))) 
-  }else{
-    print("Summarising proteins...")
-    if(topNindividual){
+      summarise_each(funs(single_hits(.)))
+  }
+  
+  if(integrationMethod == "topN_individual"){
+      print("Summarising proteins...")
       print("using TOP3 individual for each run")
       proteins_wide <- peptides_wide %>% 
-        select(-sequenceID) %>% 
-        arrange(proteinID, species) %>%
-        group_by(proteinID, species) %>%  
-        summarise_each(funs(avg_top_n(., top.N, top.N.min))) 
-    }else{
-      print("using consensus TOP3")
+          select(-sequenceID) %>% 
+          arrange(proteinID, species) %>%
+          group_by(proteinID, species) %>%  
+          summarise_each(funs(avg_top_n(., top.N, top.N.min))) 
+  }
+  
+  if(integrationMethod == "median_individual"){
+      print("Summarising proteins...")
+      print("using median, individual for each run")
+      proteins_wide <- peptides_wide %>% 
+          select(-sequenceID) %>% 
+          arrange(proteinID, species) %>%
+          group_by(proteinID, species) %>%  
+          summarise_each(funs(median_all(., top.N.min))) 
+  }
+  
+  if(integrationMethod == "medianQuench_individual"){
+      print("Summarising proteins...")
+      print(paste0("using median (quenching top", quench.removeTop, 
+                   " when the protein has more than ", quench.minPepsToRemove, 
+                   " peptides), individual for each run." )) 
+      proteins_wide <- peptides_wide %>% 
+          select(-sequenceID) %>% 
+          arrange(proteinID, species) %>%
+          group_by(proteinID, species) %>%  
+          summarise_each(funs(median_quench(., top.N.min, minPepsToRemove = quench.minPepsToRemove, removeTop = quench.removeTop))) 
+  }
+    
+  if(integrationMethod == "topN_consensus"){
+      print("Summarising proteins...")
+      print(paste0("using consensus TOP", top.N))
       nums <- sapply(peptides_wide, is.numeric)
       proteins_wide <- peptides_wide %>% ungroup() %>%
-        mutate(totalIntensity = rowSums(.[nums], na.rm=T))  %>% 
-        group_by(proteinID) %>%
-        arrange(desc(totalIntensity)) %>%
-        filter(row_number() <= top.N & n() >= top.N.min) %>%
-        select(-sequenceID, -totalIntensity) %>%
-        group_by(proteinID, species)
+          mutate(totalIntensity = rowSums(.[nums], na.rm=T))  %>% 
+          group_by(proteinID) %>%
+          arrange(desc(totalIntensity)) %>%
+          filter(row_number() <= top.N & n() >= top.N.min) %>%
+          select(-sequenceID, -totalIntensity) %>%
+          group_by(proteinID, species)
       
+      #TODO: Does this make sense only to TopN_consensus ????
       if(restrictNA){
-        proteins_wide <- proteins_wide %>%
-          summarise_each(funs(mean))
+          proteins_wide <- proteins_wide %>%
+              summarise_each(funs(mean))
       }else{
-        proteins_wide <- proteins_wide %>%
-          summarise_each(funs(avgNA))
+          proteins_wide <- proteins_wide %>%
+              summarise_each(funs(avgNA))
       }
       
-    }
-  }  
+  }
+
+
+  
+
+    
+   
   
   # Remove "empty" proteins (all values are NAs). TODO: I wish I could find a more elegant way to do it. I am tired.
   common_names <- !sapply(proteins_wide, is.numeric)
