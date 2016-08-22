@@ -27,9 +27,8 @@ FSWE.generateReports <- function(
                             quench.removeTop = 3
                             )
 {
-    
 
-    
+
     integrationMethod.types = c("topN_individual", "topN_consensus", "median_individual")
     
     dataSets = as.list(FSWE.dataSets)
@@ -96,7 +95,7 @@ FSWE.generateReports <- function(
       df2 <- left_join(df, df.fdr, by= "sequence_z" )
       df2 <- unique(df2)
       df2.flags <- df2[,grepl(fdr.var.tag, colnames(df2), ignore.case=T)]
-      df2.values <-df[,grepl(quantitative.var.tag, colnames(df2), ignore.case=T) & 
+      df2.values <-df2[,grepl(quantitative.var.tag, colnames(df2), ignore.case=T) & 
                         !grepl(fdr.var.tag, colnames(df2), ignore.case=T)] 
       df2.values[!df2.flags] <- NA
       rm(df2); rm(df2.flags); rm(valid_peptides); rm(df.fdr)
@@ -244,7 +243,7 @@ FSWE.generateReports <- function(
   
   # Remove any duplicate: (based on: injectionfile, ModifiedSequence, ChargeState)
   # (These cases are likely to be due to several entries in the library)
-  data <- df %>% distinct_(filename.var, sequence.mod.var, charge.var)  # I am not sure I removed all duplicates, or there is still one value per duplicate
+  data <- df %>% distinct_(filename.var, sequence.mod.var, charge.var, .keep_all = TRUE)  # I am not sure I removed all duplicates, or there is still one value per duplicate
   
   # Change zeroes to NA values at the quantitative variable
   data[[quantitative.var]][data[[quantitative.var]] == 0] <- NA
@@ -254,7 +253,7 @@ FSWE.generateReports <- function(
   #data <- data %>% na.omit() 
   
   # For each peptide: Sum quantitative values of charge states
-  data <- data %>% group_by_(filename.var, sequence.mod.var, protein.var , "species") %>% 
+  data <- data %>% ungroup() %>% group_by_(filename.var, sequence.mod.var, protein.var , "species") %>% 
     summarise_( quant_value = sumquant ) # proteinID = protein.var, species = "species" , 
   
   peptides_wide <- spread_(data, filename.var, "quant_value") 
