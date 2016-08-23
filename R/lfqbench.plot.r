@@ -63,14 +63,26 @@ emptyPlot = function(xRange=c(0,1), yRange=c(0,1), lwd=1, grid=T, showXlab=T, sh
 #' @param showXAxis=T
 #' @param showYAxis=T
 #' @param cex.axis=1
+#' @param at.x=NULL 
+#' @param at.y=NULL
 #' @export
 addAxes = function(lwd=1, showXlab=T, showYlab=T, showXAxis=T, showYAxis=T, cex.axis=1)
 {
   usr = par()$usr
   if(showXAxis) lines(x=usr[c(1,2)], y=usr[c(3,3)], lwd=lwd, xpd=T)
   if(showYAxis) lines(x=usr[c(1,1)], y=usr[c(3,4)], lwd=lwd, xpd=T)
-  if(showXlab) axis(1, lwd=0, lwd.ticks=lwd, cex.axis=cex.axis)
-  if(showYlab) axis(2, lwd=0, lwd.ticks=lwd, cex.axis=cex.axis)
+  
+  if(showXlab) {
+      at = NULL
+      if(!is.null(LFQbench.Config$AxisXLabelNumDiv)) at = seq(usr[1], usr[2], by = LFQbench.Config$AxisXLabelNumDiv)
+      axis(1, lwd=0, lwd.ticks=lwd, cex.axis=cex.axis, at=at)  
+  } 
+  if(showYlab){
+      at=NULL
+      if(!is.null(LFQbench.Config$AxisYLabelNumDiv)) at = seq(usr[3], usr[4], by = LFQbench.Config$AxisYLabelNumDiv)
+      axis(2, lwd=0, lwd.ticks=lwd, cex.axis=cex.axis, at=at)
+  } 
+      
 }
 ################################################################################
 
@@ -263,11 +275,11 @@ addScatterPointsForSpecies2 = function(species, samplePairResult, minAlpha=.2, s
 #' @param showRegLines display regression curves
 #' @param showExpLines display expectation lines
 #' @param useCfgColor ignore result set colors and use colors from current configuration settings
-makeScatter = function( samplePair, showLegend=F, showRegLines=F, showExpLines=T, useCfgColor=T )
+makeScatter = function( samplePair, showLegend=F, showRegLines=F, showExpLines=T, useCfgColor=T ) 
 {
   emptyPlot(samplePair$xlim, samplePair$ylim, grid=F, lwd = LFQbench.Config$AxisLineThickness, cex.axis = LFQbench.Config$AxisAnnotationSize)
   if( !any(names(LFQbench.Config)=="DisplayAxisLabels") ) LFQbench.Config[["DisplayAxisLabels"]] <<- TRUE
-  if(LFQbench.Config$DisplayAxisLabels)
+  if(LFQbench.Config$DisplayAxisLabels) 
   {
       addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ) )
       addYLab( as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ) )

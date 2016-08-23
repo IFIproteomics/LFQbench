@@ -32,6 +32,8 @@
 #' @param  AxisLabelSize the relative font size for axis labels
 #' @param  AxisAnnotationSize the relative font size for axis labels
 #' @param  AxisLineThickness the line thickness of axes
+#' @param  AxisXLabelNumDiv divide the number of labels displayed in axis X
+#' @param  AxisYLabelNumDiv divide the number of labels displayed in axis Y
 #' @param  par the graphical parameters like mar, mgp, las, ... to set for the plot canvases.
 #' @export
 LFQbench.initConfiguration = function( 
@@ -92,6 +94,10 @@ LFQbench.initConfiguration = function(
   ,AxisAnnotationSize = 2
   # line thinkes for plotting axes
   ,AxisLineThickness = 2
+  # AxisXLabelNumDiv divide the number of labels displayed in axis X
+  ,AxisXLabelNumDiv = NULL 
+  # AxisYLabelNumDiv divide the number of labels displayed in axis Y
+  ,AxisYLabelNumDiv = NULL 
   # canvas settings
   ,par = list(
     # plot area margins: c(bottom, left, top, right)
@@ -246,6 +252,8 @@ LFQbench.changeConfiguration = function(
   ,AxisLabelSize = LFQbench.Config$AxisLabelSize
   ,AxisAnnotationSize = LFQbench.Config$AxisAnnotationSize
   ,AxisLineThickness = LFQbench.Config$AxisLineThickness
+  ,AxisXLabelNumDiv = LFQbench.Config$AxisXLabelNumDiv 
+  ,AxisYLabelNumDiv = LFQbench.Config$AxisYLabelNumDiv 
   ,par = LFQbench.Config$par
 )
 {
