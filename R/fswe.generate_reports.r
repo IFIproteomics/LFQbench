@@ -365,13 +365,17 @@ FSWE.generateReports <- function(
 
   if(singleHits){
     print("Summarising protein single hits...")
-    integrationMethod = NULL
+    integrationMethod = ""
+    library(dplyr)
+    peptides_wide <- read_tsv("/Users/napedro/tmp_data/SWATHbenchmark/output_benchmark/HYE110_TTOF6600_32fix/input/Spectronaut_HYE110_TTOF6600_32fix_peptides.tsv")
     proteins_wide <- peptides_wide %>% 
-      arrange(proteinID, species) %>%
-      group_by(proteinID, species) %>%
-      filter(n_distinct(sequenceID) == 1) %>%
-      select(-sequenceID) %>% 
-      summarise_each(funs(single_hits(.)))
+        arrange(proteinID, species) %>%
+        group_by(proteinID, species) %>%
+        # filter(n_distinct(sequenceID) == 1) %>%    ## n_distinct is very, very, very slow!
+        filter(length(unique(sequenceID)) == 1) %>%
+        select(-sequenceID) %>% 
+        summarise_each(funs(single_hits(.)))
+
   }
   
   if(integrationMethod == "topN_individual"){
