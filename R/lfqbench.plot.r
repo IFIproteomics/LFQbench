@@ -44,10 +44,10 @@ getQCFunction = function( ratios, ensureValueRange=c(0, 1) )
 #' @param axes=T
 #' @param cex.axis=1
 #' @export
-emptyPlot = function(xRange=c(0,1), yRange=c(0,1), lwd=1, grid=T, showXlab=T, showYlab=T, axes=T, cex.axis=1)
+emptyPlot = function(xRange=c(0,1), yRange=c(0,1), lwd=1, grid=T, showXlab=T, showYlab=T, axes=T, cex.axis=1, at.x = NULL, at.y = NULL)
 {
 	plot( 0, 0, xlim=xRange, ylim=yRange, type="n", axes=F, xlab="", ylab="", main="" )
-	if(axes) addAxes(lwd, showXlab, showYlab, cex.axis=cex.axis)
+	if(axes) addAxes(lwd, showXlab, showYlab, cex.axis=cex.axis, at.x = at.x, at.y = at.y)
 	if(grid) grid()
 }
 ################################################################################
@@ -66,7 +66,7 @@ emptyPlot = function(xRange=c(0,1), yRange=c(0,1), lwd=1, grid=T, showXlab=T, sh
 #' @param at.x=NULL 
 #' @param at.y=NULL
 #' @export
-addAxes = function(lwd=1, showXlab=T, showYlab=T, showXAxis=T, showYAxis=T, cex.axis=1)
+addAxes = function(lwd=1, showXlab=T, showYlab=T, showXAxis=T, showYAxis=T, cex.axis=1, at.x = NULL, at.y = NULL)
 {
   usr = par()$usr
   if(showXAxis) lines(x=usr[c(1,2)], y=usr[c(3,3)], lwd=lwd, xpd=T)
@@ -75,11 +75,13 @@ addAxes = function(lwd=1, showXlab=T, showYlab=T, showXAxis=T, showYAxis=T, cex.
   if(showXlab) {
       at = NULL
       if(!is.null(LFQbench.Config$AxisXLabelNumDiv)) at = seq(usr[1], usr[2], by = LFQbench.Config$AxisXLabelNumDiv)
+      if(!is.null(at.x)) at = at.x
       axis(1, lwd=0, lwd.ticks=lwd, cex.axis=cex.axis, at=at)  
   } 
   if(showYlab){
       at=NULL
       if(!is.null(LFQbench.Config$AxisYLabelNumDiv)) at = seq(usr[3], usr[4], by = LFQbench.Config$AxisYLabelNumDiv)
+      if(!is.null(at.y)) at = at.y
       axis(2, lwd=0, lwd.ticks=lwd, cex.axis=cex.axis, at=at)
   } 
       
@@ -275,12 +277,15 @@ addScatterPointsForSpecies2 = function(species, samplePairResult, minAlpha=.2, s
 #' @param showRegLines display regression curves
 #' @param showExpLines display expectation lines
 #' @param useCfgColor ignore result set colors and use colors from current configuration settings
-makeScatter = function( samplePair, showLegend=F, showRegLines=F, showExpLines=T, useCfgColor=T ) 
-{
-  emptyPlot(samplePair$xlim, samplePair$ylim, grid=F, lwd = LFQbench.Config$AxisLineThickness, cex.axis = LFQbench.Config$AxisAnnotationSize)
+makeScatter = function( samplePair, showLegend=F, showRegLines=F, showExpLines=T, useCfgColor=T, at.x = NULL, at.y = NULL) {
+        
+  emptyPlot(samplePair$xlim, samplePair$ylim, grid=F, 
+            lwd = LFQbench.Config$AxisLineThickness, 
+            cex.axis = LFQbench.Config$AxisAnnotationSize, 
+            at.x = at.x, at.y = at.y)
+
   if( !any(names(LFQbench.Config)=="DisplayAxisLabels") ) LFQbench.Config[["DisplayAxisLabels"]] <<- TRUE
-  if(LFQbench.Config$DisplayAxisLabels) 
-  {
+  if(LFQbench.Config$DisplayAxisLabels) {
       addXLab( as.expression( bquote( Log[2]~"("~.(samplePair$name2)~")" ) ) )
       addYLab( as.expression( bquote( Log[2]~"("~.(paste(samplePair$name1, ":", samplePair$name2, sep=""))~")" ) ) )
   }
@@ -288,7 +293,7 @@ makeScatter = function( samplePair, showLegend=F, showRegLines=F, showExpLines=T
                      addScatterPointsForSpecies2, samplePair, 
                       minAlpha=LFQbench.Config$ScatterPlotPointMinAlpha, showExpectationLine=showExpLines, showRegressionLine=showRegLines, 
                       useCfgColor=T, rampColors=ifelse(LFQbench.Config$ScatterPlotPointMinAlpha==1, F, T), cex=LFQbench.Config$PlotPointSize
-  )
+                        )
   if(showLegend) plotSpeciesLegend( horiz=T )
   return(logRatios)
 }
@@ -302,10 +307,10 @@ makeScatter = function( samplePair, showLegend=F, showRegLines=F, showExpLines=T
 #' @param showLegend display the legend
 #' @param showRegLines display regression curves
 #' @export
-LFQbench.showScatterPlot = function( samplePair, showLegend=F, showRegLines=F )
+LFQbench.showScatterPlot = function( samplePair, showLegend=F, showRegLines=F, at.x = NULL, at.y = NULL )
 {
   par(LFQbench.Config$par)
-  logRatios = makeScatter(samplePair, showLegend, showRegLines )
+  logRatios = makeScatter(samplePair, showLegend, showRegLines, at.x = at.x, at.y = at.y )
   par(LFQbench.Config$parBackup)
 }
 ################################################################################
@@ -370,11 +375,11 @@ LFQbench.showQuantBarPlot = function( samplePair )
 #' @param showRegLines display regression curves
 #' @param scatterPlotWidth the window portion used for scatter plot
 #' @export
-LFQbench.showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8)
+LFQbench.showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8, at.x = NULL, at.y = NULL)
 {
 	par(LFQbench.Config$par)
 	par(fig=c(0,scatterPlotWidth,0,1), new=F)
-	logRatios = makeScatter(samplePair, showLegend, showRegLines)
+	logRatios = makeScatter(samplePair, showLegend, showRegLines, at.x = at.x, at.y = at.y)
 	# density plot
 	par(fig=c(scatterPlotWidth,1,0,1), new=T)
 	pm = par()$mar
@@ -405,11 +410,11 @@ LFQbench.showScatterAndDensityPlot = function(samplePair, showLegend=F, showRegL
 #' @param showRegLines display regression curves
 #' @param scatterPlotWidth the window portion used for scatter plot
 #' @export
-LFQbench.showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8)
+LFQbench.showScatterAndBoxPlot = function(samplePair, showLegend=F, showRegLines=F, scatterPlotWidth=0.8, at.x = NULL, at.y = NULL)
 {
   par(LFQbench.Config$par)
   par(fig=c(0,scatterPlotWidth,0,1), new=F)
-  logRatios = makeScatter(samplePair, showLegend, showRegLines)
+  logRatios = makeScatter(samplePair, showLegend, showRegLines, at.x = at.x, at.y = at.y)
   # box plot
   par(fig=c(scatterPlotWidth,1,0,1), new=T)
   pm = par()$mar
