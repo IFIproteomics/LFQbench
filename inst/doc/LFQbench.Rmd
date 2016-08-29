@@ -1,0 +1,188 @@
+---
+title: "LFQbench"
+author: "Jörg Kuharev & Pedro Navarro"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+LFQbench is an open source R package for the automated evaluation of label-free quantification performance. The evaluation bases on the interpretation of the quantitative analysis results of hybrid proteome samples prepared in known ratios.
+
+LFQbench calculates and represents graphically a set of qualitative and quantitative performance metrics like identification rates, precision and accuracy of quantification, providing developers and end-users with a standardized set of reports to enable an in-depth performance evaluation of their software and analysis platforms.
+
+## Load LFQbench 
+
+LFQbench includes two main modules implemented in a single package (LFQbench). The first module is called FSWE (Format SoftWare Exports): it is able to read
+practically any kind of output text format generated from any label-free quantification software tools. The second module is LFQbench: this is the analysis module that generates all benchmark reports.
+
+```{r loadLibraries, echo=TRUE, warning=FALSE, message=FALSE}
+
+library(LFQbench)
+
+```
+
+## Configure 
+
+### Configuring LFQbench for benchmarking a software report not included as default
+
+In FSWE it is necessary to define several details in order to run it properly:
+
+* __Datasets to be evaluated__: each dataset is defined as a named vector of strings. The strings define the raw file names of the dataset as they are defined at the report(s) of the software tool(s) you want to benchmark. FSWE can analyse two samples (sample A and sample B), which defer on their species composition ratio. It is required to input the same number of replicates for both samples A and B. The first half of values of the named vector defining raw names is interpreted as sample A, and the second half is interpreted as sample B.
+
+
+```{r defineDatasets}
+
+# Define the data sets you want to analyse. 
+dataSets = data.frame(
+    "HYE124_TTOF6600_64var"=c("lgillet_I150211_008", "lgillet_I150211_010", "lgillet_I150211_012", # A
+                               "lgillet_I150211_009", "lgillet_I150211_011", "lgillet_I150211_013") # B
+    ,"HYE110_SynaptG2S"=c( paste(rep("HYE110_A"), 1:3, sep = "."), paste(rep("HYE110_B"), 1:3, sep = "."))
+    ,row.names=c("A1", "A2", "A3", "B1", "B2", "B3")
+)
+
+```
+
+* __Define the species tags__: protein names should provide a clue about the species. A convenient format is Uniprot's entry name (example: 1433B_HUMAN is the entry name of the 14-3-3 protein beta/alpha of human). These species tags (clues) must be defined in FSWE as a named list.
+
+```{r speciesTags}
+
+speciesTags = list(HUMAN = "_HUMAN", YEAST = "_YEAS", ECOLI = "_ECOLI") 
+
+```
+
+
+You can init LFQbench and FSWE by passing the defined datasets and species tags. LFQbench module __must__ be initialized before FSWE.
+
+```{r initLFQbench}
+
+LFQbench.initConfiguration()
+FSWE.initConfiguration( dataSets, speciesTags )
+
+```
+
+
+Note that after running the initialization for both modules, some new objects appear at the global environment. Among them: 
+
+* __LFQbench.Config__: it contains a list of configuration parameters for the analysis that can be modified by using the command LFQbench.changeConfiguration. The most important ones are commented below.
+* __FSWE.modificationsToUniMod__: a list of default fixed and variable modifications as they appear within the sequence, and their corresponding translation to UniMod. If you miss any modification, you may add it by using the function FSWE.addModification.
+* __FSWE.configFunctionForSoftware__: this object contains configuration parameters to read each specific software tool report. There are many default software tool configurations (see FSWE.softwareNames), and you can add your own configurations by using FSWE.addSoftwareConfiguration. 
+
+Adding a software configuration only requires to know some necessary column names. In this example, we use a non default software tool report from ISOQuant. We can configure it with the following command:
+
+```{r addSoftwareConfig}
+
+##### Add configuration for ISOQuant (peptides) 
+FSWE.addSoftwareConfiguration("ISOQuant_pep",               
+                              # Software configuration name      
+                              input_format = "wide",        
+                              # input_format can be wide or long. Wide contains all quantitative values (all samples and replicates) 
+                              # for a peptide in a single row, whereas long contains a single quantitative value (just one replicate)
+                              # in a row.
+                              input.extension = "*.csv$",
+                              # it is important to know that LFQbench honours the extension: csv are COMMA separated values, tsv are TAB separated values
+                              nastrings = " ",
+                              # how NA (not available) values are reported
+                              quantitative.var = make.names("intensity in"),
+                              # in long formats, how the quantitative value column is named
+                              quantitative.var.tag = make.names("intensity in"),
+                              # in wide formats, how quantitative values are tagged 
+                              #(they also should include the injection names reported at the datasets object)
+                              protein.var = "entry",
+                              # name of the protein name variable. Remember: protein names should include species information (speciesTags)
+                              sequence.mod.var = "sequence",
+                              # variable name of sequence (including modifications as defined in FSWE.modificationsToUniMod)
+                              charge.var = make.names("signal_charge")
+                              # variable name of the precursar charge state.
+                              )
+                            
+
+```
+
+
+#### Adding a variable modification
+
+You may add new modifications (or modifications reported in different ways for each software tool) by using the command FSWE.addModification(). You must use a regular expression compatible format to add modifications.  
+
+```{r addModification}
+
+# Add a modification
+FSWE.addModification( "\\[Oxi\\]", "\\(UniMod:35\\)")
+
+# See modifications available
+print(FSWE.modificationsToUniMod)
+
+
+```
+
+
+## Analysis
+
+### Source directory
+
+Set the directory that stores all software tool reports as data root folder. You may also create a subfolder structure, which will contain LFQbench analyses.
+
+```{r sourceDir}
+
+## Source directory and input files
+srcDir = "../ext/data/vignette_examples"
+
+##### Set the data root folder and create the subfolder structure
+LFQbench.setDataRootFolder( srcDir, createSubfolders = T )
+
+```
+
+
+### Generate reports in LFQbench format.
+
+FSWE parses software tool reports, makes some common data processing (like adding up quantitative values of the different charge states for a same peptide), 
+and outputs each analysed report file in two different files (peptide and protein summaries) compatible with LFQbench at the newly created _input_ folder.
+
+```{r FSWE, message=FALSE, warning=FALSE, cache=TRUE}
+
+inputFiles = list.files(path = LFQbench.Config$DataRootFolder, pattern = "\\..+")
+
+# generate reports (they will be used by LFQbench)
+nix = sapply(inputFiles, 
+             FSWE.generateReports,
+             softwareSource = "guess",
+             keep_original_names = T,
+             singleHits = F,
+             plotHistogram = T, 
+             plotHistNAs = T, 
+             reportSequences = F
+)
+
+```
+
+Note here that by default FSWE assigns the reading report configuration in function of the report name (softwareSource = "guess"). This is done by parsing the start of the file name and comparing it with the available _FSWE.softwareNames_. It is then recommendable to rename your files by including at the start the software name as it appears at the _FSWE.configFunctionForSoftware_ (you can see the current available names at _FSWE.softwareNames_). In this execution, the current available names are: `r print(FSWE.softwareNames)`. By renaming the file names this way, you are able to run all LFQbench analyses of different software tools in the same LFQbench analysis batch. 
+
+### Perform LFQbench analyses
+
+LFQbench analyses can be stored in a batch analysis (all files stored at _log_ and _plot_ folders), and also they can be further used to represent data online.
+
+```{r LFQbench_analysis}
+
+# LFQbench analysis
+
+#LFQbench.changeConfiguration(SampleComposition = )
+LFQbench.Config$LogIntensityPlotRange = c(9,20)
+
+res <- LFQbench.batchProcessRootFolder()
+myr <- res[1]
+
+#LFQbench.showAllSpeciesQC(myr)
+#LFQbench.plotResultSet(res[1])
+#LFQbench.plotResultSet(res[2], showScatterPlot = F, showScatterAndDensityPlot = T, showBoxPlot = F, showDensityPlot = F)
+
+LFQbench.explainMetrics()
+
+
+```
+
+
+LFQbench::LFQbench.changeConfiguration()
+
+
