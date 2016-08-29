@@ -176,7 +176,7 @@ myr <- res[1]
 #LFQbench.showAllSpeciesQC(myr)
 #LFQbench.plotResultSet(res[1])
 #LFQbench.plotResultSet(res[2], showScatterPlot = F, showScatterAndDensityPlot = T, showBoxPlot = F, showDensityPlot = F)
-=======
+
 LFQbench.explainMetrics()
 
 
