@@ -163,8 +163,7 @@ Note here that by default FSWE assigns the reading report configuration in funct
 
 LFQbench analyses can be stored in a batch analysis (all files stored at _log_ and _plot_ folders), and also they can be further used to represent data online.
 
-```{r LFQbench_analysis}
-
+```{r LFQbench_analysis, echo=TRUE, warning=FALSE, message=FALSE, results="hide"}
 # LFQbench analysis
 
 #LFQbench.changeConfiguration(SampleComposition = )
@@ -172,17 +171,35 @@ LFQbench.Config$LogIntensityPlotRange = c(9,20)
 
 res <- LFQbench.batchProcessRootFolder()
 myr <- res[1]
-
-#LFQbench.showAllSpeciesQC(myr)
-#LFQbench.plotResultSet(res[1])
-#LFQbench.plotResultSet(res[2], showScatterPlot = F, showScatterAndDensityPlot = T, showBoxPlot = F, showDensityPlot = F)
-
-LFQbench.explainMetrics()
-
-
 ```
 
+------- my 2 cents -------
 
+### changing configuration after initialization
 LFQbench::LFQbench.changeConfiguration()
+PS: place this subsection after package initialisation part
 
+### how to define sample composition
+#### default sample set
+#### a different sample set
+
+## diplay results
+
+### numeric metrics
+
+```{r LFQbench_analysis, echo=TRUE, warning=FALSE, message=FALSE, results="hide"}
+# LFQbench.showAllSpeciesQC(myr)
+# LFQbench.plotResultSet(res[1])
+# LFQbench.plotResultSet(res[2], showScatterPlot = F, showScatterAndDensityPlot = T, showBoxPlot = F, showDensityPlot = F)
+# LFQbench.explainMetrics()
+```
+
+### plots ...
+
+```{r LFQbench_analysis, echo=TRUE, warning=FALSE, message=FALSE, results="hide"}
+# LFQbench.showAllSpeciesQC(myr)
+# LFQbench.plotResultSet(res[1])
+# LFQbench.plotResultSet(res[2], showScatterPlot = F, showScatterAndDensityPlot = T, showBoxPlot = F, showDensityPlot = F)
+# LFQbench.explainMetrics()
+```
 
