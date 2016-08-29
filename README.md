@@ -23,24 +23,10 @@ Then we just call
 
 ### Examples
 
-```{r, engine='bash', count_lines}
-# Download the library code using git
-> git clone https://github.com/IFIproteomics/LFQbench
+You may find a complete example on how to use LFQbench at the vignette:
 
-# Move to the scripts folder
-> cd inst/scripts
+vignette("LFQbench")
 
-# run one of the datasets examples
-> sh exec.example.peakview.sh
-
-# In the main folder of the dataset: ext/data/example_peakview
-> ../../ext/data/peakview
-
-# Different folder shows the plot and information: 
-# (i) the log folder contain the log information, 
-# (ii) the input the example information, 
-# (iii) the plot folder the resulted plot from the analysis
-```
 
 ### References
 
