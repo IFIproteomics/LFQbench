@@ -13,4 +13,4 @@ vignettes/*.pdf
 Rplots.pdf
 *.Rout
 .Rproj.user
-inst/doc
+
