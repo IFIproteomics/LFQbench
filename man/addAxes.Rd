@@ -5,7 +5,10 @@
 \title{addAxes}
 \usage{
 addAxes(lwd = 1, showXlab = T, showYlab = T, showXAxis = T,
-  showYAxis = T, cex.axis = 1)
+  showYAxis = T, cex.axis = 1, at.x = NULL, at.y = NULL)
+}
+\arguments{
+\item{at.x=NULL}{}
 }
 \description{
 add normal axes having full lengths of plotting area

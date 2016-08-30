@@ -5,7 +5,7 @@
 \title{makeScatter}
 \usage{
 makeScatter(samplePair, showLegend = F, showRegLines = F,
-  showExpLines = T, useCfgColor = T)
+  showExpLines = T, useCfgColor = T, at.x = NULL, at.y = NULL)
 }
 \arguments{
 \item{samplePair}{the result set data of a sample pair}

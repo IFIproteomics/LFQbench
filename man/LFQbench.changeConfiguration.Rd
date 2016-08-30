@@ -31,6 +31,8 @@ LFQbench.changeConfiguration(DataRootFolder = LFQbench.Config$DataRootFolder,
   AxisLabelSize = LFQbench.Config$AxisLabelSize,
   AxisAnnotationSize = LFQbench.Config$AxisAnnotationSize,
   AxisLineThickness = LFQbench.Config$AxisLineThickness,
+  AxisXLabelNumDiv = LFQbench.Config$AxisXLabelNumDiv,
+  AxisYLabelNumDiv = LFQbench.Config$AxisYLabelNumDiv,
   par = LFQbench.Config$par)
 }
 \arguments{

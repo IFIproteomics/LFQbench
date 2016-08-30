@@ -4,7 +4,8 @@
 \alias{LFQbench.showScatterPlot}
 \title{LFQbench.showScatterPlot}
 \usage{
-LFQbench.showScatterPlot(samplePair, showLegend = F, showRegLines = F)
+LFQbench.showScatterPlot(samplePair, showLegend = F, showRegLines = F,
+  at.x = NULL, at.y = NULL)
 }
 \arguments{
 \item{samplePair}{the result set data of a hybrid proteome sample pair}

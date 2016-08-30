@@ -17,8 +17,9 @@ LFQbench.initConfiguration(DataRootFolder = getwd(),
   PlotCurveLineWidth = 2, PlotLegendLineWidth = 4, PlotPointSize = 1.5,
   ScatterPlotPointType = 20, ScatterPlotPointMinAlpha = 0.5,
   ScatterPlotLowessBandWidth = 0.8, AxisLabelSize = 2,
-  AxisAnnotationSize = 2, AxisLineThickness = 2, par = list(mar = c(4.5,
-  6, 0.5, 0.5), mgp = c(3.7, 1.5, 0), las = 1))
+  AxisAnnotationSize = 2, AxisLineThickness = 2, AxisXLabelNumDiv = NULL,
+  AxisYLabelNumDiv = NULL, par = list(mar = c(4.5, 6, 0.5, 0.5), mgp =
+  c(3.7, 1.5, 0), las = 1))
 }
 \arguments{
 \item{DataRootFolder}{the parent folder for batch processing}
@@ -74,6 +75,10 @@ LFQbench.initConfiguration(DataRootFolder = getwd(),
 \item{AxisAnnotationSize}{the relative font size for axis labels}
 
 \item{AxisLineThickness}{the line thickness of axes}
+
+\item{AxisXLabelNumDiv}{divide the number of labels displayed in axis X}
+
+\item{AxisYLabelNumDiv}{divide the number of labels displayed in axis Y}
 
 \item{par}{the graphical parameters like mar, mgp, las, ... to set for the plot canvases.}
 }

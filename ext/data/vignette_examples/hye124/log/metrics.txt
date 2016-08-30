@@ -1,0 +1,288 @@
+--------------------------------------------------------------------------------
+# Metrics description: 
+
+Identification statistics:
+  the number of identifications for benchmark species
+
+Quantification statistics:
+   valid ratios - total number of valid log-ratios that meet following conditions:
+    a) peptide/protein could be quantified in both samples.
+    b) calulcated log-ratio falls within the expectation range
+       defined by the sample composition and the spread of spread of the log-ratios observed for each species.
+    The expectation range is defined as a miximum difference of 5 standard deviations from the average ratio.
+   in plot range - numbers of valid log-ratios inside of the user defined plot range
+   out of plot range - numbers of valid log-ratios outside of the user defined plot range
+   invalid ratios - total numbers of invalid log-ratios
+   invalid ratios, out of validity range - proteins/peptides outside of validity range (see condition b)
+   invalid ratios, missing value - proteins/peptides exclusively quantified in one of the samples (see condition a)
+
+Technical variance:
+  the median CV for the background species among replicate runs
+
+Global accuracy:
+  accuracy of relative quantification,
+  the median deviation of log-ratios to the expected value
+
+Global precision:
+  precision of quantification,
+  the standard deviation of log-ratios
+
+Global species overlap:
+ species separation ability,
+ the area under ROC curve between a species pair.
+
+Local accuracy:
+ local accuracy of relative quantification,
+ the median deviation of log-ratios to the expected value
+ for partial data split in quantiles by intensity in first sample
+
+Local precision:
+ precision of quantification,
+ the standard deviation of log-ratios
+ for partial data split in quantiles by intensity in first sample
+
+Local species overlap:
+ species separation ability,
+ the area under ROC curve between a species pair
+ for partial data split in quantiles by intensity in first sample
+--------------------------------------------------------------------------------
+--------------------------------------------
+
+PeakView_TTOF6600_64w_benchmark_example.xlsx_peptides
+name: PeakView_TTOF6600_64w_benchmark_example.xlsx_peptides
+Identification statistics: 3302
+Quantification statistics: 
+$`A:B`
+                               HUMAN YEAST ECOLI
+invalid ratios                   106   306   418
+invalid, out of validity range     0     0     0
+invalid, missing value           106   306   418
+valid ratios                    1451   619   402
+in plot range                   1451   619   402
+out of plot range                  0     0     0
+
+
+Technical variance: 0.06223386
+Global accuracy: 
+$`A:B`
+      HUMAN       YEAST       ECOLI 
+ 0.00000000 -0.00273761  0.08865045 
+
+
+Global precision: 
+$`A:B`
+    HUMAN     YEAST     ECOLI 
+0.2345301 0.2941245 0.4172283 
+
+
+Global species overlap: 
+$`A:B`
+HUMAN-YEAST HUMAN-ECOLI YEAST-ECOLI 
+  0.9855528   0.9869964   0.9984649 
+
+
+Local accuracy: 
+$`A:B`
+           HUMAN       YEAST        ECOLI
+Q1 -0.0103529332 -0.07522958 0.2102981097
+Q2  0.0009399194 -0.01436289 0.1169354060
+Q3  0.0090400074  0.05214669 0.0007542413
+
+
+Local precision: 
+$`A:B`
+       HUMAN     YEAST     ECOLI
+Q1 0.2841307 0.2898079 0.5369625
+Q2 0.2410514 0.2643365 0.3809661
+Q3 0.1603814 0.3228699 0.2162221
+
+
+Local species overlap: 
+$`A:B`
+   HUMAN-YEAST HUMAN-ECOLI YEAST-ECOLI
+Q1   0.9850317   0.9687863   0.9905149
+Q2   0.9695669   0.9984205   0.9997495
+Q3   0.9920494   0.9934407   0.9991234
+
+
+
+--------------------------------------------
+
+PeakView_TTOF6600_64w_benchmark_example.xlsx_proteins
+name: PeakView_TTOF6600_64w_benchmark_example.xlsx_proteins
+Identification statistics: 370
+Quantification statistics: 
+$`A:B`
+                               HUMAN YEAST ECOLI
+invalid ratios                     6    18    41
+invalid, out of validity range     0     0     0
+invalid, missing value             6    18    41
+valid ratios                     173    85    47
+in plot range                    173    85    47
+out of plot range                  0     0     0
+
+
+Technical variance: 0.05930475
+Global accuracy: 
+$`A:B`
+     HUMAN      YEAST      ECOLI 
+0.00000000 0.04977152 0.06751814 
+
+
+Global precision: 
+$`A:B`
+    HUMAN     YEAST     ECOLI 
+0.1225878 0.2151134 0.2909042 
+
+
+Global species overlap: 
+$`A:B`
+HUMAN-YEAST HUMAN-ECOLI YEAST-ECOLI 
+   0.999932    1.000000    1.000000 
+
+
+Local accuracy: 
+$`A:B`
+           HUMAN      YEAST      ECOLI
+Q1 -0.0001710294 0.01064577 0.16543014
+Q2 -0.0028037579 0.08007078 0.06751814
+Q3  0.0032423045 0.06719198 0.01050192
+
+
+Local precision: 
+$`A:B`
+        HUMAN     YEAST     ECOLI
+Q1 0.16491043 0.2545071 0.3475763
+Q2 0.09465325 0.2280048 0.2735039
+Q3 0.09618704 0.1554285 0.2320289
+
+
+Local species overlap: 
+$`A:B`
+   HUMAN-YEAST HUMAN-ECOLI YEAST-ECOLI
+Q1           1           1           1
+Q2           1           1           1
+Q3           1           1           1
+
+
+
+--------------------------------------------
+
+Spectronaut_TTOF6600_64w_example.tsv_peptides
+name: Spectronaut_TTOF6600_64w_example.tsv_peptides
+Identification statistics: 4678
+Quantification statistics: 
+$`A:B`
+                               HUMAN YEAST ECOLI
+invalid ratios                    24   184   418
+invalid, out of validity range     0     0     0
+invalid, missing value            24   184   418
+valid ratios                    1841  1465   746
+in plot range                   1841  1464   746
+out of plot range                  0     1     0
+
+
+Technical variance: 0.06160095
+Global accuracy: 
+$`A:B`
+      HUMAN       YEAST       ECOLI 
+0.000000000 0.006870306 0.133242655 
+
+
+Global precision: 
+$`A:B`
+    HUMAN     YEAST     ECOLI 
+0.3132392 0.3931409 0.6779666 
+
+
+Global species overlap: 
+$`A:B`
+HUMAN-YEAST HUMAN-ECOLI YEAST-ECOLI 
+  0.9648166   0.9747398   0.9850269 
+
+
+Local accuracy: 
+$`A:B`
+          HUMAN        YEAST      ECOLI
+Q1  0.028524419  0.037501862 0.31125626
+Q2 -0.002850147  0.001951384 0.17616963
+Q3 -0.008984548 -0.009730432 0.02555866
+
+
+Local precision: 
+$`A:B`
+       HUMAN     YEAST     ECOLI
+Q1 0.4218595 0.4385076 0.9238387
+Q2 0.2537548 0.4184955 0.5120097
+Q3 0.2241624 0.2995975 0.4313201
+
+
+Local species overlap: 
+$`A:B`
+   HUMAN-YEAST HUMAN-ECOLI YEAST-ECOLI
+Q1   0.9251985   0.9557085   0.9326012
+Q2   0.9579247   0.9836816   0.9895347
+Q3   0.9806531   0.9944545   0.9960744
+
+
+
+--------------------------------------------
+
+Spectronaut_TTOF6600_64w_example.tsv_proteins
+name: Spectronaut_TTOF6600_64w_example.tsv_proteins
+Identification statistics: 506
+Quantification statistics: 
+$`A:B`
+                               HUMAN YEAST ECOLI
+invalid ratios                     1     6    25
+invalid, out of validity range     0     0     0
+invalid, missing value             1     6    25
+valid ratios                     212   174    88
+in plot range                    212   174    88
+out of plot range                  0     0     0
+
+
+Technical variance: 0.03062434
+Global accuracy: 
+$`A:B`
+       HUMAN        YEAST        ECOLI 
+1.734723e-18 9.815355e-03 7.800380e-02 
+
+
+Global precision: 
+$`A:B`
+    HUMAN     YEAST     ECOLI 
+0.1435670 0.2999619 0.5754916 
+
+
+Global species overlap: 
+$`A:B`
+HUMAN-YEAST HUMAN-ECOLI YEAST-ECOLI 
+  0.9802375   0.9882075   0.9884404 
+
+
+Local accuracy: 
+$`A:B`
+           HUMAN        YEAST       ECOLI
+Q1  0.0005064032  0.075019941 0.130462201
+Q2 -0.0004792445 -0.004379041 0.128966298
+Q3 -0.0011534277 -0.006053920 0.004133878
+
+
+Local precision: 
+$`A:B`
+        HUMAN     YEAST     ECOLI
+Q1 0.18732232 0.3651349 0.8714099
+Q2 0.14867380 0.3246188 0.4303350
+Q3 0.06486972 0.1459417 0.1418242
+
+
+Local species overlap: 
+$`A:B`
+   HUMAN-YEAST HUMAN-ECOLI YEAST-ECOLI
+Q1   0.9655271   0.9717882   0.9241026
+Q2   0.9819820   0.9990079   0.9989011
+Q3   1.0000000   1.0000000   1.0000000
+
+
+

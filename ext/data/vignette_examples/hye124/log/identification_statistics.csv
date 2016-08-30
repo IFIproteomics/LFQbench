@@ -1,0 +1,5 @@
+"name"	"HUMAN"	"YEAST"	"ECOLI"	"OTHER"	"sum"
+"PeakView_TTOF6600_64w_benchmark_example.xlsx_peptides"	1557	925	820	0	3302
+"PeakView_TTOF6600_64w_benchmark_example.xlsx_proteins"	179	103	88	0	370
+"Spectronaut_TTOF6600_64w_example.tsv_peptides"	1865	1649	1164	0	4678
+"Spectronaut_TTOF6600_64w_example.tsv_proteins"	213	180	113	0	506

@@ -5,7 +5,7 @@
 \title{LFQbench.showScatterAndBoxPlot}
 \usage{
 LFQbench.showScatterAndBoxPlot(samplePair, showLegend = F, showRegLines = F,
-  scatterPlotWidth = 0.8)
+  scatterPlotWidth = 0.8, at.x = NULL, at.y = NULL)
 }
 \arguments{
 \item{samplePair}{the result set data of a hybrid proteome sample pair}
