@@ -13,4 +13,6 @@ vignettes/*.pdf
 Rplots.pdf
 *.Rout
 .Rproj.user
+.DS_Store
+
 

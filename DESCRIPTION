@@ -10,7 +10,7 @@ Description: The package LFQbench comprises functions to compare different Label
 Depends:
     R (>= 3.1.0),hash,SDMTools,RColorBrewer,
     dplyr,tidyr,ggplot2,readxl,classInt,
-    scales,pander,GGally,tools,readr
+    scales,pander,GGally,tools,readr,R.utils
 Imports:
     tools (>= 3.1.0),
     RColorBrewer (>= 1.1.0),
