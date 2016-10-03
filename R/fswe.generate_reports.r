@@ -367,7 +367,7 @@ FSWE.generateReports <- function(
     print("Summarising protein single hits...")
     integrationMethod = ""
     library(dplyr)
-    peptides_wide <- read_tsv("/Users/napedro/tmp_data/SWATHbenchmark/output_benchmark/HYE110_TTOF6600_32fix/input/Spectronaut_HYE110_TTOF6600_32fix_peptides.tsv")
+    #peptides_wide <- read_tsv("/Users/napedro/tmp_data/SWATHbenchmark/output_benchmark/HYE110_TTOF6600_32fix/input/Spectronaut_HYE110_TTOF6600_32fix_peptides.tsv")
     proteins_wide <- peptides_wide %>% 
         arrange(proteinID, species) %>%
         group_by(proteinID, species) %>%
