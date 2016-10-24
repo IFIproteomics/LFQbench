@@ -30,6 +30,8 @@ vignette("LFQbench")
 
 ### References
 
+
 [1] Navarro P, Kuharev J, Gillet LC, Bernhardt OM, MacLean B, Röst HL, Tate SA, Tsou C, Reiter L, Distler U, Rosenberger G, Perez-Riverol Y, Nesvizhskii AI, Aebersold R	& Tenzer S. A multicenter study benchmarks software tools for label-free proteome quantification. Nature Biotechnology 1546-1696 (2016). DOI: 10.1038/nbt.3685  
-[2] Kuharev J, Navarro P, Distler U, Jahn O & Tenzer S. In-depth evaluation of software tools for data-independent acquisition based label-free quantification. Proteomics 15, 3140–3151 (2015).
+
+[2] Kuharev J, Navarro P, Distler U, Jahn O & Tenzer S. In-depth evaluation of software tools for data-independent acquisition based label-free quantification. Proteomics 15, 3140–3151 (2015).  
 
