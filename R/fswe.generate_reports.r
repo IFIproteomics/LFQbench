@@ -448,10 +448,15 @@ FSWE.generateReports <- function(
     select(-totalIntensity)
   
   
-  #Remove proteins, which have less than x hits per sample (among the two samples)
-  cols_sampleA <- grep("^A", names(proteins_wide))
-  cols_sampleB <- grep("^B", names(proteins_wide))
   
+  #Remove proteins, which have less than x hits per sample (among the two samples)
+  #TODO: This is still provisional since it only considers two samples A and B.
+  injectionNamesA <- rownames(FSWE.dataSets)[1:(length(rownames(FSWE.dataSets))/2)]
+  injectionNamesB <- rownames(FSWE.dataSets)[(1+length(rownames(FSWE.dataSets))/2):length(rownames(FSWE.dataSets))]
+  cols_sampleA <- match(injectionNamesA, names(proteins_wide)) 
+  cols_sampleB <- match(injectionNamesB, names(proteins_wide)) 
+  
+    
   proteins_wide$numHitsA <- apply(proteins_wide, 1, function(elt, cols) length(cols) - sum(is.na(elt[cols])), cols_sampleA)
   proteins_wide$numHitsB <- apply(proteins_wide, 1, function(elt, cols) length(cols) - sum(is.na(elt[cols])), cols_sampleB)
   proteins_wide <- proteins_wide %>% rowwise() %>% 
