@@ -10,13 +10,13 @@ peptidesPerProtein = c(3, 3, 3)
 species = c("HUMAN", "YEAST", "ECOLI")
 speciesRatios = c(0.0, 1.0, -2.0)
 stdDevRatios = c(0.001, 0.001, 0.001)
-intDistribution = c(13.0, 1.5)
+proteinAbundanceDistribution = c(6.0, 1.5)
 stdDeviationFactorMS = 0.03
-BackgroundSignalLevel = 2^14 #2^14
-MissingValuesFactor = 0.01
-SignalNoiseFactor = 5.0
+BackgroundSignalLevel = 0.2 #2^14
+MissingValuesFactor = 0.0
+SignalNoiseFactor = 1.5 # 5.0
 # General LFQbench settings =======================================================
-srcDir = "/Users/napedro/tmp_data/LFQbench/simulator"
+srcDir = "ext/simulations/simulator"
 expFile = "test_PeptideSummary.tsv"
 
 replicateNames = c(paste0("A", 1:numReplicates), paste0("B", 1:numReplicates))
@@ -37,7 +37,7 @@ mySimExp <- FSWE.simExperiment(numReplicates = numReplicates,
                    speciesRatios = speciesRatios, 
                    stdDevRatios = stdDevRatios, 
                    peptidesPerProtein = peptidesPerProtein, 
-                   intDistribution = intDistribution,
+                   proteinAbundanceDistribution = proteinAbundanceDistribution,
                    stdDeviationFactorMS = stdDeviationFactorMS,
                    BackgroundSignalLevel = BackgroundSignalLevel,
                    MissingValuesFactor = MissingValuesFactor,
@@ -45,6 +45,7 @@ mySimExp <- FSWE.simExperiment(numReplicates = numReplicates,
 
 #write.csv2(mySimExp, file = file.path(srcDir, expFile) , sep = "\t", na = "NA", row.names = F, col.names = T)
 
+mkdir(srcDir)
 write_tsv(mySimExp, path = file.path(srcDir, expFile), na = "NA", col_names = T)
 
 LFQbench.initConfiguration()

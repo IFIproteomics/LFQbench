@@ -258,9 +258,11 @@ getPeptideIntensities <- function(peptidesProtein, AbsoluteIntensityProtein){
 #' @param stdDevRatios biological/prep variation. Example: stdDeviations = c(0.05, 0.1, 0.1)
 #' @param numProteinsSpecies vector with number of proteins simulated per species. Example: numProteins = c(2000, 1500, 1000)
 #' @param peptidesPerProtein vector with the average number of peptides per protein simulated. Example: peptidesPerProtein = c(10, 8, 5)
-#' @param intDistribution vector containing mean and sd values defining the protein distribution intensities desired. Example: intDistribution = c(10.0, 5.0) 
+#' @param proteinAbundanceDistribution vector containing mean and sd values defining the protein distribution intensities desired. Example: proteinAbundanceDistribution = c(10.0, 5.0) 
 #' @param stdDeviationFactorMS standard deviation factor (0 to 1) due to MS. Example: stdDeviationFactorMS = 0.03
+#' @param BackgroundSignalLevel 
 #' @param MissingValuesFactor factor of missing values in the experiment. They are intensity-dependant.
+#' @param SignalNoiseFactor 
 #' @export
 FSWE.simExperiment <- function(numReplicates, 
                                species, 
@@ -268,7 +270,7 @@ FSWE.simExperiment <- function(numReplicates,
                                stdDevRatios, 
                                numProteinsSpecies, 
                                peptidesPerProtein, 
-                               intDistribution,
+                               proteinAbundanceDistribution,
                                stdDeviationFactorMS,
                                BackgroundSignalLevel,
                                MissingValuesFactor,
@@ -290,21 +292,27 @@ FSWE.simExperiment <- function(numReplicates,
     
     for(i in 1:length(species)){
         #i = 1
+        
         # Simulate the number of peptides per protein
         pepsProtein = rpois(numProteinsSpecies[i], peptidesPerProtein[i])
         pepsProtein[pepsProtein == 0] = 1  # Fix at the case no peptides assigned to a protein
         numPeps = sum(pepsProtein)
+        
         # Assign to each peptide a protein key
         proteinKeys = getProteinKeys(pepsProtein, paste0("_",species[i]))
         peptideKeys = getPeptideKeys(pepsProtein, proteinKeys)
         speciesKeys = rep(species[i], numPeps)
+        
         # Simulate the total intensity of each protein
-        AbsIntProtein = rnorm(numProteinsSpecies[i], mean = intDistribution[1], sd = intDistribution[2])
+        AbsIntProtein = rnorm(numProteinsSpecies[i], mean = proteinAbundanceDistribution[1], sd = proteinAbundanceDistribution[2])
+        
         # Simulate the total intensity of each peptide of the protein -- we use a logarithmic distribution
         AbsPepInt = getPeptideIntensities(pepsProtein, AbsIntProtein)
-        minAbsPepInt = min(AbsPepInt)
-        maxAbsPepInt = max(AbsPepInt)
-        deltaAbsPepInt = maxAbsPepInt - minAbsPepInt 
+        
+        # minAbsPepInt = min(AbsPepInt)
+        # maxAbsPepInt = max(AbsPepInt)
+        # deltaAbsPepInt = maxAbsPepInt - minAbsPepInt 
+        
         # Simulate peptide ratios according to species ratios
         logs <- rnorm( n = numPeps, mean = speciesRatios[i], sd = stdDevRatios[i])  # * (AbsPepInt / max(AbsPepInt)) )
         
@@ -324,13 +332,13 @@ FSWE.simExperiment <- function(numReplicates,
         
         # add random values (normal distributed) to all replicates, regardless the intensity
         rndMean = 0
-        rndSD = (2 ^ intDistribution[1]) * SignalNoiseFactor 
+        rndSD = (2 ^ abs(proteinAbundanceDistribution[1] - proteinAbundanceDistribution[2])) * SignalNoiseFactor 
         for(rep in 1:numReplicates){
             rndNoiseA = rnorm(length(AInt), mean = rndMean, sd = rndSD)
             rndNoiseB = rnorm(length(BInt), mean = rndMean, sd = rndSD)
             dfA[, rep] = dfA[, rep] + rndNoiseA
             dfB[, rep] = dfB[, rep] + rndNoiseB
-            dfA[ dfA < BackgroundSignalLevel] = 0.0
+            dfA[ dfA < BackgroundSignalLevel] = 0.0  # This is necessary to avoid negative probabilities at NMAR simmulation.
             dfB[ dfB < BackgroundSignalLevel] = 0.0
             
         }
@@ -347,7 +355,7 @@ FSWE.simExperiment <- function(numReplicates,
     keyCols <- names(numericCols[numericCols == FALSE])
     numericCols <- names(numericCols[numericCols == TRUE])
     
-    # We entry missing values to each of the replicates: a total of length(replicate) * MissingValuesFactor
+    # We entry missing not at random values (MNAR) to each of the replicates: a total of length(replicate) * MissingValuesFactor
     # The probobility a peptide (peak) is taken as missing value is: min( MVP + 1 / (Signal/Noise) , 1- MVP )
     MVP = 0.01
     expLength = nrow(experiment)
