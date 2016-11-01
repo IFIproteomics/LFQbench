@@ -4,7 +4,7 @@ library(readr)
 set.seed(1234)
 
 # For the simulator ===============================================================
-numReplicates = 9
+numReplicates = 3
 numProteinsSpecies = c(2000, 1500, 1000)
 peptidesPerProtein = c(3, 3, 3)
 species = c("HUMAN", "YEAST", "ECOLI")
@@ -13,8 +13,9 @@ stdDevRatios = c(0.001, 0.001, 0.001)
 proteinAbundanceDistribution = c(6.0, 1.5)
 stdDeviationFactorMS = 0.03
 BackgroundSignalLevel = 0.2 #2^14
-MissingValuesFactor = 0.0
-SignalNoiseFactor = 1.5 # 5.0
+NMARFactor = 0.05 # Not Missing at Random missing values factor
+MARFactor = 0.01 # Missing at Random missing values factor
+ProteinAbundanceErrorFactor = 1.5 # 5.0
 # General LFQbench settings =======================================================
 srcDir = "ext/simulations/simulator"
 expFile = "test_PeptideSummary.tsv"
@@ -31,17 +32,21 @@ speciesTags = list(HUMAN = "_HUMAN", YEAST = "_YEAS", ECOLI = "_ECOLI")
 
 # =================================================================================
 
-mySimExp <- FSWE.simExperiment(numReplicates = numReplicates,  
-                   numProteinsSpecies = numProteinsSpecies, 
-                   species = species, 
-                   speciesRatios = speciesRatios, 
-                   stdDevRatios = stdDevRatios, 
-                   peptidesPerProtein = peptidesPerProtein, 
-                   proteinAbundanceDistribution = proteinAbundanceDistribution,
-                   stdDeviationFactorMS = stdDeviationFactorMS,
-                   BackgroundSignalLevel = BackgroundSignalLevel,
-                   MissingValuesFactor = MissingValuesFactor,
-                   SignalNoiseFactor = SignalNoiseFactor)
+
+
+
+mySimExp <- FSWE.simExperiment(numReplicates = numReplicates, 
+                               species = species, 
+                               speciesRatios = speciesRatios, 
+                               stdDevRatios = stdDevRatios, 
+                               numProteinsSpecies = numProteinsSpecies, 
+                               peptidesPerProtein = peptidesPerProtein, 
+                               proteinAbundanceDistribution = proteinAbundanceDistribution,
+                               stdDeviationFactorMS = stdDeviationFactorMS,
+                               BackgroundSignalLevel = BackgroundSignalLevel,
+                               NMARFactor = NMARFactor,
+                               MARFactor = MARFactor,
+                               ProteinAbundanceErrorFactor = ProteinAbundanceErrorFactor)
 
 #write.csv2(mySimExp, file = file.path(srcDir, expFile) , sep = "\t", na = "NA", row.names = F, col.names = T)
 
@@ -56,7 +61,7 @@ FSWE.addSoftwareConfiguration("test",
                               nastrings = "NA", 
                               protein_input = F, 
                               quantitative.var = "quant",
-                              quantitative.var.tag = "quant", 
+                              quantitative.var.tag = "^quant", 
                               protein.var = "protein", 
                               sequence.mod.var = "peptide", 
                               charge.var = "charge")
@@ -64,9 +69,11 @@ FSWE.switchSoftwareConfiguration("test")
 
 LFQbench.setDataRootFolder( srcDir, createSubfolders = T )
 
+
+
 FSWE.generateReports(experimentFile = expFile, 
                      plotHistogram = T, 
-                     plotHistNAs = F, 
+                     plotHistNAs = T, 
                      reportSequences = F, 
                      keep_original_names = T)
 

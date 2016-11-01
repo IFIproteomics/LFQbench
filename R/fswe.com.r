@@ -260,9 +260,10 @@ getPeptideIntensities <- function(peptidesProtein, AbsoluteIntensityProtein){
 #' @param peptidesPerProtein vector with the average number of peptides per protein simulated. Example: peptidesPerProtein = c(10, 8, 5)
 #' @param proteinAbundanceDistribution vector containing mean and sd values defining the protein distribution intensities desired. Example: proteinAbundanceDistribution = c(10.0, 5.0) 
 #' @param stdDeviationFactorMS standard deviation factor (0 to 1) due to MS. Example: stdDeviationFactorMS = 0.03
-#' @param BackgroundSignalLevel 
-#' @param MissingValuesFactor factor of missing values in the experiment. They are intensity-dependant.
-#' @param SignalNoiseFactor 
+#' @param BackgroundSignalLevel A threshold value limiting the signal. Every peptide signal estimated under this will be transformed to NA. 
+#' @param NMARFactor factor of Not Missing At Random missing values in the experiment. They are intensity-dependant!
+#' @param MARFactor factor of Missing At Random missing values in the experiment. Taken from a uniform distribution.
+#' @param ProteinAbundanceErrorFactor error factor applied to the protein abundance. 
 #' @export
 FSWE.simExperiment <- function(numReplicates, 
                                species, 
@@ -273,8 +274,9 @@ FSWE.simExperiment <- function(numReplicates,
                                proteinAbundanceDistribution,
                                stdDeviationFactorMS,
                                BackgroundSignalLevel,
-                               MissingValuesFactor,
-                               SignalNoiseFactor){
+                               NMARFactor,
+                               MARFactor,
+                               ProteinAbundanceErrorFactor){
     
     pepsProtein = numeric()
     proteinKeys = character()
@@ -332,7 +334,7 @@ FSWE.simExperiment <- function(numReplicates,
         
         # add random values (normal distributed) to all replicates, regardless the intensity
         rndMean = 0
-        rndSD = (2 ^ abs(proteinAbundanceDistribution[1] - proteinAbundanceDistribution[2])) * SignalNoiseFactor 
+        rndSD = (2 ^ abs(proteinAbundanceDistribution[1] - proteinAbundanceDistribution[2])) * ProteinAbundanceErrorFactor 
         for(rep in 1:numReplicates){
             rndNoiseA = rnorm(length(AInt), mean = rndMean, sd = rndSD)
             rndNoiseB = rnorm(length(BInt), mean = rndMean, sd = rndSD)
@@ -354,12 +356,20 @@ FSWE.simExperiment <- function(numReplicates,
     numericCols <- sapply(experiment, is.numeric)
     keyCols <- names(numericCols[numericCols == FALSE])
     numericCols <- names(numericCols[numericCols == TRUE])
+
+    # Add text columns to classify missing values
+    for(repl in numericCols){
+        varname <- paste0("MissingValue.", repl)
+        experiment <- experiment %>% mutate(tempname = "")
+        colnames(experiment)[grep("tempname", colnames(experiment))] <- varname
+    }
     
-    # We entry missing not at random values (MNAR) to each of the replicates: a total of length(replicate) * MissingValuesFactor
-    # The probobility a peptide (peak) is taken as missing value is: min( MVP + 1 / (Signal/Noise) , 1- MVP )
+        
+    # We entry missing not at random values (MNAR) to each of the replicates: a total of length(replicate) * NMARFactor
+    # The probability a peptide (peak) is taken as missing value is: min( MVP + 1 / (Signal/Noise) , 1- MVP )
     MVP = 0.01
     expLength = nrow(experiment)
-    numNAsPerReplicate = as.integer(expLength * MissingValuesFactor)
+    numNAsPerReplicate = as.integer(expLength * NMARFactor)
     for(repl in numericCols){
         # repl = numericCols[1]
         currRepl = experiment[, repl]
@@ -369,13 +379,27 @@ FSWE.simExperiment <- function(numReplicates,
         
         naList <- sample.int(n = expLength, size = numNAsPerReplicate, replace = F, prob = experiment_tmp$MVprob)
         experiment[naList, repl] <- NA
+        varname <- paste0("MissingValue.", repl)
+        experiment[naList, varname] <- "NMAR"
         
     }
+
     
+    # We entry missing at random values (MAR) to each of the replicates: a total of length(replicate) * MARFactor
+    # The probability a peptide (peak) is taken as missing value is: min( MVP + 1 / (Signal/Noise) , 1- MVP )
+    MVP = 0.01
+    expLength = nrow(experiment)
+    numMARPerReplicate = as.integer(expLength * MARFactor)
+    for(repl in numericCols){
+        naList <- sample.int(n = expLength, size = numMARPerReplicate, replace = F)
+        experiment[naList, repl] <- NA
+        varname <- paste0("MissingValue.", repl)
+        experiment[naList, varname] <- "MAR"
+    }
+
     experiment[experiment < BackgroundSignalLevel ] = NA
     
     experiment$charge = 2
-    
     
     return(experiment) 
 }
