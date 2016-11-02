@@ -366,16 +366,19 @@ FSWE.simExperiment <- function(numReplicates,
     
         
     # We entry missing not at random values (MNAR) to each of the replicates: a total of length(replicate) * NMARFactor
-    # The probability a peptide (peak) is taken as missing value is: min( MVP + 1 / (Signal/Noise) , 1- MVP )
-    MVP = 0.01
+    # The probability a peptide (peak) is taken as missing value is: max( 1 - (( log(currRepl) - minSignalExp)/(maxSignalExp - minSignalExp)) , MVP )
+    MVP = 0.001
     expLength = nrow(experiment)
     numNAsPerReplicate = as.integer(expLength * NMARFactor)
+    
     for(repl in numericCols){
         # repl = numericCols[1]
+        maxSignalExp = log( max(experiment[, repl]) )
+        minSignalExp = log( min( experiment[experiment[, repl] > 0, repl]  ) )
         currRepl = experiment[, repl]
         experiment_tmp <- experiment %>%
-                        mutate(MVprob = 1/(currRepl/BackgroundSignalLevel)) %>% rowwise() %>%
-                        mutate(MVprob = MVP + min(MVprob, 1-MVP)) %>% ungroup()
+                        mutate(MVprob = 1 - (( log(currRepl) - minSignalExp)/(maxSignalExp - minSignalExp)) ) %>% rowwise() %>%
+                        mutate(MVprob = max(MVprob, MVP)) %>% ungroup()
         
         naList <- sample.int(n = expLength, size = numNAsPerReplicate, replace = F, prob = experiment_tmp$MVprob)
         experiment[naList, repl] <- NA
@@ -386,7 +389,7 @@ FSWE.simExperiment <- function(numReplicates,
 
     
     # We entry missing at random values (MAR) to each of the replicates: a total of length(replicate) * MARFactor
-    # The probability a peptide (peak) is taken as missing value is: min( MVP + 1 / (Signal/Noise) , 1- MVP )
+    # The probability a peptide (peak) is taken as missing value is uniform for all peptides.
     MVP = 0.01
     expLength = nrow(experiment)
     numMARPerReplicate = as.integer(expLength * MARFactor)

@@ -5,8 +5,9 @@
 \title{FSWE.simExperiment}
 \usage{
 FSWE.simExperiment(numReplicates, species, speciesRatios, stdDevRatios,
-  numProteinsSpecies, peptidesPerProtein, intDistribution, stdDeviationFactorMS,
-  BackgroundSignalLevel, MissingValuesFactor, SignalNoiseFactor)
+  numProteinsSpecies, peptidesPerProtein, proteinAbundanceDistribution,
+  stdDeviationFactorMS, BackgroundSignalLevel, NMARFactor, MARFactor,
+  ProteinAbundanceErrorFactor)
 }
 \arguments{
 \item{numReplicates}{number of replicates of the experiment (same number for samples A and B)}
@@ -21,11 +22,17 @@ FSWE.simExperiment(numReplicates, species, speciesRatios, stdDevRatios,
 
 \item{peptidesPerProtein}{vector with the average number of peptides per protein simulated. Example: peptidesPerProtein = c(10, 8, 5)}
 
-\item{intDistribution}{vector containing mean and sd values defining the protein distribution intensities desired. Example: intDistribution = c(10.0, 5.0)}
+\item{proteinAbundanceDistribution}{vector containing mean and sd values defining the protein distribution intensities desired. Example: proteinAbundanceDistribution = c(10.0, 5.0)}
 
 \item{stdDeviationFactorMS}{standard deviation factor (0 to 1) due to MS. Example: stdDeviationFactorMS = 0.03}
 
-\item{MissingValuesFactor}{factor of missing values in the experiment. They are intensity-dependant.}
+\item{BackgroundSignalLevel}{A threshold value limiting the signal. Every peptide signal estimated under this will be transformed to NA.}
+
+\item{NMARFactor}{factor of Not Missing At Random missing values in the experiment. They are intensity-dependant!}
+
+\item{MARFactor}{factor of Missing At Random missing values in the experiment. Taken from a uniform distribution.}
+
+\item{ProteinAbundanceErrorFactor}{error factor applied to the protein abundance.}
 }
 \description{
 This function simulates a complete experiment that can be read by FSWE.
