@@ -340,9 +340,10 @@ FSWE.simExperiment <- function(numReplicates,
             rndNoiseB = rnorm(length(BInt), mean = rndMean, sd = rndSD)
             dfA[, rep] = dfA[, rep] + rndNoiseA
             dfB[, rep] = dfB[, rep] + rndNoiseB
-            dfA[ dfA < BackgroundSignalLevel] = 0.0  # This is necessary to avoid negative probabilities at NMAR simmulation.
-            dfB[ dfB < BackgroundSignalLevel] = 0.0
-            
+            dfA[ dfA <= 0] = 0.01  # This is necessary to avoid negative probabilities at NMAR simulation.
+            dfB[ dfB <= 0] = 0.01
+            dfA[ is.na(dfA)] = 0.01
+            dfB[ is.na(dfB)] = 0.01
         }
         
         df = cbind(peptideKeys, proteinKeys, speciesKeys, dfA, dfB)
@@ -373,8 +374,8 @@ FSWE.simExperiment <- function(numReplicates,
     
     for(repl in numericCols){
         # repl = numericCols[1]
-        maxSignalExp = log( max(experiment[, repl]) )
-        minSignalExp = log( min( experiment[experiment[, repl] > 0, repl]  ) )
+        maxSignalExp = log( max(experiment[, repl], na.rm=T) )
+        minSignalExp = log( min( experiment[experiment[, repl] > 0, repl], na.rm = T  ) )
         currRepl = experiment[, repl]
         experiment_tmp <- experiment %>%
                         mutate(MVprob = 1 - (( log(currRepl) - minSignalExp)/(maxSignalExp - minSignalExp)) ) %>% rowwise() %>%
@@ -384,7 +385,6 @@ FSWE.simExperiment <- function(numReplicates,
         experiment[naList, repl] <- NA
         varname <- paste0("MissingValue.", repl)
         experiment[naList, varname] <- "NMAR"
-        
     }
 
     
@@ -400,8 +400,14 @@ FSWE.simExperiment <- function(numReplicates,
         experiment[naList, varname] <- "MAR"
     }
 
-    experiment[experiment < BackgroundSignalLevel ] = NA
-    
+    # Replace values under BackgroundSignalLevel by NA
+    for(repl in numericCols){
+        underBG <- experiment[,repl] < BackgroundSignalLevel & !is.na(experiment[,repl] )
+        experiment[underBG, repl] <- NA  
+        varname <- paste0("MissingValue.", repl)
+        experiment[underBG, varname] <- "under BackgroundSignalLevel"   
+    }
+
     experiment$charge = 2
     
     return(experiment) 
