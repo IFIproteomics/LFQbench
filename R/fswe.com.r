@@ -264,6 +264,7 @@ getPeptideIntensities <- function(peptidesProtein, AbsoluteIntensityProtein){
 #' @param NMARFactor factor of Not Missing At Random missing values in the experiment. They are intensity-dependant!
 #' @param MARFactor factor of Missing At Random missing values in the experiment. Taken from a uniform distribution.
 #' @param ProteinAbundanceErrorFactor error factor applied to the protein abundance. 
+#' @param weibullShape shape of the Weibull distribution used to model the probabilities peptides being selected as NMAR value. 
 #' @export
 FSWE.simExperiment <- function(numReplicates, 
                                species, 
@@ -276,7 +277,8 @@ FSWE.simExperiment <- function(numReplicates,
                                BackgroundSignalLevel,
                                NMARFactor,
                                MARFactor,
-                               ProteinAbundanceErrorFactor){
+                               ProteinAbundanceErrorFactor,
+                               weibullShape = 0.5){
     
     pepsProtein = numeric()
     proteinKeys = character()
@@ -367,8 +369,10 @@ FSWE.simExperiment <- function(numReplicates,
     
         
     # We entry missing not at random values (MNAR) to each of the replicates: a total of length(replicate) * NMARFactor
-    # The probability a peptide (peak) is taken as missing value is: max( 1 - (( log(currRepl) - minSignalExp)/(maxSignalExp - minSignalExp)) , MVP )
-    MVP = 0.001
+    # The probability a peptide (peak) is taken as missing value follows a weibull distribution scaled to the highest signal detected 
+    # and shape given by a user parameter
+    
+    # MVP = 0.001
     expLength = nrow(experiment)
     numNAsPerReplicate = as.integer(expLength * NMARFactor)
     
@@ -378,8 +382,16 @@ FSWE.simExperiment <- function(numReplicates,
         minSignalExp = log( min( experiment[experiment[, repl] > 0, repl], na.rm = T  ) )
         currRepl = experiment[, repl]
         experiment_tmp <- experiment %>%
-                        mutate(MVprob = 1 - (( log(currRepl) - minSignalExp)/(maxSignalExp - minSignalExp)) ) %>% rowwise() %>%
-                        mutate(MVprob = max(MVprob, MVP)) %>% ungroup()
+                        mutate(MVprob = dweibull(experiment[, repl], shape = weibullShape, scale = maxSignalExp)) %>%
+                        # mutate(MVprob = 1 - (( log(currRepl) - minSignalExp)/(maxSignalExp - minSignalExp)) ) %>% 
+                        rowwise() %>%
+                        # mutate(MVprob = max(MVprob, MVP)) %>% 
+                        ungroup()
+        
+        #scale probabilities 
+        maxProb <- max(experiment_tmp$MVprob, na.rm = T)
+        minProb <- min(experiment_tmp$MVprob, na.rm = T)
+        experiment_tmp <- experiment_tmp %>% mutate(MVprob = (MVprob - minProb) / (maxProb - minProb) )
         
         naList <- sample.int(n = expLength, size = numNAsPerReplicate, replace = F, prob = experiment_tmp$MVprob)
         experiment[naList, repl] <- NA
@@ -388,9 +400,10 @@ FSWE.simExperiment <- function(numReplicates,
     }
 
     
+    
     # We entry missing at random values (MAR) to each of the replicates: a total of length(replicate) * MARFactor
     # The probability a peptide (peak) is taken as missing value is uniform for all peptides.
-    MVP = 0.01
+    
     expLength = nrow(experiment)
     numMARPerReplicate = as.integer(expLength * MARFactor)
     for(repl in numericCols){

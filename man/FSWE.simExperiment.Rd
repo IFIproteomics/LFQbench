@@ -7,7 +7,7 @@
 FSWE.simExperiment(numReplicates, species, speciesRatios, stdDevRatios,
   numProteinsSpecies, peptidesPerProtein, proteinAbundanceDistribution,
   stdDeviationFactorMS, BackgroundSignalLevel, NMARFactor, MARFactor,
-  ProteinAbundanceErrorFactor)
+  ProteinAbundanceErrorFactor, weibullShape = 0.5)
 }
 \arguments{
 \item{numReplicates}{number of replicates of the experiment (same number for samples A and B)}
@@ -33,6 +33,8 @@ FSWE.simExperiment(numReplicates, species, speciesRatios, stdDevRatios,
 \item{MARFactor}{factor of Missing At Random missing values in the experiment. Taken from a uniform distribution.}
 
 \item{ProteinAbundanceErrorFactor}{error factor applied to the protein abundance.}
+
+\item{weibullShape}{shape of the Weibull distribution used to model the probabilities peptides being selected as NMAR value.}
 }
 \description{
 This function simulates a complete experiment that can be read by FSWE.
