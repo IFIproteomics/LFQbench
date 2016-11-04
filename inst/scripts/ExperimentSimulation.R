@@ -15,6 +15,7 @@ stdDeviationFactorMS = 0.03
 BackgroundSignalLevel = 0.2 #2^14
 NMARFactor = 0.05 # Not Missing at Random missing values factor
 MARFactor = 0.01 # Missing at Random missing values factor
+weibullShape = 0.5
 ProteinAbundanceErrorFactor = 1.5 # 5.0
 # General LFQbench settings =======================================================
 srcDir = "ext/simulations/simulator"
@@ -46,7 +47,15 @@ mySimExp <- FSWE.simExperiment(numReplicates = numReplicates,
                                BackgroundSignalLevel = BackgroundSignalLevel,
                                NMARFactor = NMARFactor,
                                MARFactor = MARFactor,
-                               ProteinAbundanceErrorFactor = ProteinAbundanceErrorFactor)
+                               ProteinAbundanceErrorFactor = ProteinAbundanceErrorFactor,
+                               weibullShape = weibullShape)
+
+
+# exp.complete <- t(mySimExp[complete.cases(mySimExp[,4:9]), 4:9]) 
+# exp.dist <- dist(exp.complete)
+# exp.clusters <- hclust(exp.dist)
+# plot(exp.clusters)
+# cutree(exp.clusters, 2)
 
 #write.csv2(mySimExp, file = file.path(srcDir, expFile) , sep = "\t", na = "NA", row.names = F, col.names = T)
 
