@@ -1,15 +1,14 @@
 # changes to native R support in Travis CI
 
 language: R
-cache: packages
-sudo: false
+
+sudo: true
 
 os:
 - linux
-- osx
 
 r:
-- release
-- oldrelease
-- devel
+- 3.1
+
+
 
