@@ -1,23 +1,15 @@
-#Sample .travis.yml for R projects from https://github.com/craigcitro/r-travis
+# changes to native R support in Travis CI
 
-sudo: required
-sudo: true
-language: c
+language: R
+cache: packages
+sudo: false
 
-before_install:
-  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-  - chmod 755 ./travis-tool.sh
-  - ./travis-tool.sh bootstrap
+os:
+- linux
+- osx
 
-install:
-  - ./travis-tool.sh install_deps
+r:
+- release
+- oldrelease
+- devel
 
-script: ./travis-tool.sh run_tests
-
-on_failure:
-  - ./travis-tool.sh dump_logs
-
-notifications:
-  email:
-    on_success: change
-    on_failure: change
