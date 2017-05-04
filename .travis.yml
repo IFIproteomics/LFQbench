@@ -2,8 +2,6 @@
 
 language: R
 
-sudo: true
-
 os:
 - linux
 
