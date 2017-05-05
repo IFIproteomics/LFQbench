@@ -1,12 +1,15 @@
 # changes to native R support in Travis CI
 
-language: R
+os: linux
+language: r
+r: 3.1
 
-os:
-- linux
+sudo: required
+warnings_are_errors: false
+cran: http://cran.rstudio.com
+cache: packages
 
-r:
-- 3.2
-
-
-
+notifications:
+  email:
+    on_success: change
+    on_failure: change
