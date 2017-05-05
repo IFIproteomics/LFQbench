@@ -1,8 +1,8 @@
 # changes to native R support in Travis CI
 
-os: linux
+os: osx
 language: r
-r: 3.2
+r: 3.2.4
 
 sudo: false
 warnings_are_errors: false
