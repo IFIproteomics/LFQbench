@@ -2,14 +2,31 @@
 
 os: linux
 language: r
-r: 3.1
+r: 3.2
 
-sudo: required
+sudo: false
 warnings_are_errors: false
 cran: http://cran.rstudio.com
 cache: packages
 
-notifications:
-  email:
-    on_success: change
-    on_failure: change
+r_packages:
+    - hash
+    - SDMTools,
+    - RColorBrewer
+    - dplyr
+    - tidyr
+    - ggplot2
+    - readxl
+    - classInt
+    - scales
+    - pander
+    - GGally
+    - tools
+    - readr
+    - devtools
+    - RUnit
+
+# notifications:
+#   email:
+#    on_success: change
+#    on_failure: change
