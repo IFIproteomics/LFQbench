@@ -1,0 +1,32 @@
+# changes to native R support in Travis CI
+
+os: osx
+language: r
+r: 3.2.4
+
+sudo: false
+warnings_are_errors: false
+cran: http://cran.rstudio.com
+cache: packages
+
+r_packages:
+    - hash
+    - SDMTools,
+    - RColorBrewer
+    - dplyr
+    - tidyr
+    - ggplot2
+    - readxl
+    - classInt
+    - scales
+    - pander
+    - GGally
+    - tools
+    - readr
+    - devtools
+    - RUnit
+
+# notifications:
+#   email:
+#    on_success: change
+#    on_failure: change

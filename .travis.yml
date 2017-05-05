@@ -1,32 +1,23 @@
-# changes to native R support in Travis CI
+#Sample .travis.yml for R projects from https://github.com/craigcitro/r-travis
 
-os: osx
-language: r
-r: 3.2.4
+sudo: required
+sudo: true
+language: c
 
-sudo: false
-warnings_are_errors: false
-cran: http://cran.rstudio.com
-cache: packages
+before_install:
+  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
+  - chmod 755 ./travis-tool.sh
+  - ./travis-tool.sh bootstrap
 
-r_packages:
-    - hash
-    - SDMTools,
-    - RColorBrewer
-    - dplyr
-    - tidyr
-    - ggplot2
-    - readxl
-    - classInt
-    - scales
-    - pander
-    - GGally
-    - tools
-    - readr
-    - devtools
-    - RUnit
+install:
+  - ./travis-tool.sh install_deps
 
-# notifications:
-#   email:
-#    on_success: change
-#    on_failure: change
+script: ./travis-tool.sh run_tests
+
+on_failure:
+  - ./travis-tool.sh dump_logs
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
