@@ -131,21 +131,62 @@ LFQbench.showMetrics = function(m){
   cat("\n")
 }
 
+#' getFileExt
+#' 
+#' generate appropriate file extension for a column separator: 
+#' csv for ',' or ';'
+#' tsv for '\t'
+#' txt for anything else
+#' 
+#' @param colSep column separator character
+#' @return a file extension csv/tsv/txt without '.'
+#' @export
+getFileExt = function(colSep)
+{
+    if(colSep==',' || colSep==';') return("csv")
+    if(colSep=="\t") return("tsv")
+    return("txt")
+}
+
+#' fixFileExt
+#' 
+#' fix the given file name by applying an appropriate file extension
+#' that is guessed by column separator character provided
+#' the new file extension will be
+#' csv for ',' or ';'
+#' tsv for '\t'
+#' txt for anything else
+#' 
+#' @param file file name or path
+#' @param sep column separator character
+#' @return fixed file name or path
+#' @export
+fixFileExt=function(file, sep)
+{
+    # remove current extension
+    fileBase = gsub("\\.(.sv|txt)$","", file, ignore.case = T)
+    # find appropriate extension
+    ext = getFileExt(sep)
+    # apply new extension
+    resFile = paste(fileBase, ext, sep=".")
+    return(resFile)
+}
+
 #' logIdStatistics
 #' 
 #' store identification statistics from a list of result sets
 #' 
 #' @param resultSets the result sets
 #' @param csvFile the delimiter separated output file
-logIdStatistics = function( resultSets, csvFile=paste(LFQbench.Config$LogFilesLocation,"/identification_statistics.csv",sep="") ){
+logIdStatistics = function( resultSets, csvFile=paste(LFQbench.Config$LogFilesLocation,"identification_statistics.csv",sep="/") ){
   cat("storing identification statistics ... ")
   idstats = t( sapply( resultSets, function(rs) rs$idstat ) )
   sums = rowSums(idstats)
   labs = sapply( resultSets, function(rs) rs$docSet$fileBase )
   write.table(
       data.frame( "name"=labs, idstats, "sum"=sums ),
-      file=csvFile, 
-      sep=LFQbench.Config$CsvColumnSeparator, 
+      file=fixFileExt(csvFile, LFQbench.Config$CsvColumnSeparator), 
+      sep=LFQbench.Config$CsvColumnSeparator,
       row.names=F, col.names=T
       )
   cat("[done]\n")
