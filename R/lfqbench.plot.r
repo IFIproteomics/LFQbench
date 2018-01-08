@@ -31,6 +31,22 @@ getQCFunction = function( ratios, ensureValueRange=c(0, 1) )
 ################################################################################
 
 ################################################################################
+#' expandRange
+#' expand a range by a relative factor.
+#' @param r the range as a vector of two numbers in increasing order
+#' @param f the ralative expansion factor, e.g. 
+#'          f=0 will not affect the original range,
+#'          f=0.2 will expand the range by 20%, t.m. 10% to each side
+#' @export
+expandRange = function(r=c(0,1), f=0)
+{
+    margin = abs(r[2] - r[1]) * f / 2
+    res = r + c(-margin, margin)
+    return(res)
+}
+################################################################################
+
+################################################################################
 #' emptyPlot
 #' show an empty plot with the plotting area in given ranges
 #' x/y-Axes are plotted on the bottom/left side with given line width
@@ -43,9 +59,12 @@ getQCFunction = function( ratios, ensureValueRange=c(0, 1) )
 #' @param showYlab=T
 #' @param axes=T
 #' @param cex.axis=1
+#' @param plotAreaExpansionFactor=0.02 # this will expand the diplayed plot area by 1% to each side
 #' @export
-emptyPlot = function(xRange=c(0,1), yRange=c(0,1), lwd=1, grid=T, showXlab=T, showYlab=T, axes=T, cex.axis=1, at.x = NULL, at.y = NULL)
+emptyPlot = function(xRange=c(0,1), yRange=c(0,1), lwd=1, grid=T, showXlab=T, showYlab=T, axes=T, cex.axis=1, at.x = NULL, at.y = NULL, plotAreaExpansionFactor=0.02)
 {
+    xRange = expandRange(xRange, plotAreaExpansionFactor)
+    yRange = expandRange(yRange, plotAreaExpansionFactor)
 	plot( 0, 0, xlim=xRange, ylim=yRange, type="n", axes=F, xlab="", ylab="", main="" )
 	if(axes) addAxes(lwd, showXlab, showYlab, cex.axis=cex.axis, at.x = at.x, at.y = at.y)
 	if(grid) grid()
