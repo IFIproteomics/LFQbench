@@ -332,7 +332,7 @@ FSWE.generateReports <- function(
   }
   
   attr(peptides_wide, "vars") <- NULL
-  peptides_wide <- peptides_wide %>% select(-sequence) 
+  peptides_wide <- peptides_wide %>% ungroup() %>% select(-sequence) 
   # Remove "empty" peptides (all values are NAs).
   common_names <- !sapply(peptides_wide, is.numeric)
   nums <- sapply(peptides_wide, is.numeric)
