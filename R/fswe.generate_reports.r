@@ -181,13 +181,8 @@ FSWE.generateReports <- function(
   
   # If there is a "decoy" column with boolean values, filter to no decoys
   if(!is.na(decoy.var)){
-      #Evaluate first how decoys are reported in the data matrix (numeric (0 or 1) or boolean (false or true))
-      is_decoytype_int = typeof(as.matrix(df[, decoy.var])) == "integer"
-      if(is_decoytype_int){
-          df <- df[tolower(df[[decoy.var]]) == 0,]
-      }else{
-          df <- df[tolower(df[[decoy.var]]) == "false",]    
-      }
+      df[[decoy.var]] = as.logical(df[[decoy.var]])
+      df <- df[df[[decoy.var]] == FALSE,]
   }
   
   # Attach species and remove peptides belonging to multiple species, and not considered species ("NA"s)
