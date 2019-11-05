@@ -41,9 +41,18 @@ LFQbench.processFile = function( file ) {
   if( length( speciesColumnIdx ) < 1 ) 
     stop("no ''species'' column found.")
   
+  if(LFQbench.Config$BackgroundSpeciesName %in% unique(csvDat[, speciesColumnIdx]) == FALSE)
+    stop(paste0("The backgroud species (", LFQbench.Config$BackgroundSpeciesName, ") is not present in this dataset!"))
+   
   # 1.0 * is a work-around to force the amounts matrix to numeric class
   csvAmounts = 1.0 * as.matrix( csvDat[, numericColumnIdx] )
   csvSpecies = as.vector( csvDat[, speciesColumnIdx[[1]]] )  
+  
+  if(length(which(csvSpecies == LFQbench.Config$BackgroundSpeciesName)) < 20)
+    stop(paste0("Too few elements of the backgroud species (", LFQbench.Config$BackgroundSpeciesName, ") are present in this dataset!"))
+  
+  
+  
   rm( csvDat )
   ################################################################################
   
