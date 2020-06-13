@@ -9,6 +9,10 @@ LFQbench<sup>[1]</sup> is an open source [R package](https://github.com/IFIprote
 
 LFQbench calculates and represents graphically a set of qualitative and quantitative performance metrics like identification rates,  precision and accuracy of quantification, providing developers and end-users with a standardized set of reports to enable an in-depth performance evaluation of their software and analysis platforms.
 
+#### Acknoledgement
+
+We acknowledge to Jeremy Van der War, author of SDMTools R package, which is no longer maintained. The function auc (area under the curve) has been taken from SDMTools (under GPL license).
+
 ### Installation  
 
 First, we need to install `devtools`:  
