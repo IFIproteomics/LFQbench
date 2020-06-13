@@ -8,8 +8,11 @@ x/y-Axes are plotted on the bottom/left side with given line width
 grid can be switched off}
 \usage{
 emptyPlot(xRange = c(0, 1), yRange = c(0, 1), lwd = 1, grid = T,
-  showXlab = T, showYlab = T, axes = T, cex.axis = 1, at.x = NULL,
-  at.y = NULL)
+  showXlab = T, showYlab = T, axes = T, cex.axis = 1,
+  at.x = NULL, at.y = NULL, plotAreaExpansionFactor = 0.02)
+}
+\arguments{
+\item{plotAreaExpansionFactor=0.02}{# this will expand the diplayed plot area by 1% to each side}
 }
 \description{
 emptyPlot
@@ -17,4 +20,3 @@ show an empty plot with the plotting area in given ranges
 x/y-Axes are plotted on the bottom/left side with given line width
 grid can be switched off
 }
-
