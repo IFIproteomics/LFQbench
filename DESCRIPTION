@@ -3,12 +3,13 @@ Title: Label Free Quantitation benchmark package
 Version: 1.0.0
 Author: Jorg Kuharev, Pedro Navarro, Yasset Perez-Riverol
 Maintainer: Jorg Kuharev <kuharev@uni-mainz.de>,
-    Pedro Navarro <pnavarro@uni-mainz.de>,
+    Pedro Navarro <mesontau@gmail.com>,
     Yasset Perez-Riverol <yperez@ebi.ac.uk>
 Description: The package LFQbench comprises functions to compare different Label
     Free Quantitation pipelines and softwares in proteomics.
+    We acknowledge to Jeremy VanDerWal for the function to estimate the area under the curve. 
 Depends:
-    R (>= 4.0.1),hash,SDMTools (>= 1.1.0),RColorBrewer (>= 1.1.0),
+    R (>= 3.6.1),hash,RColorBrewer (>= 1.1.0),
     dplyr,tidyr,ggplot2,readxl,classInt,
     scales,pander,GGally,tools (>= 3.1.0),readr
 Imports:
@@ -23,4 +24,4 @@ License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 URL: https://github.com/IFIproteomics/LFQbench
 BugReports: https://github.com/IFIproteomics/LFQbench/issues
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 6.1.1
