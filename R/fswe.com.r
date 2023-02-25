@@ -27,6 +27,13 @@ guessSoftwareSource <- function(filename, software_sources, allowNA = FALSE){
             "Review file names: they should start by the software source!",
             "File: ", filename)
     )
+  } else if (length(softsource) > 1) {
+    stop(
+        paste0(
+            "There are more than one software source after guessing: ",
+            softsource,
+            "Avoid software with the same lowercase prefix!")
+    )
   }
   return(softsource)    
 }
